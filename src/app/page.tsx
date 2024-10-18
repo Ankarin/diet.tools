@@ -32,7 +32,7 @@ function HeroTitles() {
           staggerChildren: 0.2,
         }}
       >
-        {["Body", "composition", "calculator", ""].map((text, index) => (
+        {["Body ", "composition ", "calculator"].map((text, index) => (
           <motion.span
             key={index}
             className="inline-block px-1 md:px-2 text-balance font-bold"
@@ -102,9 +102,7 @@ export default function BodyCompositionCalculator() {
             href="/?step=1"
             className="flex justify-start items-center hover:opacity-85 transition-opacity duration-300"
           >
-            <h1 className="font-bold text-xl">
-              {"//"}Body composition calculator
-            </h1>
+            <h1 className="font-bold text-xl">Body composition calculator</h1>
           </Link>
         </div>
       </header>
