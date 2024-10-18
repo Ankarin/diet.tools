@@ -1,107 +1,152 @@
-"use client";
-
-import { TrendingUp } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+  calculateBodyComposition,
+  BodyCompositionData,
+  CalculationResults,
+} from "./calculations";
 
-export const description = "A stacked area chart";
+interface ResultsProps {
+  data: BodyCompositionData;
+}
 
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-];
+const metricUnits = {
+  bmi: "kg/m²",
+  weight: "kg",
+  fatPercentage: "%",
+  fatMass: "kg",
+  leanMass: "kg",
+  activeCellMass: "kg",
+  totalBodyWater: "L",
+  extracellularWater: "L",
+  intracellularWater: "L",
+  basalMetabolicRate: "kcal/day",
+};
 
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
-  },
-} satisfies ChartConfig;
+const imperialUnits = {
+  bmi: "lb/in²",
+  weight: "lb",
+  fatPercentage: "%",
+  fatMass: "lb",
+  leanMass: "lb",
+  activeCellMass: "lb",
+  totalBodyWater: "fl oz",
+  extracellularWater: "fl oz",
+  intracellularWater: "fl oz",
+  basalMetabolicRate: "kcal/day",
+};
 
-export default function Results() {
+const formatLabel = (key: string): string => {
+  return key
+    .split(/(?=[A-Z])/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+const convertToImperial = (value: number, unit: string): number => {
+  switch (unit) {
+    case "kg":
+    case "lb":
+      return value * 2.20462;
+    case "L":
+    case "fl oz":
+      return value * 33.814;
+    default:
+      return value;
+  }
+};
+
+export default function Results({ data }: ResultsProps) {
+  if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
+    return (
+      <Card className="w-full max-w-4xl mx-auto mt-8">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Error</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            Invalid or missing data. Please ensure all required fields are
+            filled out correctly.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  let results: CalculationResults;
+  try {
+    results = calculateBodyComposition(data);
+  } catch (error) {
+    console.error("Error calculating body composition:", error);
+    return (
+      <Card className="w-full max-w-4xl mx-auto mt-8">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Error</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            An error occurred while calculating body composition. Please check
+            your input data and try again.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const units = data.unit === "metric" ? metricUnits : imperialUnits;
+
   return (
-    <Card>
+    <Card className="w-full max-w-4xl mx-auto mt-8">
       <CardHeader>
-        <CardTitle>Area Chart - Stacked</CardTitle>
-        <CardDescription>
-          Showing total visitors for the last 6 months
-        </CardDescription>
+        <CardTitle className="text-2xl font-bold">Results</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <AreaChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="dot" />}
-            />
-            <Area
-              dataKey="mobile"
-              type="natural"
-              fill="var(--color-mobile)"
-              fillOpacity={0.4}
-              stroke="var(--color-mobile)"
-              stackId="a"
-            />
-            <Area
-              dataKey="desktop"
-              type="natural"
-              fill="var(--color-desktop)"
-              fillOpacity={0.4}
-              stroke="var(--color-desktop)"
-              stackId="a"
-            />
-          </AreaChart>
-        </ChartContainer>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-1/2">Metric</TableHead>
+              <TableHead className="w-1/2">Value</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {Object.entries(results).map(([key, value]) => {
+              if (key !== "gender") {
+                const displayValue =
+                  data.unit === "imperial" &&
+                  key !== "fatPercentage" &&
+                  key !== "basalMetabolicRate"
+                    ? convertToImperial(
+                        value as number,
+                        units[key as keyof typeof units],
+                      )
+                    : value;
+                return (
+                  <TableRow key={key}>
+                    <TableCell className="font-medium">
+                      {formatLabel(key)}
+                    </TableCell>
+                    <TableCell>
+                      {typeof displayValue === "number"
+                        ? displayValue.toFixed(2)
+                        : displayValue}
+                      {` ${units[key as keyof typeof units]}`}
+                    </TableCell>
+                  </TableRow>
+                );
+              }
+              return null;
+            })}
+          </TableBody>
+        </Table>
       </CardContent>
-      <CardFooter>
-        <div className="flex w-full items-start gap-2 text-sm">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="flex items-center gap-2 leading-none text-muted-foreground">
-              January - June 2024
-            </div>
-          </div>
-        </div>
-      </CardFooter>
     </Card>
   );
 }

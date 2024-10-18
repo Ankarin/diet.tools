@@ -1,3 +1,4 @@
+import Results from "@/app/form/results";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -392,6 +393,16 @@ export function NeckStep() {
         </RainbowButton>
       </div>
     </Step>
+  );
+}
+
+export function BodyCompositionStep() {
+  const { formData } = useFormStore();
+
+  return (
+    <motion.div initial="hidden" animate="visible" exit="hidden">
+      <Results data={formData} />
+    </motion.div>
   );
 }
 

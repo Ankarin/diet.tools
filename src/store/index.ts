@@ -28,18 +28,18 @@ type FormStore = {
 };
 
 export const useFormStore = create<FormStore>((set) => ({
-  currentStep: 9,
+  currentStep: 1,
   formData: {
     gender: "" as "male" | "female",
-    age: "25",
-    unit: "metric",
-    height: "176",
+    age: "",
+    unit: "" as "metric" | "imperial",
+    height: "",
     heightFeet: "",
     heightInches: "",
-    weight: "79",
-    waist: "83",
-    hip: "97",
-    neck: "42",
+    weight: "",
+    waist: "",
+    hip: "",
+    neck: "",
 
     activityLevel: "",
     dietaryRestrictions: [],

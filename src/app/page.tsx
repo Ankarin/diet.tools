@@ -1,8 +1,5 @@
 "use client";
 
-import { calculateBodyComposition } from "@/app/form/calculations";
-import Results from "@/app/form/results";
-import MetricBarChart from "@/app/metric-bart-chart";
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,13 +14,14 @@ import {
   WaistStep,
   HipStep,
   NeckStep,
+  BodyCompositionStep,
 } from "./step-components";
 
 const ease = [0.16, 1, 0.3, 1];
 
 function HeroTitles() {
   return (
-    <div className="flex w-full max-w-2xl flex-col space-y-4 overflow-hidden pt-8">
+    <div className="flex w-full max-w-3xl flex-col space-y-4 overflow-hidden pt-8">
       <motion.h1
         className="text-center text-4xl font-medium leading-tight text-foreground sm:text-5xl md:text-6xl"
         initial={{ filter: "blur(10px)", opacity: 0, y: 50 }}
@@ -84,7 +82,7 @@ export default function BodyCompositionCalculator() {
     <WaistStep key="waist" />,
     <HipStep key="hip" />,
     <NeckStep key="neck" />,
-    <ResultsStep key="results" />,
+    <BodyCompositionStep key="results" />,
   ];
 
   return (
@@ -95,12 +93,14 @@ export default function BodyCompositionCalculator() {
             href="/?step=1"
             className="flex justify-start items-center hover:opacity-85 transition-opacity duration-300"
           >
-            <span className="font-bold text-xl">{"//"}Bodycomposition</span>
+            <h1 className="font-bold text-xl">
+              {"//"}Body composition calculator
+            </h1>
           </Link>
         </div>
       </header>
       <main className="flex-grow flex items-center justify-center py-12 px-4">
-        <div className="w-full max-w-2xl">
+        <div className="w-full max-w-3xl">
           <HeroTitles />
           <form className="mt-12" onSubmit={(e) => e.preventDefault()}>
             <AnimatePresence mode="wait">
@@ -130,26 +130,10 @@ export default function BodyCompositionCalculator() {
       <footer className="py-6 md:py-0 border-t border-border/40">
         <div className="container flex flex-col items-center justify-center gap-4 md:h-24 md:flex-row">
           <p className="text-balance text-center text-sm leading-loose text-muted-foreground">
-            Bodycomposition 2024 © All rights reserved
+            Body composition calculator
           </p>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function ResultsStep() {
-  const { formData } = useFormStore();
-  const results = calculateBodyComposition(formData);
-
-  return (
-    <div
-    // variants={stepperVariants}
-    // initial="hidden"
-    // animate="visible"
-    // exit="hidden"
-    >
-      <Results results={results} />
     </div>
   );
 }
