@@ -1,3 +1,4 @@
+import ReactQueryProvider from "@/app/QueryProvider";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Inter } from "next/font/google";
@@ -20,10 +21,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className={`flex min-h-screen flex-col ${inter.className}`}>
-        <main className="grow">
+        <ReactQueryProvider>
           {children}
           <Analytics />
-        </main>
+        </ReactQueryProvider>
       </body>
     </html>
   );
