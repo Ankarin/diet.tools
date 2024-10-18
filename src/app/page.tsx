@@ -1,6 +1,8 @@
 "use client";
 
-import RainbowButton from "@/components/ui/rainbow-button";
+import { calculateBodyComposition } from "@/app/form/calculations";
+import Results from "@/app/form/results";
+import MetricBarChart from "@/app/metric-bart-chart";
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,12 +17,6 @@ import {
   WaistStep,
   HipStep,
   NeckStep,
-  ActivityLevelStep,
-  DietaryRestrictionsStep,
-  AllergiesStep,
-  HealthGoalsStep,
-  MealPreferencesStep,
-  CookingSkillStep,
 } from "./step-components";
 
 const ease = [0.16, 1, 0.3, 1];
@@ -63,10 +59,10 @@ const stepperVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease } },
 };
 
-export default function Hero2() {
+export default function BodyCompositionCalculator() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentStep, setCurrentStep, formData } = useFormStore();
+  const { currentStep, setCurrentStep } = useFormStore();
 
   useEffect(() => {
     const step = searchParams.get("step");
@@ -79,11 +75,6 @@ export default function Hero2() {
     router.replace(`?step=${currentStep}`, { scroll: false });
   }, [currentStep, router]);
 
-  const handleSubmit = () => {
-    console.log(formData);
-    alert("Form submitted! Check console for data.");
-  };
-
   const steps = [
     <GenderStep key="gender" />,
     <AgeStep key="age" />,
@@ -93,12 +84,7 @@ export default function Hero2() {
     <WaistStep key="waist" />,
     <HipStep key="hip" />,
     <NeckStep key="neck" />,
-    <ActivityLevelStep key="activity" />,
-    <DietaryRestrictionsStep key="diet" />,
-    <AllergiesStep key="allergies" />,
-    <HealthGoalsStep key="goals" />,
-    <MealPreferencesStep key="preferences" />,
-    <CookingSkillStep key="cooking" />,
+    <ResultsStep key="results" />,
   ];
 
   return (
@@ -137,16 +123,6 @@ export default function Hero2() {
                 ></div>
               </div>
             </motion.div>
-
-            {currentStep === steps.length && (
-              <RainbowButton
-                type="button"
-                onClick={handleSubmit}
-                className="w-full mt-6"
-              >
-                Generate Diet Plan
-              </RainbowButton>
-            )}
           </form>
         </div>
       </main>
@@ -158,6 +134,22 @@ export default function Hero2() {
           </p>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function ResultsStep() {
+  const { formData } = useFormStore();
+  const results = calculateBodyComposition(formData);
+
+  return (
+    <div
+    // variants={stepperVariants}
+    // initial="hidden"
+    // animate="visible"
+    // exit="hidden"
+    >
+      <Results results={results} />
     </div>
   );
 }

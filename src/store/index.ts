@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 type FormData = {
-  gender: string;
+  gender: "male" | "female";
   age: string;
   unit: "metric" | "imperial";
   height: string;
@@ -11,6 +11,7 @@ type FormData = {
   waist: string;
   hip: string;
   neck: string;
+
   activityLevel: string;
   dietaryRestrictions: string[];
   allergies: string;
@@ -27,18 +28,19 @@ type FormStore = {
 };
 
 export const useFormStore = create<FormStore>((set) => ({
-  currentStep: 1,
+  currentStep: 9,
   formData: {
-    gender: "",
-    age: "",
+    gender: "" as "male" | "female",
+    age: "25",
     unit: "metric",
-    height: "",
+    height: "176",
     heightFeet: "",
     heightInches: "",
-    weight: "",
-    waist: "",
-    hip: "",
-    neck: "",
+    weight: "79",
+    waist: "83",
+    hip: "97",
+    neck: "42",
+
     activityLevel: "",
     dietaryRestrictions: [],
     allergies: "",
