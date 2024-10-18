@@ -139,10 +139,16 @@ export function UnitStep() {
   return (
     <Step title="Choose your preferred unit system">
       <div className="flex justify-center space-x-4">
-        <RainbowButton colorScheme="black" onClick={() => handleUnitSelection("metric")}>
+        <RainbowButton
+          colorScheme="black"
+          onClick={() => handleUnitSelection("metric")}
+        >
           Metric
         </RainbowButton>
-        <RainbowButton colorScheme="white" onClick={() => handleUnitSelection("imperial")}>
+        <RainbowButton
+          colorScheme="white"
+          onClick={() => handleUnitSelection("imperial")}
+        >
           Imperial
         </RainbowButton>
       </div>
@@ -178,7 +184,7 @@ export function HeightStep() {
   ]);
 
   return (
-    <Step title={`What's your height?`}>
+    <Step title={`What's your height? (cm)`}>
       <div className="space-y-4">
         {formData.unit === "metric" ? (
           <Input
@@ -186,7 +192,7 @@ export function HeightStep() {
             type="number"
             value={formData.height}
             onChange={(e) => updateFormData("height", e.target.value)}
-            placeholder="Enter your height (cm)"
+            placeholder="Enter your height "
             required
             min="50"
             max="300"
