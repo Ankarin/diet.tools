@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -57,10 +57,9 @@ const stepperVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease } },
 };
 
-export default function BodyCompositionCalculator() {
-  const router = useRouter();
+function SearchParamsHandler() {
   const searchParams = useSearchParams();
-  const { currentStep, setCurrentStep } = useFormStore();
+  const { setCurrentStep } = useFormStore();
 
   useEffect(() => {
     const step = searchParams.get("step");
@@ -68,6 +67,13 @@ export default function BodyCompositionCalculator() {
       setCurrentStep(parseInt(step, 10));
     }
   }, [searchParams, setCurrentStep]);
+
+  return null;
+}
+
+export default function BodyCompositionCalculator() {
+  const router = useRouter();
+  const { currentStep } = useFormStore();
 
   useEffect(() => {
     router.replace(`?step=${currentStep}`, { scroll: false });
@@ -87,6 +93,9 @@ export default function BodyCompositionCalculator() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Suspense fallback={null}>
+        <SearchParamsHandler />
+      </Suspense>
       <header className="z-[50] sticky top-0 w-full bg-background/95 border-b backdrop-blur-sm border-border/40">
         <div className="container h-14 flex items-center justify-between">
           <Link
