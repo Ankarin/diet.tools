@@ -102,7 +102,7 @@ export default function BodyCompositionCalculator() {
             href="/?step=1"
             className="flex justify-start items-center hover:opacity-85 transition-opacity duration-300"
           >
-            <h1 className="font-bold text-xl">Body composition calculator</h1>
+            <h2 className="font-bold text-xl">Body composition calculator</h2>
           </Link>
         </div>
       </header>
