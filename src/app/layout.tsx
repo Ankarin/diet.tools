@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   description:
     "Calculate your body composition with our easy-to-use online tool. Get accurate results for body fat percentage, lean mass, and more.",
   keywords: [
-    "body composition",
-    "calculator",
+    "body composition calculator",
+    "body composition ",
     "body fat",
     "lean mass",
     "health",
@@ -25,6 +25,9 @@ export const metadata: Metadata = {
     siteName: "Body Composition Calculator",
     locale: "en_US",
     type: "website",
+  },
+  other: {
+    "google-site-verification": "twun68fQNTTMV292k6EdGidJBwLlidG1toMs37otkZM",
   },
 };
 
