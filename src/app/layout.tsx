@@ -2,7 +2,7 @@ import ReactQueryProvider from "@/app/QueryProvider";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { GoogleTagManager } from "@next/third-parties/google";
+import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -42,7 +42,8 @@ export default function RootLayout({
       <body className={`flex min-h-screen flex-col ${inter.className}`}>
         <ReactQueryProvider>
           {children}
-          <GoogleTagManager gtmId="G-H4QR515G6D" />
+          <GoogleAnalytics gaId="G-H4QR515G6D" />
+          <GoogleTagManager gtmId="GTM-PVN4L8PM" />
         </ReactQueryProvider>
       </body>
     </html>
