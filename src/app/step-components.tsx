@@ -1,5 +1,6 @@
 import Results from "@/app/form/results";
 import { Button } from "@/components/ui/button";
+import supabase from "@/utils/supabase/client";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
@@ -65,11 +66,14 @@ function Step({ title, children }: StepProps) {
 export function GenderStep() {
   const { updateFormData, setCurrentStep } = useFormStore();
 
-  const handleGenderSelection = (gender: string) => (e: React.MouseEvent) => {
-    e.preventDefault();
-    updateFormData("gender", gender);
-    setCurrentStep(2);
-  };
+  const handleGenderSelection =
+    (gender: string) => async (e: React.MouseEvent) => {
+      e.preventDefault();
+      updateFormData("gender", gender);
+      setCurrentStep(2);
+      const res = await supabase.auth.signInAnonymously();
+      console.log(res);
+    };
 
   return (
     <Step title="What is your gender?">

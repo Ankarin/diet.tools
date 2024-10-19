@@ -42,13 +42,11 @@ export default function RootLayout({
       className="scroll-smooth antialiased"
       suppressHydrationWarning
     >
+      <GoogleTagManager gtmId="GTM-PVN4L8PM" />
       <body className={`flex min-h-screen flex-col ${inter.className}`}>
-        <ReactQueryProvider>
-          {children}
-          <GoogleAnalytics gaId="G-H4QR515G6D" />
-          <GoogleTagManager gtmId="GTM-PVN4L8PM" />
-        </ReactQueryProvider>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
       </body>
+      <GoogleAnalytics gaId="G-H4QR515G6D" />
     </html>
   );
 }
