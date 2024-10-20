@@ -1,4 +1,5 @@
 import ReactQueryProvider from "@/app/QueryProvider";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Inter } from "next/font/google";
@@ -45,6 +46,7 @@ export default function RootLayout({
       <GoogleTagManager gtmId="GTM-PVN4L8PM" />
       <body className={`flex min-h-screen flex-col ${inter.className}`}>
         <ReactQueryProvider>{children}</ReactQueryProvider>
+        <Analytics />;
       </body>
       <GoogleAnalytics gaId="G-H4QR515G6D" />
     </html>
