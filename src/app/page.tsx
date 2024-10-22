@@ -109,7 +109,7 @@ export default function BodyCompositionCalculator() {
       <main className="flex-grow flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-3xl">
           <HeroTitles />
-          <form className="mt-12" onSubmit={(e) => e.preventDefault()}>
+          <div className="mt-12">
             <AnimatePresence mode="wait">
               {steps[currentStep - 1]}
             </AnimatePresence>
@@ -130,7 +130,7 @@ export default function BodyCompositionCalculator() {
                 ></div>
               </div>
             </motion.div>
-          </form>
+          </div>
         </div>
       </main>
 

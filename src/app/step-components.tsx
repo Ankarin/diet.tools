@@ -4,10 +4,6 @@ import supabase from "@/utils/supabase/client";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Slider } from "@/components/ui/slider";
-import { Textarea } from "@/components/ui/textarea";
 import RainbowButton from "@/components/ui/rainbow-button";
 import { useFormStore } from "@/store";
 import { ArrowLeft } from "lucide-react";
@@ -16,15 +12,6 @@ const stepVariants = {
   hidden: { opacity: 0, x: 50 },
   visible: { opacity: 1, x: 0 },
   exit: { opacity: 0, x: -50 },
-};
-
-const sliderVariants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { type: "spring", stiffness: 300, damping: 30 },
-  },
 };
 
 interface StepProps {
@@ -108,27 +95,37 @@ export function AgeStep() {
 
   return (
     <Step title="How old are you?">
-      <div className="space-y-4">
-        <Input
-          id="age"
-          type="number"
-          value={formData.age}
-          onChange={(e) => updateFormData("age", e.target.value)}
-          placeholder="Enter your age"
-          required
-          min="1"
-          max="120"
-          className="text-center text-lg"
-        />
-        <RainbowButton
-          colorScheme="green"
-          onClick={() => setCurrentStep(3)}
-          className="w-full"
-          disabled={!isValid}
-        >
-          Next
-        </RainbowButton>
-      </div>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (isValid) {
+            setCurrentStep(3);
+          }
+        }}
+      >
+        <div className="space-y-4">
+          <Input
+            autoFocus={true}
+            id="age"
+            type="number"
+            value={formData.age}
+            onChange={(e) => updateFormData("age", e.target.value)}
+            placeholder="Enter your age"
+            required
+            min="1"
+            max="120"
+            className="text-center text-lg"
+          />
+          <RainbowButton
+            colorScheme="green"
+            type="submit"
+            className="w-full"
+            disabled={!isValid}
+          >
+            Next
+          </RainbowButton>
+        </div>
+      </form>
     </Step>
   );
 }
@@ -190,53 +187,60 @@ export function HeightStep() {
 
   return (
     <Step title={`What's your height? (cm)`}>
-      <div className="space-y-4">
-        {formData.unit === "metric" ? (
-          <Input
-            id="height"
-            type="number"
-            value={formData.height}
-            onChange={(e) => updateFormData("height", e.target.value)}
-            placeholder="Enter your height "
-            required
-            min="50"
-            max="300"
-            className="text-center text-lg"
-          />
-        ) : (
-          <div className="flex space-x-2">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (isValid) {
+            setCurrentStep(5);
+          }
+        }}
+      >
+        <div className="space-y-4">
+          {formData.unit === "metric" ? (
             <Input
-              id="heightFeet"
+              autoFocus={true}
+              id="height"
               type="number"
-              value={formData.heightFeet}
-              onChange={(e) => updateFormData("heightFeet", e.target.value)}
-              placeholder="Feet"
+              value={formData.height}
+              onChange={(e) => updateFormData("height", e.target.value)}
+              placeholder="Enter your height"
               required
-              min="1"
-              max="9"
+              min="50"
+              max="300"
               className="text-center text-lg"
             />
-            <Input
-              id="heightInches"
-              type="number"
-              value={formData.heightInches}
-              onChange={(e) => updateFormData("heightInches", e.target.value)}
-              placeholder="Inches"
-              required
-              min="0"
-              max="11"
-              className="text-center text-lg"
-            />
-          </div>
-        )}
-        <RainbowButton
-          onClick={() => setCurrentStep(5)}
-          className="w-full"
-          disabled={!isValid}
-        >
-          Next
-        </RainbowButton>
-      </div>
+          ) : (
+            <div className="flex space-x-2">
+              <Input
+                autoFocus={true}
+                id="heightFeet"
+                type="number"
+                value={formData.heightFeet}
+                onChange={(e) => updateFormData("heightFeet", e.target.value)}
+                placeholder="Feet"
+                required
+                min="1"
+                max="9"
+                className="text-center text-lg"
+              />
+              <Input
+                id="heightInches"
+                type="number"
+                value={formData.heightInches}
+                onChange={(e) => updateFormData("heightInches", e.target.value)}
+                placeholder="Inches"
+                required
+                min="0"
+                max="11"
+                className="text-center text-lg"
+              />
+            </div>
+          )}
+          <RainbowButton type="submit" className="w-full" disabled={!isValid}>
+            Next
+          </RainbowButton>
+        </div>
+      </form>
     </Step>
   );
 }
@@ -258,30 +262,35 @@ export function WeightStep() {
     <Step
       title={`What's your weight? (${formData.unit === "metric" ? "kg" : "lbs"})`}
     >
-      <div className="space-y-4">
-        <Input
-          id="weight"
-          type="number"
-          value={formData.weight}
-          onChange={(e) => updateFormData("weight", e.target.value)}
-          placeholder={`Enter your weight`}
-          required
-          min={formData.unit === "metric" ? "20" : "44"}
-          max={formData.unit === "metric" ? "500" : "1100"}
-          className="text-center text-lg"
-        />
-        <RainbowButton
-          onClick={() => setCurrentStep(6)}
-          className="w-full"
-          disabled={!isValid}
-        >
-          Next
-        </RainbowButton>
-      </div>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (isValid) {
+            setCurrentStep(6);
+          }
+        }}
+      >
+        <div className="space-y-4">
+          <Input
+            autoFocus={true}
+            id="weight"
+            type="number"
+            value={formData.weight}
+            onChange={(e) => updateFormData("weight", e.target.value)}
+            placeholder={`Enter your weight`}
+            required
+            min={formData.unit === "metric" ? "20" : "44"}
+            max={formData.unit === "metric" ? "500" : "1100"}
+            className="text-center text-lg"
+          />
+          <RainbowButton type="submit" className="w-full" disabled={!isValid}>
+            Next
+          </RainbowButton>
+        </div>
+      </form>
     </Step>
   );
 }
-
 export function WaistStep() {
   const { formData, updateFormData, setCurrentStep } = useFormStore();
   const [isValid, setIsValid] = useState(false);
@@ -298,26 +307,32 @@ export function WaistStep() {
     <Step
       title={`What's your waist measurement? (${formData.unit === "metric" ? "cm" : "inches"})`}
     >
-      <div className="space-y-4">
-        <Input
-          id="waist"
-          type="number"
-          value={formData.waist}
-          onChange={(e) => updateFormData("waist", e.target.value)}
-          placeholder={`Enter your waist measurement`}
-          required
-          min={formData.unit === "metric" ? "40" : "15"}
-          max={formData.unit === "metric" ? "200" : "80"}
-          className="text-center text-lg"
-        />
-        <RainbowButton
-          onClick={() => setCurrentStep(7)}
-          className="w-full"
-          disabled={!isValid}
-        >
-          Next
-        </RainbowButton>
-      </div>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (isValid) {
+            setCurrentStep(7);
+          }
+        }}
+      >
+        <div className="space-y-4">
+          <Input
+            autoFocus={true}
+            id="waist"
+            type="number"
+            value={formData.waist}
+            onChange={(e) => updateFormData("waist", e.target.value)}
+            placeholder={`Enter your waist measurement`}
+            required
+            min={formData.unit === "metric" ? "40" : "15"}
+            max={formData.unit === "metric" ? "200" : "80"}
+            className="text-center text-lg"
+          />
+          <RainbowButton type="submit" className="w-full" disabled={!isValid}>
+            Next
+          </RainbowButton>
+        </div>
+      </form>
     </Step>
   );
 }
@@ -337,26 +352,32 @@ export function HipStep() {
     <Step
       title={`What's your hip measurement? (${formData.unit === "metric" ? "cm" : "inches"})`}
     >
-      <div className="space-y-4">
-        <Input
-          id="hip"
-          type="number"
-          value={formData.hip}
-          onChange={(e) => updateFormData("hip", e.target.value)}
-          placeholder={`Enter your hip measurement`}
-          required
-          min={formData.unit === "metric" ? "50" : "20"}
-          max={formData.unit === "metric" ? "200" : "80"}
-          className="text-center text-lg"
-        />
-        <RainbowButton
-          onClick={() => setCurrentStep(8)}
-          className="w-full"
-          disabled={!isValid}
-        >
-          Next
-        </RainbowButton>
-      </div>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (isValid) {
+            setCurrentStep(8);
+          }
+        }}
+      >
+        <div className="space-y-4">
+          <Input
+            autoFocus={true}
+            id="hip"
+            type="number"
+            value={formData.hip}
+            onChange={(e) => updateFormData("hip", e.target.value)}
+            placeholder={`Enter your hip measurement`}
+            required
+            min={formData.unit === "metric" ? "50" : "20"}
+            max={formData.unit === "metric" ? "200" : "80"}
+            className="text-center text-lg"
+          />
+          <RainbowButton type="submit" className="w-full" disabled={!isValid}>
+            Next
+          </RainbowButton>
+        </div>
+      </form>
     </Step>
   );
 }
@@ -376,26 +397,32 @@ export function NeckStep() {
     <Step
       title={`What's your neck measurement? (${formData.unit === "metric" ? "cm" : "inches"})`}
     >
-      <div className="space-y-4">
-        <Input
-          id="neck"
-          type="number"
-          value={formData.neck}
-          onChange={(e) => updateFormData("neck", e.target.value)}
-          placeholder={`Enter your neck measurement`}
-          required
-          min={formData.unit === "metric" ? "20" : "8"}
-          max={formData.unit === "metric" ? "80" : "32"}
-          className="text-center text-lg"
-        />
-        <RainbowButton
-          onClick={() => setCurrentStep(9)}
-          className="w-full"
-          disabled={!isValid}
-        >
-          Next
-        </RainbowButton>
-      </div>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (isValid) {
+            setCurrentStep(9);
+          }
+        }}
+      >
+        <div className="space-y-4">
+          <Input
+            autoFocus={true}
+            id="neck"
+            type="number"
+            value={formData.neck}
+            onChange={(e) => updateFormData("neck", e.target.value)}
+            placeholder={`Enter your neck measurement`}
+            required
+            min={formData.unit === "metric" ? "20" : "8"}
+            max={formData.unit === "metric" ? "80" : "32"}
+            className="text-center text-lg"
+          />
+          <RainbowButton type="submit" className="w-full" disabled={!isValid}>
+            Next
+          </RainbowButton>
+        </div>
+      </form>
     </Step>
   );
 }
@@ -407,197 +434,5 @@ export function BodyCompositionStep() {
     <motion.div initial="hidden" animate="visible" exit="hidden">
       <Results data={formData} />
     </motion.div>
-  );
-}
-
-export function ActivityLevelStep() {
-  const { formData, updateFormData, setCurrentStep } = useFormStore();
-
-  return (
-    <Step title="What's your activity level?">
-      <RadioGroup
-        value={formData.activityLevel}
-        onValueChange={(value) => {
-          updateFormData("activityLevel", value);
-          setCurrentStep(10);
-        }}
-        className="space-y-4"
-      >
-        {[
-          { value: "sedentary", label: "Sedentary" },
-          { value: "lightly-active", label: "Lightly Active" },
-          { value: "moderately-active", label: "Moderately Active" },
-          { value: "very-active", label: "Very Active" },
-        ].map((item) => (
-          <div
-            key={item.value}
-            className="flex items-center space-x-2 bg-secondary/50 p-4 rounded-lg hover:bg-secondary/70 transition-colors"
-          >
-            <RadioGroupItem
-              value={item.value}
-              id={item.value}
-              className="text-primary"
-            />
-            <Label htmlFor={item.value} className="flex-grow cursor-pointer">
-              {item.label}
-            </Label>
-          </div>
-        ))}
-      </RadioGroup>
-    </Step>
-  );
-}
-
-export function DietaryRestrictionsStep() {
-  const { formData, updateFormData, setCurrentStep } = useFormStore();
-
-  return (
-    <Step title="Do you have any dietary restrictions?">
-      <div className="space-y-4">
-        {[
-          "Vegetarian",
-          "Vegan",
-          "Gluten-Free",
-          "Dairy-Free",
-          "Keto",
-          "Paleo",
-        ].map((diet) => (
-          <div
-            key={diet}
-            className="flex items-center space-x-2 bg-secondary/50 p-4 rounded-lg hover:bg-secondary/70 transition-colors"
-          >
-            <input
-              type="checkbox"
-              id={diet.toLowerCase()}
-              value={diet}
-              checked={formData.dietaryRestrictions.includes(diet)}
-              onChange={(e) => {
-                const updatedRestrictions = e.target.checked
-                  ? [...formData.dietaryRestrictions, diet]
-                  : formData.dietaryRestrictions.filter(
-                      (item) => item !== diet,
-                    );
-                updateFormData("dietaryRestrictions", updatedRestrictions);
-              }}
-              className="text-primary focus:ring-primary"
-            />
-            <Label
-              htmlFor={diet.toLowerCase()}
-              className="flex-grow cursor-pointer"
-            >
-              {diet}
-            </Label>
-          </div>
-        ))}
-        <RainbowButton onClick={() => setCurrentStep(11)} className="w-full">
-          Next
-        </RainbowButton>
-      </div>
-    </Step>
-  );
-}
-
-export function AllergiesStep() {
-  const { formData, updateFormData, setCurrentStep } = useFormStore();
-
-  return (
-    <Step title="Do you have any food allergies?">
-      <div className="space-y-4">
-        <Textarea
-          id="allergies"
-          value={formData.allergies}
-          onChange={(e) => updateFormData("allergies", e.target.value)}
-          placeholder="List any food allergies you have"
-          className="min-h-[100px]"
-        />
-        <RainbowButton onClick={() => setCurrentStep(12)} className="w-full">
-          Next
-        </RainbowButton>
-      </div>
-    </Step>
-  );
-}
-
-export function HealthGoalsStep() {
-  const { formData, updateFormData, setCurrentStep } = useFormStore();
-  const [isValid, setIsValid] = useState(false);
-
-  useEffect(() => {
-    setIsValid(formData.healthGoals.trim() !== "");
-  }, [formData.healthGoals]);
-
-  return (
-    <Step title="What are your health goals?">
-      <div className="space-y-4">
-        <Textarea
-          id="healthGoals"
-          value={formData.healthGoals}
-          onChange={(e) => updateFormData("healthGoals", e.target.value)}
-          placeholder="Describe your health goals"
-          required
-          className="min-h-[100px]"
-        />
-        <RainbowButton
-          onClick={() => setCurrentStep(13)}
-          className="w-full"
-          disabled={!isValid}
-        >
-          Next
-        </RainbowButton>
-      </div>
-    </Step>
-  );
-}
-
-export function MealPreferencesStep() {
-  const { formData, updateFormData, setCurrentStep } = useFormStore();
-
-  return (
-    <Step title="Any specific meal preferences?">
-      <div className="space-y-4">
-        <Textarea
-          id="mealPreferences"
-          value={formData.mealPreferences}
-          onChange={(e) => updateFormData("mealPreferences", e.target.value)}
-          placeholder="Describe your meal preferences"
-          className="min-h-[100px]"
-        />
-        <RainbowButton onClick={() => setCurrentStep(14)} className="w-full">
-          Next
-        </RainbowButton>
-      </div>
-    </Step>
-  );
-}
-
-export function CookingSkillStep() {
-  const { formData, updateFormData } = useFormStore();
-
-  return (
-    <Step title="How would you rate your cooking skills?">
-      <div className="space-y-6">
-        <motion.div
-          variants={sliderVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <Slider
-            min={1}
-            max={5}
-            step={1}
-            value={[parseInt(formData.cookingSkill) || 1]}
-            onValueChange={(value) =>
-              updateFormData("cookingSkill", value[0].toString())
-            }
-            className="w-full"
-          />
-        </motion.div>
-        <div className="flex justify-between text-sm text-muted-foreground">
-          <span>Beginner</span>
-          <span>Intermediate</span>
-          <span>Expert</span>
-        </div>
-      </div>
-    </Step>
   );
 }
