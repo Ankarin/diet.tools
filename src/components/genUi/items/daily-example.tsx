@@ -32,6 +32,7 @@ export default function DailyExample() {
   const { formData } = useFormStore();
   const handleGenerate = () => submit(formData);
 
+
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       {!isLoading && !mealPlan ? (
@@ -79,6 +80,7 @@ export default function DailyExample() {
 
           {mealPlan?.shoppingList?.categories &&
             mealPlan.shoppingList.categories.length > 0 && (
+                 // @ts-ignore
               <ShoppingListCard categories={mealPlan.shoppingList.categories} />
             )}
 
@@ -87,6 +89,7 @@ export default function DailyExample() {
               <MealCard
                 key={mealName}
                 mealName={mealName}
+                     // @ts-ignore
                 items={meal.items || []}
               />
             ))}
