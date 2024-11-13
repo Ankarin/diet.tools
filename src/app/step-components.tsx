@@ -1,12 +1,23 @@
-import Results from "@/app/form/results";
+import DailyExample from "@/components/genUi/items/daily-example";
 import { Button } from "@/components/ui/button";
-import supabase from "@/utils/supabase/client";
-import { useState, useEffect } from "react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import RainbowButton from "@/components/ui/rainbow-button";
 import { useFormStore } from "@/store";
 import { ArrowLeft } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import { Textarea } from "@/components/ui/textarea";
 
 const stepVariants = {
   hidden: { opacity: 0, x: 50 },
@@ -43,7 +54,9 @@ function Step({ title, children }: StepProps) {
             <span className="sr-only">Go back</span>
           </Button>
         )}
-        <h2 className="text-2xl font-bold text-center flex-grow">{title}</h2>
+        <p className="text-xl sm:text-2xl font-bold text-left  sm:text-center flex-grow">
+          {title}
+        </p>
       </div>
       {children}
     </motion.div>
@@ -58,8 +71,8 @@ export function GenderStep() {
       e.preventDefault();
       updateFormData("gender", gender);
       setCurrentStep(2);
-      const res = await supabase.auth.signInAnonymously();
-      console.log(res);
+      // const res = await supabase.auth.signInAnonymously();
+      // console.log(res);
     };
 
   return (
@@ -84,52 +97,68 @@ export function GenderStep() {
   );
 }
 
+const ageSchema = z.object({
+  age: z.string().refine((val) => {
+    const num = parseInt(val, 10);
+    return !isNaN(num) && num > 0 && num <= 120;
+  }, "Age must be between 1 and 120"),
+});
+
 export function AgeStep() {
   const { formData, updateFormData, setCurrentStep } = useFormStore();
-  const [isValid, setIsValid] = useState(false);
+
+  const form = useForm<z.infer<typeof ageSchema>>({
+    resolver: zodResolver(ageSchema),
+    defaultValues: {
+      age: formData.age || "",
+    },
+  });
 
   useEffect(() => {
-    const age = parseInt(formData.age);
-    setIsValid(formData.age !== "" && age > 0 && age <= 120);
-  }, [formData.age]);
+    if (formData.age) {
+      form.setValue("age", formData.age.toString());
+    }
+  }, [formData.age, form]);
+
+  function onSubmit(values: z.infer<typeof ageSchema>) {
+    updateFormData("age", values.age);
+    setCurrentStep(3);
+  }
 
   return (
     <Step title="How old are you?">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (isValid) {
-            setCurrentStep(3);
-          }
-        }}
-      >
-        <div className="space-y-4">
-          <Input
-            autoFocus={true}
-            id="age"
-            type="number"
-            value={formData.age}
-            onChange={(e) => updateFormData("age", e.target.value)}
-            placeholder="Enter your age"
-            required
-            min="1"
-            max="120"
-            className="text-center text-lg"
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="age"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="number"
+                    placeholder="Enter your age"
+                    className="text-center text-lg"
+                    autoFocus
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
           <RainbowButton
-            colorScheme="green"
             type="submit"
             className="w-full"
-            disabled={!isValid}
+            disabled={!form.formState.isValid}
           >
             Next
           </RainbowButton>
-        </div>
-      </form>
+        </form>
+      </Form>
     </Step>
   );
 }
-
 export function UnitStep() {
   const { updateFormData, setCurrentStep } = useFormStore();
 
@@ -158,281 +187,612 @@ export function UnitStep() {
   );
 }
 
+const metricHeightSchema = z.object({
+  height: z.string().refine(
+    (val) => {
+      const num = parseInt(val, 10);
+      return !isNaN(num) && num > 50 && num <= 300;
+    },
+    { message: "Height must be between 50 and 300 cm" },
+  ),
+});
+
+const imperialHeightSchema = z.object({
+  heightFeet: z.string().refine(
+    (val) => {
+      const num = parseInt(val, 10);
+      return !isNaN(num) && num > 0 && num <= 9;
+    },
+    { message: "Feet must be between 1 and 9" },
+  ),
+  heightInches: z.string().refine(
+    (val) => {
+      const num = parseInt(val, 10);
+      return !isNaN(num) && num >= 0 && num < 12;
+    },
+    { message: "Inches must be between 0 and 11" },
+  ),
+});
+
 export function HeightStep() {
   const { formData, updateFormData, setCurrentStep } = useFormStore();
-  const [isValid, setIsValid] = useState(false);
 
-  useEffect(() => {
-    if (formData.unit === "metric") {
-      const height = parseInt(formData.height);
-      setIsValid(formData.height !== "" && height > 0 && height <= 300);
-    } else {
-      const feet = parseInt(formData.heightFeet || "0");
-      const inches = parseInt(formData.heightInches || "0");
-      setIsValid(
-        formData.heightFeet !== "" &&
-          feet > 0 &&
-          feet <= 9 &&
-          formData.heightInches !== "" &&
-          inches >= 0 &&
-          inches < 12,
-      );
-    }
-  }, [
-    formData.height,
-    formData.heightFeet,
-    formData.heightInches,
-    formData.unit,
-  ]);
+  const metricForm = useForm<z.infer<typeof metricHeightSchema>>({
+    resolver: zodResolver(metricHeightSchema),
+    defaultValues: { height: formData.height || "" },
+  });
+
+  const imperialForm = useForm<z.infer<typeof imperialHeightSchema>>({
+    resolver: zodResolver(imperialHeightSchema),
+    defaultValues: {
+      heightFeet: formData.heightFeet || "",
+      heightInches: formData.heightInches || "",
+    },
+  });
+
+  function onSubmitMetric(values: z.infer<typeof metricHeightSchema>) {
+    updateFormData("height", values.height);
+    setCurrentStep(5);
+  }
+
+  function onSubmitImperial(values: z.infer<typeof imperialHeightSchema>) {
+    updateFormData("heightFeet", values.heightFeet);
+    updateFormData("heightInches", values.heightInches);
+    setCurrentStep(5);
+  }
 
   return (
-    <Step title={`What's your height? (cm)`}>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (isValid) {
-            setCurrentStep(5);
-          }
-        }}
-      >
-        <div className="space-y-4">
-          {formData.unit === "metric" ? (
-            <Input
-              autoFocus={true}
-              id="height"
-              type="number"
-              value={formData.height}
-              onChange={(e) => updateFormData("height", e.target.value)}
-              placeholder="Enter your height"
-              required
-              min="50"
-              max="300"
-              className="text-center text-lg"
+    <Step
+      title={`What's your height? (${formData.unit === "metric" ? "cm" : "ft/in"})`}
+    >
+      {formData.unit === "metric" ? (
+        <Form {...metricForm}>
+          <form
+            onSubmit={metricForm.handleSubmit(onSubmitMetric)}
+            className="space-y-4"
+          >
+            <FormField
+              control={metricForm.control}
+              name="height"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="number"
+                      placeholder="Enter your height in cm"
+                      className="text-center text-lg"
+                      autoFocus
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          ) : (
+            <RainbowButton
+              type="submit"
+              className="w-full"
+              disabled={!metricForm.formState.isValid}
+            >
+              Next
+            </RainbowButton>
+          </form>
+        </Form>
+      ) : (
+        <Form {...imperialForm}>
+          <form
+            onSubmit={imperialForm.handleSubmit(onSubmitImperial)}
+            className="space-y-4"
+          >
             <div className="flex space-x-2">
-              <Input
-                autoFocus={true}
-                id="heightFeet"
-                type="number"
-                value={formData.heightFeet}
-                onChange={(e) => updateFormData("heightFeet", e.target.value)}
-                placeholder="Feet"
-                required
-                min="1"
-                max="9"
-                className="text-center text-lg"
+              <FormField
+                control={imperialForm.control}
+                name="heightFeet"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        placeholder="Feet"
+                        className="text-center text-lg"
+                        autoFocus
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Input
-                id="heightInches"
-                type="number"
-                value={formData.heightInches}
-                onChange={(e) => updateFormData("heightInches", e.target.value)}
-                placeholder="Inches"
-                required
-                min="0"
-                max="11"
-                className="text-center text-lg"
+              <FormField
+                control={imperialForm.control}
+                name="heightInches"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        placeholder="Inches"
+                        className="text-center text-lg"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-          )}
-          <RainbowButton type="submit" className="w-full" disabled={!isValid}>
-            Next
-          </RainbowButton>
-        </div>
-      </form>
+            <RainbowButton
+              type="submit"
+              className="w-full"
+              disabled={!imperialForm.formState.isValid}
+            >
+              Next
+            </RainbowButton>
+          </form>
+        </Form>
+      )}
     </Step>
   );
 }
 
+const createWeightSchema = (isMetric: boolean) =>
+  z.object({
+    weight: z.string().refine(
+      (val) => {
+        const num = parseFloat(val);
+        const minWeight = isMetric ? 20 : 44;
+        const maxWeight = isMetric ? 500 : 1100;
+        return !isNaN(num) && num >= minWeight && num <= maxWeight;
+      },
+      {
+        message: `Weight must be between ${isMetric ? "20 and 500 kg" : "44 and 1100 lbs"}`,
+      },
+    ),
+  });
 export function WeightStep() {
   const { formData, updateFormData, setCurrentStep } = useFormStore();
-  const [isValid, setIsValid] = useState(false);
 
-  useEffect(() => {
-    const weight = parseFloat(formData.weight);
-    const minWeight = formData.unit === "metric" ? 20 : 44;
-    const maxWeight = formData.unit === "metric" ? 500 : 1100;
-    setIsValid(
-      formData.weight !== "" && weight >= minWeight && weight <= maxWeight,
-    );
-  }, [formData.weight, formData.unit]);
+  const isMetric = formData.unit === "metric";
+  const weightSchema = createWeightSchema(isMetric);
+
+  const form = useForm<z.infer<typeof weightSchema>>({
+    resolver: zodResolver(weightSchema),
+    defaultValues: {
+      weight: formData.weight || "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof weightSchema>) {
+    updateFormData("weight", values.weight);
+    setCurrentStep(6);
+  }
 
   return (
-    <Step
-      title={`What's your weight? (${formData.unit === "metric" ? "kg" : "lbs"})`}
-    >
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (isValid) {
-            setCurrentStep(6);
-          }
-        }}
-      >
-        <div className="space-y-4">
-          <Input
-            autoFocus={true}
-            id="weight"
-            type="number"
-            value={formData.weight}
-            onChange={(e) => updateFormData("weight", e.target.value)}
-            placeholder={`Enter your weight`}
-            required
-            min={formData.unit === "metric" ? "20" : "44"}
-            max={formData.unit === "metric" ? "500" : "1100"}
-            className="text-center text-lg"
+    <Step title={`What's your weight? (${isMetric ? "kg" : "lbs"})`}>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="weight"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="number"
+                    placeholder={`Enter your weight in ${isMetric ? "kg" : "lbs"}`}
+                    className="text-center text-lg"
+                    autoFocus
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          <RainbowButton type="submit" className="w-full" disabled={!isValid}>
+          <RainbowButton
+            type="submit"
+            className="w-full"
+            disabled={!form.formState.isValid}
+          >
             Next
           </RainbowButton>
-        </div>
-      </form>
+        </form>
+      </Form>
     </Step>
   );
 }
-export function WaistStep() {
+
+const goalsSchema = z.object({
+  goals: z
+    .string()
+    .min(5, "Please enter your goals")
+    .max(500, "Goals should be 500 characters or less"),
+});
+
+export function GoalsStep() {
   const { formData, updateFormData, setCurrentStep } = useFormStore();
-  const [isValid, setIsValid] = useState(false);
 
-  useEffect(() => {
-    const waist = parseFloat(formData.waist);
-    const minWaist = formData.unit === "metric" ? 40 : 15;
-    const maxWaist = formData.unit === "metric" ? 200 : 80;
+  const form = useForm<z.infer<typeof goalsSchema>>({
+    resolver: zodResolver(goalsSchema),
+    defaultValues: {
+      goals: formData.goals || "",
+    },
+  });
 
-    setIsValid(formData.waist !== "" && waist >= minWaist && waist <= maxWaist);
-  }, [formData.waist, formData.unit]);
+  function onSubmit(values: z.infer<typeof goalsSchema>) {
+    updateFormData("goals", values.goals);
+    setCurrentStep(7);
+  }
 
   return (
-    <Step
-      title={`What's your waist measurement? (${formData.unit === "metric" ? "cm" : "inches"})`}
-    >
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (isValid) {
-            setCurrentStep(7);
-          }
-        }}
-      >
-        <div className="space-y-4">
-          <Input
-            autoFocus={true}
-            id="waist"
-            type="number"
-            value={formData.waist}
-            onChange={(e) => updateFormData("waist", e.target.value)}
-            placeholder={`Enter your waist measurement`}
-            required
-            min={formData.unit === "metric" ? "40" : "15"}
-            max={formData.unit === "metric" ? "200" : "80"}
-            className="text-center text-lg"
+    <Step title="What are your weight and health goals ?">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="goals"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    placeholder="Are you aiming to lose weight, gain muscle, maintain weight, or manage a health condition?"
+                    {...field}
+                    className="min-h-[150px] text-lg"
+                    autoFocus
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          <RainbowButton type="submit" className="w-full" disabled={!isValid}>
+          <RainbowButton
+            type="submit"
+            className="w-full"
+            disabled={!form.formState.isValid}
+          >
             Next
           </RainbowButton>
-        </div>
-      </form>
+        </form>
+      </Form>
     </Step>
   );
 }
 
-export function HipStep() {
+const activitySchema = z.object({
+  activity: z
+    .string()
+    .min(5, "Please describe your activity level")
+    .max(1000, "Description should be 1000 characters or less"),
+});
+export function ActivityStep() {
   const { formData, updateFormData, setCurrentStep } = useFormStore();
-  const [isValid, setIsValid] = useState(false);
 
-  useEffect(() => {
-    const hip = parseFloat(formData.hip);
-    const minHip = formData.unit === "metric" ? 50 : 20;
-    const maxHip = formData.unit === "metric" ? 200 : 80;
-    setIsValid(formData.hip !== "" && hip >= minHip && hip <= maxHip);
-  }, [formData.hip, formData.unit]);
+  const form = useForm<z.infer<typeof activitySchema>>({
+    resolver: zodResolver(activitySchema),
+    defaultValues: {
+      activity: formData.activity || "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof activitySchema>) {
+    updateFormData("activity", values.activity);
+    setCurrentStep(8);
+  }
 
   return (
-    <Step
-      title={`What's your hip measurement? (${formData.unit === "metric" ? "cm" : "inches"})`}
-    >
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (isValid) {
-            setCurrentStep(8);
-          }
-        }}
-      >
-        <div className="space-y-4">
-          <Input
-            autoFocus={true}
-            id="hip"
-            type="number"
-            value={formData.hip}
-            onChange={(e) => updateFormData("hip", e.target.value)}
-            placeholder={`Enter your hip measurement`}
-            required
-            min={formData.unit === "metric" ? "50" : "20"}
-            max={formData.unit === "metric" ? "200" : "80"}
-            className="text-center text-lg"
+    <Step title="How physically active are you throughout the day?">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="activity"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="Describe your typical daily activities, including any exercise or sports you participate in."
+                    className="min-h-[150px] text-lg"
+                    autoFocus
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          <RainbowButton type="submit" className="w-full" disabled={!isValid}>
+          <RainbowButton
+            type="submit"
+            className="w-full"
+            disabled={!form.formState.isValid}
+          >
             Next
           </RainbowButton>
-        </div>
-      </form>
+        </form>
+      </Form>
     </Step>
   );
 }
 
-export function NeckStep() {
+const medicalConditionsSchema = z.object({
+  medicalConditions: z
+    .string()
+    .max(1000, "Description should be 1000 characters or less"),
+});
+export function MedicalConditionsStep() {
   const { formData, updateFormData, setCurrentStep } = useFormStore();
-  const [isValid, setIsValid] = useState(false);
 
-  useEffect(() => {
-    const neck = parseFloat(formData.neck);
-    const minNeck = formData.unit === "metric" ? 20 : 8;
-    const maxNeck = formData.unit === "metric" ? 80 : 32;
-    setIsValid(formData.neck !== "" && neck >= minNeck && neck <= maxNeck);
-  }, [formData.neck, formData.unit]);
+  const form = useForm<z.infer<typeof medicalConditionsSchema>>({
+    resolver: zodResolver(medicalConditionsSchema),
+    defaultValues: {
+      medicalConditions: formData.medicalConditions || "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof medicalConditionsSchema>) {
+    updateFormData("medicalConditions", values.medicalConditions);
+    setCurrentStep(9);
+  }
 
   return (
-    <Step
-      title={`What's your neck measurement? (${formData.unit === "metric" ? "cm" : "inches"})`}
-    >
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (isValid) {
-            setCurrentStep(9);
-          }
-        }}
-      >
-        <div className="space-y-4">
-          <Input
-            autoFocus={true}
-            id="neck"
-            type="number"
-            value={formData.neck}
-            onChange={(e) => updateFormData("neck", e.target.value)}
-            placeholder={`Enter your neck measurement`}
-            required
-            min={formData.unit === "metric" ? "20" : "8"}
-            max={formData.unit === "metric" ? "80" : "32"}
-            className="text-center text-lg"
+    <Step title="Do you have any medical conditions or health concerns?">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="medicalConditions"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="Conditions like diabetes, high blood pressure, or digestive issues can significantly impact dietary recommendations."
+                    className="min-h-[150px] text-lg"
+                    autoFocus
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          <RainbowButton type="submit" className="w-full" disabled={!isValid}>
+          <RainbowButton
+            type="submit"
+            className="w-full"
+            disabled={!form.formState.isValid}
+          >
             Next
           </RainbowButton>
-        </div>
-      </form>
+        </form>
+      </Form>
     </Step>
   );
 }
 
-export function BodyCompositionStep() {
-  const { formData } = useFormStore();
+const dietaryRestrictionsSchema = z.object({
+  dietaryRestrictions: z
+    .string()
+    .max(1000, "Description should be 1000 characters or less"),
+});
+
+export function DietaryRestrictionsStep() {
+  const { formData, updateFormData, setCurrentStep } = useFormStore();
+
+  const form = useForm<z.infer<typeof dietaryRestrictionsSchema>>({
+    resolver: zodResolver(dietaryRestrictionsSchema),
+    defaultValues: {
+      dietaryRestrictions: formData.dietaryRestrictions || "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof dietaryRestrictionsSchema>) {
+    updateFormData("dietaryRestrictions", values.dietaryRestrictions);
+    setCurrentStep(10);
+  }
 
   return (
-    <motion.div initial="hidden" animate="visible" exit="hidden">
-      <Results data={formData} />
-    </motion.div>
+    <Step title="Do you have any dietary restrictions?">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="dietaryRestrictions"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="For example: vegetarian, vegan, gluten-free, lactose intolerant, food allergies (nuts, shellfish, dairy), or religious dietary laws."
+                    className="min-h-[150px] text-lg"
+                    autoFocus
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <RainbowButton
+            type="submit"
+            className="w-full"
+            disabled={!form.formState.isValid}
+          >
+            Next
+          </RainbowButton>
+        </form>
+      </Form>
+    </Step>
+  );
+}
+
+const foodPreferencesSchema = z.object({
+  foodPreferences: z
+    .string()
+    .max(1000, "Description should be 1000 characters or less"),
+});
+export function FoodPreferencesStep() {
+  const { formData, updateFormData, setCurrentStep } = useFormStore();
+
+  const form = useForm<z.infer<typeof foodPreferencesSchema>>({
+    resolver: zodResolver(foodPreferencesSchema),
+    defaultValues: {
+      foodPreferences: formData.foodPreferences || "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof foodPreferencesSchema>) {
+    updateFormData("foodPreferences", values.foodPreferences);
+    setCurrentStep(11);
+  }
+
+  return (
+    <Step title="Are there any foods you particularly enjoy or dislike?">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="foodPreferences"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="Incorporating favorite foods can increase adherence. Avoiding disliked foods enhances satisfaction."
+                    className="min-h-[150px] text-lg"
+                    autoFocus
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <RainbowButton
+            type="submit"
+            className="w-full"
+            disabled={!form.formState.isValid}
+          >
+            Next
+          </RainbowButton>
+        </form>
+      </Form>
+    </Step>
+  );
+}
+
+const dietaryApproachSchema = z.object({
+  dietaryApproach: z
+    .string()
+    .max(1000, "Description should be 1000 characters or less"),
+});
+
+export function DietaryApproachStep() {
+  const { formData, updateFormData, setCurrentStep } = useFormStore();
+
+  const form = useForm<z.infer<typeof dietaryApproachSchema>>({
+    resolver: zodResolver(dietaryApproachSchema),
+    defaultValues: {
+      dietaryApproach: formData.dietaryApproach || "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof dietaryApproachSchema>) {
+    updateFormData("dietaryApproach", values.dietaryApproach);
+    setCurrentStep(12);
+  }
+
+  return (
+    <Step title="Are you interested in following any specific dietary approaches or meal plans?">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="dietaryApproach"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="For example: low-carb, Mediterranean, keto, paleo, intermittent fasting, or others."
+                    className="min-h-[150px] text-lg"
+                    autoFocus
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <RainbowButton
+            type="submit"
+            className="w-full"
+            disabled={!form.formState.isValid}
+          >
+            Next
+          </RainbowButton>
+        </form>
+      </Form>
+    </Step>
+  );
+}
+
+const mealPreparationSchema = z.object({
+  mealPreparation: z
+    .string()
+    .min(
+      1,
+      "Please provide information about your meal preparation preferences",
+    )
+    .max(1000, "Description should be 1000 characters or less"),
+});
+export function MealPreparationStep() {
+  const { formData, updateFormData, setCurrentStep } = useFormStore();
+
+  const form = useForm<z.infer<typeof mealPreparationSchema>>({
+    resolver: zodResolver(mealPreparationSchema),
+    defaultValues: {
+      mealPreparation: formData.mealPreparation || "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof mealPreparationSchema>) {
+    updateFormData("mealPreparation", values.mealPreparation);
+    setCurrentStep(13);
+  }
+
+  return (
+    <Step title="Do you prefer cooking at home or eating out, and how much time can you dedicate to meal preparation each day?">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="mealPreparation"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="Combining these questions helps tailor the meal plan to your eating habits, availability, and schedule."
+                    className="min-h-[150px] text-lg"
+                    autoFocus
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <RainbowButton
+            type="submit"
+            className="w-full"
+            disabled={!form.formState.isValid}
+          >
+            Finish
+          </RainbowButton>
+        </form>
+      </Form>
+    </Step>
+  );
+}
+
+export function ExamplePlanStep() {
+  return (
+    <Step title="Looking good, lets generate an example daily meal plan for you.">
+      <DailyExample />
+    </Step>
   );
 }

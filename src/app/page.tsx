@@ -1,5 +1,6 @@
 "use client";
 
+import DailyExample from "@/components/genUi/items/daily-example";
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,10 +12,14 @@ import {
   UnitStep,
   HeightStep,
   WeightStep,
-  WaistStep,
-  HipStep,
-  NeckStep,
-  BodyCompositionStep,
+  GoalsStep,
+  DietaryRestrictionsStep,
+  MedicalConditionsStep,
+  ActivityStep,
+  FoodPreferencesStep,
+  MealPreparationStep,
+  DietaryApproachStep,
+  ExamplePlanStep,
 } from "./step-components";
 
 const ease = [0.16, 1, 0.3, 1];
@@ -32,7 +37,7 @@ function HeroTitles() {
           staggerChildren: 0.2,
         }}
       >
-        {["Body ", "composition ", "calculator"].map((text, index) => (
+        {["Ai ", "Diet ", "Planner"].map((text, index) => (
           <motion.span
             key={index}
             className="inline-block px-1 md:px-2 text-balance font-bold"
@@ -85,10 +90,14 @@ export default function BodyCompositionCalculator() {
     <UnitStep key="unit" />,
     <HeightStep key="height" />,
     <WeightStep key="weight" />,
-    <WaistStep key="waist" />,
-    <HipStep key="hip" />,
-    <NeckStep key="neck" />,
-    <BodyCompositionStep key="results" />,
+    <GoalsStep key="goals" />,
+    <ActivityStep key="activity" />,
+    <MedicalConditionsStep key="medicalConditions" />,
+    <DietaryRestrictionsStep key="dietaryRestrictions" />,
+    <FoodPreferencesStep key="foodPreferences" />,
+    <DietaryApproachStep key="dietaryApproach" />,
+    <MealPreparationStep key="mealPreparation" />,
+    <ExamplePlanStep key="examplePlan" />,
   ];
 
   return (
@@ -96,16 +105,7 @@ export default function BodyCompositionCalculator() {
       <Suspense fallback={null}>
         <SearchParamsHandler />
       </Suspense>
-      <header className="z-[50] sticky top-0 w-full bg-background/95 border-b backdrop-blur-sm border-border/40">
-        <div className="container h-14 flex items-center justify-between">
-          <Link
-            href="/?step=1"
-            className="flex justify-start items-center hover:opacity-85 transition-opacity duration-300"
-          >
-            <h2 className="font-bold text-xl">Body composition calculator</h2>
-          </Link>
-        </div>
-      </header>
+
       <main className="flex-grow flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-3xl">
           <HeroTitles />
@@ -137,7 +137,7 @@ export default function BodyCompositionCalculator() {
       <footer className="py-6 md:py-0 border-t border-border/40">
         <div className="container flex flex-col items-center justify-center gap-4 md:h-24 md:flex-row">
           <p className="text-balance text-center text-sm leading-loose text-muted-foreground">
-            Body composition calculator
+            Ai Diet Planner
           </p>
         </div>
       </footer>
