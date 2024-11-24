@@ -3,10 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { isAfter } from "date-fns";
 
 export const updateSession = async (request: NextRequest) => {
-  // This `try/catch` block is only here for the interactive tutorial.
-  // Feel free to remove once you have Supabase connected.
   try {
-    // Create an unmodified response
     let response = NextResponse.next({
       request: {
         headers: request.headers,
@@ -36,17 +33,15 @@ export const updateSession = async (request: NextRequest) => {
       },
     );
 
-    // This will refresh session if expired - required for Server Components
-    // https://supabase.com/docs/guides/auth/server-side/nextjs
     const user = await supabase.auth.getUser();
-
     if (!user.error && user.data.user) {
+      console.log("user", user.data.user.app_metadata);
       const subscriptionExpires =
         user.data.user.app_metadata.subscription_expires;
+
       if (
-        (subscriptionExpires &&
-          isAfter(new Date(), new Date(subscriptionExpires))) ||
-        !subscriptionExpires
+        !subscriptionExpires ||
+        isAfter(new Date(), new Date(subscriptionExpires))
       ) {
         if (request.nextUrl.pathname !== "/me/subscription") {
           return NextResponse.redirect(
@@ -66,11 +61,11 @@ export const updateSession = async (request: NextRequest) => {
         request.nextUrl.pathname,
       ) &&
       !user.error &&
-      (!user.data.user?.app_metadata.subscription_expires ||
-        !isAfter(
-          new Date(),
-          new Date(user.data.user.app_metadata.subscription_expires),
-        ))
+      user.data.user?.app_metadata.subscription_expires &&
+      isAfter(
+        new Date(user.data.user.app_metadata.subscription_expires),
+        new Date(),
+      )
     ) {
       return NextResponse.redirect(new URL("/me", request.url));
     }
@@ -78,9 +73,6 @@ export const updateSession = async (request: NextRequest) => {
     return response;
   } catch (e) {
     console.log(e);
-    // If you are here, a Supabase client could not be created!
-    // This is likely because you have not set up environment variables.
-    // Check out http://localhost:3000 for Next Steps.
     return NextResponse.next({
       request: {
         headers: request.headers,
