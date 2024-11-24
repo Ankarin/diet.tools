@@ -1,10 +1,8 @@
 "use client";
 
-import DailyExample from "@/components/genUi/items/daily-example";
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
 import { useFormStore } from "@/store";
 import {
   GenderStep,
