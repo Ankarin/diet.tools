@@ -61,6 +61,7 @@ export async function signup({
 
   const res = await supabase.from("users").upsert({
     id: data?.user?.id,
+    email,
     ...form,
   });
 
