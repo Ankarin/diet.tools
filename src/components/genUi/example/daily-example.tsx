@@ -44,7 +44,7 @@ export default function DailyExample() {
           Generate
         </Button>
       ) : !isLoading && mealPlan ? (
-        <Link href="/me/signup">
+        <Link href="/signup">
           <Button
             disabled={isLoading}
             className="mb-6 text-lg py-6 px-8 w-full "
@@ -108,7 +108,7 @@ export default function DailyExample() {
       )}
       <br />
       {!isLoading && mealPlan && (
-        <Link href="/me/signup">
+        <Link href="/signup">
           <Button
             disabled={isLoading}
             className="mb-6 text-lg py-6 px-8 w-full "
