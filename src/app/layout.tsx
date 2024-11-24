@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Ai Diet Planner",
     description: "",
-    url: "https://www.bodycomposition.xyz/",
+    url: "https://www.diet.tools/",
     siteName: "Ai Diet Planner",
     locale: "en_US",
     type: "website",
