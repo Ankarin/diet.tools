@@ -75,7 +75,7 @@ export default function WeeklyExample() {
       .limit(1)
       .single();
 
-    if (error) throw error;
+    if (error) return null;
     return data.plan as WeeklyPlanData;
   };
 

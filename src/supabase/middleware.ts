@@ -44,8 +44,9 @@ export const updateSession = async (request: NextRequest) => {
       const subscriptionExpires =
         user.data.user.app_metadata.subscription_expires;
       if (
-        subscriptionExpires &&
-        isAfter(new Date(), new Date(subscriptionExpires))
+        (subscriptionExpires &&
+          isAfter(new Date(), new Date(subscriptionExpires))) ||
+        !subscriptionExpires
       ) {
         if (request.nextUrl.pathname !== "/me/subscription") {
           return NextResponse.redirect(
@@ -56,16 +57,7 @@ export const updateSession = async (request: NextRequest) => {
     }
 
     // protected routes
-    if (
-      (request.nextUrl.pathname.startsWith("/me") && user.error) ||
-      (request.nextUrl.pathname.startsWith("/me") &&
-        request.nextUrl.pathname !== "/me/subscription" &&
-        user.data.user?.app_metadata.subscription_expires &&
-        isAfter(
-          new Date(),
-          new Date(user.data.user.app_metadata.subscription_expires),
-        ))
-    ) {
+    if (request.nextUrl.pathname.startsWith("/me") && user.error) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
