@@ -1,4 +1,3 @@
-import supabase from "@/supabase/client";
 import { create } from "zustand";
 
 export type FormData = {
@@ -47,48 +46,8 @@ export const useFormStore = create<FormStore>((set, get) => ({
   currentStep: 1,
   formData: initialFormData,
   goNextStep: async () => {
-    const { currentStep, formData } = get();
+    const { currentStep } = get();
     const newStep = currentStep + 1;
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      const { error } = await supabase.auth.signInAnonymously();
-      if (error) {
-        console.error("Error signing in anonymously:", error);
-        return;
-      }
-    }
-
-    const { error } = await supabase.from("users").upsert(
-      {
-        gender: formData.gender,
-        age: formData.age,
-        unit: formData.unit,
-        height: formData.unit === "metric" ? formData.height : null,
-        height_feet: formData.unit === "imperial" ? formData.heightFeet : null,
-        height_inches:
-          formData.unit === "imperial" ? formData.heightInches : null,
-        weight: formData.weight,
-        goals: formData.goals,
-        activity: formData.activity,
-        medical_conditions: formData.medicalConditions,
-        dietary_restrictions: formData.dietaryRestrictions,
-        food_preferences: formData.foodPreferences,
-        dietary_approach: formData.dietaryApproach,
-        meal_preparation: formData.mealPreparation,
-        updated_at: new Date().toISOString(),
-      },
-      {
-        onConflict: "id",
-      },
-    );
-
-    if (error) {
-      console.error("Error updating user data:", error);
-    }
 
     set({ currentStep: newStep });
   },

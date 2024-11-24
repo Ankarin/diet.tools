@@ -1,6 +1,22 @@
 "use server";
 import { createClient } from "@/supabase/server";
 
+export type FormData = {
+  gender: "male" | "female" | "";
+  age: string;
+  unit: "metric" | "imperial" | "";
+  height: string;
+  heightFeet: string;
+  heightInches: string;
+  weight: string;
+  goals: string;
+  activity: string;
+  medicalConditions: string;
+  dietaryRestrictions: string;
+  foodPreferences: string;
+  dietaryApproach: string;
+  mealPreparation: string;
+};
 export async function login({
   email,
   password,
@@ -27,10 +43,12 @@ export async function signup({
   email,
   password,
   origin,
+  form,
 }: {
   email: string;
   password: string;
   origin: string;
+  form: FormData;
 }): Promise<void | string> {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
@@ -41,6 +59,12 @@ export async function signup({
     },
   });
 
+  const res = await supabase.from("users").upsert({
+    id: data?.user?.id,
+    ...form,
+  });
+
+  console.log(res);
   if (error) throw error;
 }
 

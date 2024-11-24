@@ -1,4 +1,4 @@
-import { singleDailyPlanSchema } from "@/app/1server/ai/ai.schema";
+import { singleDailyPlanSchema } from "@/app/api/gen-day/schema";
 import { FormData } from "@/store";
 import { openai } from "@ai-sdk/openai";
 import { streamObject } from "ai";

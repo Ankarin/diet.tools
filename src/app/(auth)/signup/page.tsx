@@ -60,7 +60,7 @@ export default function Page() {
       });
     },
     onSuccess: () => {
-      router.replace("/me");
+      router.replace("/me/profile");
     },
   });
 

@@ -1,4 +1,4 @@
-import DailyExample from "@/components/genUi/items/daily-example";
+import DailyExample from "@/components/genUi/example/daily-example";
 import { Button } from "@/components/ui/button";
 import {
   Form,

@@ -1,6 +1,6 @@
 "use client";
 
-import { singleDailyPlanSchema } from "@/app/1server/ai/ai.schema";
+import { singleDailyPlanSchema } from "@/app/api/gen-day/schema";
 import { useFormStore } from "@/store";
 import { experimental_useObject as useObject } from "ai/react";
 import { z } from "zod";
@@ -31,7 +31,6 @@ export default function DailyExample() {
   });
   const { formData } = useFormStore();
   const handleGenerate = () => submit(formData);
-
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
@@ -73,14 +72,14 @@ export default function DailyExample() {
                 Your meal plan for the day
               </CardTitle>
               <CardDescription className="text-xl">
-                Calories: {mealPlan?.calories || "Calculating..."}
+                Calories: {mealPlan?.totalCalories || "Calculating..."}
               </CardDescription>
             </CardHeader>
           </Card>
 
           {mealPlan?.shoppingList?.categories &&
             mealPlan.shoppingList.categories.length > 0 && (
-                 // @ts-ignore
+              // @ts-ignore
               <ShoppingListCard categories={mealPlan.shoppingList.categories} />
             )}
 
@@ -89,7 +88,7 @@ export default function DailyExample() {
               <MealCard
                 key={mealName}
                 mealName={mealName}
-                     // @ts-ignore
+                // @ts-ignore
                 items={meal.items || []}
               />
             ))}

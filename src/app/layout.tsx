@@ -1,6 +1,5 @@
 import ReactQueryProvider from "@/app/QueryProvider";
-import { Button } from "@/components/ui/button";
-import RainbowButton from "@/components/ui/rainbow-button";
+import Auth from "@/components/auth";
 import { Toaster } from "@/components/ui/toaster";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
@@ -28,7 +27,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -44,23 +43,19 @@ export default function RootLayout({
         <header className="z-[50] sticky top-0 w-full bg-background/95 border-b backdrop-blur-sm border-border/40">
           <div className="container h-14 flex items-center justify-between">
             <Link
-              href="/?step=1"
+              href="/"
               className="flex justify-start items-center hover:opacity-85 transition-opacity duration-300"
             >
               <h2 className="font-bold text-xl">Ai Diet Planner</h2>
             </Link>
-            <Link href="/login">
-              <RainbowButton colorScheme="black" className="w-full">
-                Login
-              </RainbowButton>
-            </Link>
+            <Auth />
           </div>
         </header>
         <ReactQueryProvider>
           <Toaster></Toaster>
           {children}
         </ReactQueryProvider>
-        <Analytics />;
+        <Analytics />
       </body>
       <GoogleAnalytics gaId="G-H4QR515G6D" />
     </html>
