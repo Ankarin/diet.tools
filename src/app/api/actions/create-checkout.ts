@@ -28,8 +28,8 @@ export const createCheckoutSession = actionClient
           },
         ],
         mode: "subscription",
-        success_url: `${process.env.NEXT_PUBLIC_URL}/success`,
-        cancel_url: `${process.env.NEXT_PUBLIC_URL}/subscribe`,
+        success_url: `${process.env.NEXT_PUBLIC_URL}/me`,
+        cancel_url: `${process.env.NEXT_PUBLIC_URL}/me`,
       });
 
       return { sessionId: session.id };

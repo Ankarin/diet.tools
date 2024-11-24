@@ -3,6 +3,7 @@
 import { singleDailyPlanSchema } from "@/app/api/gen-day/schema";
 import { useFormStore } from "@/store";
 import { experimental_useObject as useObject } from "ai/react";
+import Link from "next/link";
 import { z } from "zod";
 import {
   Card,
@@ -43,13 +44,14 @@ export default function DailyExample() {
           Generate
         </Button>
       ) : !isLoading && mealPlan ? (
-        <Button
-          onClick={handleGenerate}
-          disabled={isLoading}
-          className="mb-6 text-lg py-6 px-8 w-full "
-        >
-          Get plan for 2 weeks
-        </Button>
+        <Link href="/me/signup">
+          <Button
+            disabled={isLoading}
+            className="mb-6 text-lg py-6 px-8 w-full "
+          >
+            Get plan for a week
+          </Button>
+        </Link>
       ) : null}
       {error && (
         <Card className="mb-6 bg-red-50 shadow-lg">
@@ -106,13 +108,14 @@ export default function DailyExample() {
       )}
       <br />
       {!isLoading && mealPlan && (
-        <Button
-          onClick={handleGenerate}
-          disabled={isLoading}
-          className="mb-6 text-lg py-6 px-8 w-full "
-        >
-          Get plan for 2 weeks
-        </Button>
+        <Link href="/me/signup">
+          <Button
+            disabled={isLoading}
+            className="mb-6 text-lg py-6 px-8 w-full "
+          >
+            Get plan for a week
+          </Button>
+        </Link>
       )}
     </div>
   );
