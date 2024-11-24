@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { isAfter } from "date-fns";
 
 export const updateSession = async (request: NextRequest) => {
   // This `try/catch` block is only here for the interactive tutorial.
@@ -39,8 +40,32 @@ export const updateSession = async (request: NextRequest) => {
     // https://supabase.com/docs/guides/auth/server-side/nextjs
     const user = await supabase.auth.getUser();
 
+    if (!user.error && user.data.user) {
+      const subscriptionExpires =
+        user.data.user.app_metadata.subscription_expires;
+      if (
+        subscriptionExpires &&
+        isAfter(new Date(), new Date(subscriptionExpires))
+      ) {
+        if (request.nextUrl.pathname !== "/me/subscription") {
+          return NextResponse.redirect(
+            new URL("/me/subscription", request.url),
+          );
+        }
+      }
+    }
+
     // protected routes
-    if (request.nextUrl.pathname.startsWith("/me") && user.error) {
+    if (
+      (request.nextUrl.pathname.startsWith("/me") && user.error) ||
+      (request.nextUrl.pathname.startsWith("/me") &&
+        request.nextUrl.pathname !== "/me/subscription" &&
+        user.data.user?.app_metadata.subscription_expires &&
+        isAfter(
+          new Date(),
+          new Date(user.data.user.app_metadata.subscription_expires),
+        ))
+    ) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
@@ -48,7 +73,12 @@ export const updateSession = async (request: NextRequest) => {
       ["/", "/login", "/signup", "/forgot", "/confirm"].includes(
         request.nextUrl.pathname,
       ) &&
-      !user.error
+      !user.error &&
+      (!user.data.user?.app_metadata.subscription_expires ||
+        !isAfter(
+          new Date(),
+          new Date(user.data.user.app_metadata.subscription_expires),
+        ))
     ) {
       return NextResponse.redirect(new URL("/me", request.url));
     }
