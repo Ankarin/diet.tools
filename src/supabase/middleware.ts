@@ -52,7 +52,6 @@ export const updateSession = async (request: NextRequest) => {
       }
     }
 
-    // protected routes
     if (request.nextUrl.pathname.startsWith("/me") && user.error) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
