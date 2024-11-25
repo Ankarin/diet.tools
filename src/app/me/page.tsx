@@ -73,15 +73,9 @@ export default function WeeklyExample() {
   const fetchLatestDiet = async () => {
     const user = await supabase.auth.getSession();
     if (user.error) return null;
-    const res = await supabase
-      .from("users")
-      .select()
-      .eq("id", user.data.session.user.id)
-      .single();
-
-    if (res.error) return null;
-
-    if (!res.data.completed_profile) {
+    const res = await supabase.auth.getSession();
+    console.log(res.data?.session.user.user_metadata);
+    if (!res.data?.session.user.user_metadata?.completed_profile) {
       router.push("/me/profile");
     }
     const { data, error } = await supabase
