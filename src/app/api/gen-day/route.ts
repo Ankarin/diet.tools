@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   if (!success) {
     console.log("Rate limit exceeded");
     return NextResponse.json(
-      { error: "Usage limit exceeded, please try later in an hour." },
+      { error: "Usage limit exceeded, please try again in an hour." },
       { status: 429 },
     );
   }
