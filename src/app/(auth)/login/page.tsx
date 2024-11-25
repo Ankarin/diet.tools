@@ -39,7 +39,7 @@ export default function Page() {
     onError: (error) => {
       toast({
         variant: "destructive",
-        title: error.message,
+        title: "Invalid email or password",
       });
     },
     onSuccess: () => {

@@ -1,4 +1,5 @@
 "use server";
+
 import { createClient } from "@/supabase/server";
 
 export type FormData = {
@@ -17,26 +18,27 @@ export type FormData = {
   dietaryApproach: string;
   mealPreparation: string;
 };
+
 export async function login({
   email,
   password,
 }: {
   email: string;
   password: string;
-}): Promise<void | string> {
+}): Promise<void> {
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
-  if (error) throw error;
+  if (error) throw new Error(`Login failed: ${error.message}`);
 }
 
-export async function logout(): Promise<void | string> {
+export async function logout(): Promise<void> {
   const supabase = await createClient();
   const { error } = await supabase.auth.signOut();
 
-  if (error) return error.message;
+  if (error) throw new Error(`Logout failed: ${error.message}`);
 }
 
 export async function signup({
@@ -49,7 +51,7 @@ export async function signup({
   password: string;
   origin: string;
   form: FormData;
-}): Promise<void | string> {
+}): Promise<void> {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -59,14 +61,16 @@ export async function signup({
     },
   });
 
-  const res = await supabase.from("users").upsert({
+  if (error) throw new Error(`Signup failed: ${error.message}`);
+
+  const { error: upsertError } = await supabase.from("users").upsert({
     id: data?.user?.id,
     email,
     ...form,
   });
 
-  console.log(res);
-  if (error) throw error;
+  if (upsertError)
+    throw new Error(`User data update failed: ${upsertError.message}`);
 }
 
 export async function forgot({
@@ -80,22 +84,14 @@ export async function forgot({
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${origin}/api/reset-callback`,
   });
-  if (error) throw error;
-  else {
-    return "success";
-  }
+  if (error) throw new Error(`Password reset request failed: ${error.message}`);
+  return "success";
 }
 
-export async function reset({
-  password,
-}: {
-  password: string;
-}): Promise<string | void> {
+export async function reset({ password }: { password: string }): Promise<void> {
   const supabase = await createClient();
-  const { error, data } = await supabase.auth.updateUser({
+  const { error } = await supabase.auth.updateUser({
     password: password,
   });
-  console.log(data);
-  console.log(error);
-  if (error) throw error;
+  if (error) throw new Error(`Password reset failed: ${error.message}`);
 }
