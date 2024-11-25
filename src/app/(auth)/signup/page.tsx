@@ -1,5 +1,6 @@
 "use client";
 import { signup } from "@/actions/auth";
+import { useFormStore } from "@/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -63,11 +64,12 @@ export default function Page() {
       router.replace("/me/profile");
     },
   });
-
+  const { formData } = useFormStore();
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     const origin: string = window.location.origin;
+
     // @ts-ignore
-    mutate({ origin, ...data });
+    mutate({ origin, form: formData, ...data });
   }
 
   return (

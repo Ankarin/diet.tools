@@ -52,6 +52,17 @@ export const updateSession = async (request: NextRequest) => {
       }
     }
 
+    if (!user.error && user.data.user) {
+      console.log("user", user.data.user.user_metadata);
+      const completed = user.data.user.user_metadata.completed_profile;
+
+      if (!completed) {
+        if (request.nextUrl.pathname === "/me") {
+          return NextResponse.redirect(new URL("/me/profile", request.url));
+        }
+      }
+    }
+
     if (request.nextUrl.pathname.startsWith("/me") && user.error) {
       return NextResponse.redirect(new URL("/login", request.url));
     }

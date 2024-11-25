@@ -1,12 +1,23 @@
 import { singleDailyPlanSchema } from "@/app/api/gen-day/schema";
+import { rateLimiter } from "@/lib/ratelimit";
 import { FormData } from "@/store";
 import { openai } from "@ai-sdk/openai";
 import { streamObject } from "ai";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const model = openai("gpt-4o");
 
 export async function POST(req: NextRequest) {
+  const ip = (req.headers.get("x-forwarded-for") ?? "127.0.0.1").split(",")[0];
+  console.log("IP:", ip);
+  const { success } = await rateLimiter.limit(ip);
+  if (!success) {
+    console.log("Rate limit exceeded");
+    return NextResponse.json(
+      { error: "Usage limit exceeded, please try later in an hour." },
+      { status: 429 },
+    );
+  }
   try {
     const formData: FormData = await req.json();
     console.log(111, formData);

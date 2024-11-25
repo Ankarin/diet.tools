@@ -126,6 +126,13 @@ async function updateUserSubscription(
       },
     });
 
+    const res = supabase.from("subs").upsert({
+      id: userId,
+      subscription_expires: newExpirationDate,
+      last_payment: new Date(),
+    });
+    console.log("updated subs", res);
+
     if (error) {
       console.error("Error updating user app_metadata:", error);
     } else {

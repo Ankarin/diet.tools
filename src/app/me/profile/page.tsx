@@ -226,6 +226,12 @@ export default function UserForm() {
           variant: "destructive",
         });
       } else {
+        await supabase.auth.updateUser({
+          data: {
+            completed_profile: true,
+          },
+        });
+
         toast({
           title: "Success",
           description: "User data saved successfully",

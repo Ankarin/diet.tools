@@ -79,12 +79,6 @@ export default function DailyExample() {
             </CardHeader>
           </Card>
 
-          {mealPlan?.shoppingList?.categories &&
-            mealPlan.shoppingList.categories.length > 0 && (
-              // @ts-ignore
-              <ShoppingListCard categories={mealPlan.shoppingList.categories} />
-            )}
-
           {mealPlan?.meals &&
             Object.entries(mealPlan.meals).map(([mealName, meal]) => (
               <MealCard
@@ -94,7 +88,11 @@ export default function DailyExample() {
                 items={meal.items || []}
               />
             ))}
-
+          {mealPlan?.shoppingList?.categories &&
+            mealPlan.shoppingList.categories.length > 0 && (
+              // @ts-ignore
+              <ShoppingListCard categories={mealPlan.shoppingList.categories} />
+            )}
           {mealPlan?.explanation && (
             <InfoCard title="Explanation" content={mealPlan.explanation} />
           )}

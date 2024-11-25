@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CircleUserIcon as UserIcon, LogOut } from "lucide-react";
+import { CircleUserIcon as UserIcon, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -26,6 +26,11 @@ export default function UserDropdown() {
         <Link href="/me/profile">
           <DropdownMenuItem className="cursor-pointer">
             <UserIcon className="mr-2 h-4 w-4" /> My Profile
+          </DropdownMenuItem>
+        </Link>
+        <Link href="/me/settings">
+          <DropdownMenuItem className="cursor-pointer">
+            <Settings className="mr-2 h-4 w-4" /> Settings
           </DropdownMenuItem>
         </Link>
         <DropdownMenuItem onClick={out} className="cursor-pointer">
