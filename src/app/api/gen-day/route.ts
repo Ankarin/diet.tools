@@ -29,7 +29,6 @@ export async function POST(req: NextRequest) {
       temperature: 1,
     });
 
-    console.log(result);
     return result.toTextStreamResponse();
   } catch (error) {
     console.error("Error generating daily meal plan:", error);
@@ -40,16 +39,14 @@ export async function POST(req: NextRequest) {
 }
 
 const createDailyAIPrompt = (formData: FormData) => {
-  return `As a clinical nutritionist, please create a detailed 1-day meal plan that strictly follows the provided zod schema.
+  const unitSystem = formData.unit === "metric" ? "metric" : "imperial";
+
+  return `As a clinical nutritionist, create a highly personalized and detailed 1-day meal plan that strictly follows the provided singleDailyPlanSchema. Use ONLY ${unitSystem} units throughout the entire plan and shopping list.
 
 Client Details:
 - Gender: ${formData.gender}
 - Age: ${formData.age}
-- Height: ${
-    formData.unit === "metric"
-      ? `${formData.height} cm`
-      : `${formData.heightFeet}'${formData.heightInches}"`
-  }
+- Height: ${formData.unit === "metric" ? `${formData.height} cm` : `${formData.heightFeet}'${formData.heightInches}"`}
 - Weight: ${formData.weight} ${formData.unit === "metric" ? "kg" : "lbs"}
 - Goals: ${formData.goals}
 - Activity Level: ${formData.activity}
@@ -59,21 +56,55 @@ ${formData.foodPreferences ? `- Food Preferences: ${formData.foodPreferences}` :
 ${formData.dietaryApproach ? `- Dietary Approach: ${formData.dietaryApproach}` : ""}
 ${formData.mealPreparation ? `- Meal Preparation Preferences: ${formData.mealPreparation}` : ""}
 
-Additional Instructions:
-- Ensure the meal plan is balanced and includes a variety of foods from all food groups.
-- Follow current nutritional guidelines for daily intake of calories, macronutrients (proteins, fats, carbohydrates), and essential micronutrients.
-- Make the meals practical and easy to prepare, using commonly available ingredients.
-- Consider cultural and regional food preferences where applicable.
-- Provide detailed nutritional information for each meal and the overall daily intake.
-- The meal plan should be suitable for most people, promoting general health and well-being.
-- Calories should be distributed evenly throughout the day, with appropriate portion sizes for each meal.
-- Don't make calories intake too big or too small.
+Strict Instructions:
+1. Use ONLY ${unitSystem} units throughout the entire meal plan and shopping list.
+2. Create a daily meal plan following the singleDailyPlanSchema exactly.
+3. Include breakfast, lunch, and dinner. No snacks or additional meals.
+4. Distribute daily calories approximately: Breakfast 30%, Lunch 40%, Dinner 30%.
+5. Ensure the sum of calories from all meals equals the total daily calorie target.
+6. Provide total calories and macronutrients (protein, carbs, fats) for each meal and food item.
+7. Make meals practical and easy to prepare with commonly available ingredients.
+8. Generate a comprehensive grocery list categorized by food groups.
 
-Please include breakfast, lunch, and dinner, with detailed descriptions and preparation methods for each meal.
+Personalization Guidelines:
+1. Tailor meals to the client's specific goals (e.g., weight loss, muscle gain, maintenance).
+2. Adjust portion sizes and macronutrient ratios based on the client's activity level.
+3. Incorporate the client's food preferences and avoid restricted foods.
+4. Consider the client's medical conditions and provide appropriate meal options.
+5. Align with the specified dietary approach (e.g., Mediterranean, low-carb, plant-based).
+6. Accommodate meal preparation preferences (e.g., meal prep, quick meals, cooking from scratch).
+7. Ensure all meals are free from any listed allergies or food sensitivities.
 
-Additionally, provide a shopping list with the following details, and make sure unit system is according to unit system selected by the user:
-- Category: (e.g., Vegetables, Dairy, Meat)
-- Item: (e.g., Carrots, Milk, Chicken)
-- Quantity: (e.g., 2 kg, 500 ml, 3 pieces, 5 pounds)\`;
+Nutritional Guidelines:
+1. Prioritize whole, nutrient-dense foods.
+2. Include a variety of fruits and vegetables to ensure micronutrient intake.
+3. Balance protein sources throughout the day.
+4. Include healthy fats in appropriate portions.
+5. Recommend complex carbohydrates over simple sugars.
+6. Suggest adequate fiber intake for digestive health.
+7. Provide guidance on proper hydration throughout the day.
+
+${
+  unitSystem === "metric"
+    ? `
+Metric Unit Guidelines:
+- Use grams (g), kilograms (kg), milliliters (ml), liters (L)
+- Examples: "100g chicken breast", "250ml milk", "1kg potatoes"
+`
+    : `
+Imperial Unit Guidelines:
+- Use ounces (oz), pounds (lbs), cups, tablespoons (tbsp), teaspoons (tsp)
+- Examples: "4 oz chicken breast", "1 cup milk", "2 lbs potatoes"
+`
+}
+
+Ensure all calculations are accurate and maintain consistent use of ${unitSystem} units throughout the meal plan and shopping list.
+
+In the explanation field, provide:
+1. A brief explanation of how the meal choices align with the client's goals and preferences.
+2. Any special instructions or tips for meal preparation and storage.
+3. Suggestions for adjusting portion sizes based on individual needs.
+
+Remember to follow the singleDailyPlanSchema structure exactly, including all required fields such as day, date, specialInstructions (if any), totalCalories, meals (breakfast, lunch, dinner), nutritionTargets, shoppingList, and explanation.
 `;
 };

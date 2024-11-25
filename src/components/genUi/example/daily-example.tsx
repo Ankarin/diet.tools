@@ -4,6 +4,7 @@ import { singleDailyPlanSchema } from "@/app/api/gen-day/schema";
 import { useFormStore } from "@/store";
 import { experimental_useObject as useObject } from "ai/react";
 import Link from "next/link";
+import { useEffect } from "react";
 import { z } from "zod";
 import {
   Card,
@@ -32,7 +33,9 @@ export default function DailyExample() {
   });
   const { formData } = useFormStore();
   const handleGenerate = () => submit(formData);
-
+  useEffect(() => {
+    console.log(mealPlan);
+  }, [mealPlan, isLoading, error]);
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       {!isLoading && !mealPlan ? (

@@ -62,8 +62,8 @@ export const updateSession = async (request: NextRequest) => {
         }
       }
     }
-
     if (request.nextUrl.pathname.startsWith("/me") && user.error) {
+      console.log(1);
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
