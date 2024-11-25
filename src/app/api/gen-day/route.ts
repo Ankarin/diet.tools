@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
       model: model,
       schema: singleDailyPlanSchema,
       prompt,
-      temperature: 0.5,
+      temperature: 1,
     });
 
     console.log(result);
