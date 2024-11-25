@@ -5,7 +5,7 @@ import { openai } from "@ai-sdk/openai";
 import { streamObject } from "ai";
 import { NextRequest, NextResponse } from "next/server";
 
-const model = openai("gpt-4o");
+const model = openai("gpt-4o-mini");
 
 export async function POST(req: NextRequest) {
   const ip = (req.headers.get("x-forwarded-for") ?? "127.0.0.1").split(",")[0];
