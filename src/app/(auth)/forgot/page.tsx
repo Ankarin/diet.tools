@@ -31,11 +31,13 @@ export default function Page() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: forgot,
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: error.message,
-      });
+    onSettled: (res) => {
+      if (res.error) {
+        toast({
+          variant: "destructive",
+          title: res.error,
+        });
+      }
     },
     onSuccess: () => {
       toast({

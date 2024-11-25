@@ -32,7 +32,7 @@ export async function login({
     password,
   });
   if (error) {
-    throw new Error(`Login failed: ${error.message}`);
+    return { error: error.message };
   }
 }
 
@@ -53,7 +53,7 @@ export async function signup({
   password: string;
   origin: string;
   form: FormData;
-}): Promise<void> {
+}) {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -63,7 +63,9 @@ export async function signup({
     },
   });
 
-  if (error) throw new Error(`Signup failed: ${error.message}`);
+  if (error) {
+    return { error: error.message };
+  }
 
   const { error: upsertError } = await supabase.from("users").upsert({
     id: data?.user?.id,
@@ -71,8 +73,7 @@ export async function signup({
     ...form,
   });
 
-  if (upsertError)
-    throw new Error(`User data update failed: ${upsertError.message}`);
+  if (upsertError) return { error: upsertError.message };
 }
 
 export async function forgot({
@@ -81,19 +82,26 @@ export async function forgot({
 }: {
   email: string;
   origin: string;
-}): Promise<string> {
+}) {
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${origin}/api/reset-callback`,
   });
-  if (error) throw new Error(`Password reset request failed: ${error.message}`);
-  return "success";
+  if (error) {
+    return {
+      error: error.message,
+    };
+  }
 }
 
-export async function reset({ password }: { password: string }): Promise<void> {
+export async function reset({ password }: { password: string }) {
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({
     password: password,
   });
-  if (error) throw new Error(`Password reset failed: ${error.message}`);
+  if (error) {
+    return {
+      error: error.message,
+    };
+  }
 }

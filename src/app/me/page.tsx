@@ -71,19 +71,19 @@ export default function WeeklyExample() {
   const router = useRouter();
 
   const fetchLatestDiet = async () => {
-    // const user = await supabase.auth.getSession();
-    // if (user.error) return null;
-    // const res = await supabase
-    //   .from("users")
-    //   .select()
-    //   .eq("id", user.data.session.user.id)
-    //   .single();
-    //
-    // if (res.error) return null;
-    //
-    // if (!res.data.completed_profile) {
-    //   router.push("/me/profile");
-    // }
+    const user = await supabase.auth.getSession();
+    if (user.error) return null;
+    const res = await supabase
+      .from("users")
+      .select()
+      .eq("id", user.data.session.user.id)
+      .single();
+
+    if (res.error) return null;
+
+    if (!res.data.completed_profile) {
+      router.push("/me/profile");
+    }
     const { data, error } = await supabase
       .from("diets")
       .select("plan")

@@ -54,11 +54,13 @@ export default function Page() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: signup,
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: error.message,
-      });
+    onSettled: (res) => {
+      if (res?.error) {
+        toast({
+          variant: "destructive",
+          title: res.error,
+        });
+      }
     },
     onSuccess: () => {
       router.replace("/me/profile");

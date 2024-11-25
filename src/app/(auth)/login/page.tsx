@@ -36,18 +36,17 @@ export default function Page() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: login,
-    onError: (error) => {
-      console.log("error", error);
-      toast({
-        variant: "destructive",
-        title: error.message,
-      });
-    },
+
     onSuccess: () => {
       router.replace("/me");
     },
     onSettled: (res) => {
-      console.log("res", res);
+      if (res.error) {
+        toast({
+          variant: "destructive",
+          title: res.error,
+        });
+      }
     },
   });
 
