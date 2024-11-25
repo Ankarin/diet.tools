@@ -19,6 +19,11 @@ export type FormData = {
   mealPreparation: string;
 };
 
+function handleAuthError(error: Error): never {
+  console.error("Auth Error:", error);
+  throw new Error(error.message);
+}
+
 export async function login({
   email,
   password,
@@ -31,14 +36,19 @@ export async function login({
     email,
     password,
   });
-  if (error) throw new Error(`Login failed: ${error.message}`);
+
+  if (error) {
+    handleAuthError(error);
+  }
 }
 
 export async function logout(): Promise<void> {
   const supabase = await createClient();
   const { error } = await supabase.auth.signOut();
 
-  if (error) throw new Error(`Logout failed: ${error.message}`);
+  if (error) {
+    handleAuthError(error);
+  }
 }
 
 export async function signup({
@@ -61,16 +71,19 @@ export async function signup({
     },
   });
 
-  if (error) throw new Error(`Signup failed: ${error.message}`);
+  if (error) {
+    handleAuthError(error);
+  }
 
-  const { error: upsertError } = await supabase.from("users").upsert({
+  const res = await supabase.from("users").upsert({
     id: data?.user?.id,
     email,
     ...form,
   });
 
-  if (upsertError)
-    throw new Error(`User data update failed: ${upsertError.message}`);
+  if (res.error) {
+    handleAuthError(res.error);
+  }
 }
 
 export async function forgot({
@@ -79,13 +92,15 @@ export async function forgot({
 }: {
   email: string;
   origin: string;
-}): Promise<string> {
+}): Promise<void> {
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${origin}/api/reset-callback`,
   });
-  if (error) throw new Error(`Password reset request failed: ${error.message}`);
-  return "success";
+
+  if (error) {
+    handleAuthError(error);
+  }
 }
 
 export async function reset({ password }: { password: string }): Promise<void> {
@@ -93,5 +108,8 @@ export async function reset({ password }: { password: string }): Promise<void> {
   const { error } = await supabase.auth.updateUser({
     password: password,
   });
-  if (error) throw new Error(`Password reset failed: ${error.message}`);
+
+  if (error) {
+    handleAuthError(error);
+  }
 }

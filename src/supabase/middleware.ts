@@ -34,7 +34,6 @@ export const updateSession = async (request: NextRequest) => {
     );
 
     const user = await supabase.auth.getUser();
-    console.log(88, user);
     if (!user.error && user.data.user) {
       console.log("user", user.data.user.app_metadata);
       const subscriptionExpires =
