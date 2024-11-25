@@ -1,5 +1,5 @@
 "use client";
-import { reset } from "@/actions/auth";
+import { reset } from "@/app/api/actions/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";

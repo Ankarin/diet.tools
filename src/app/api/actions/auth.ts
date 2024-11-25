@@ -19,26 +19,20 @@ export type FormData = {
   mealPreparation: string;
 };
 
-function handleAuthError(error: Error): never {
-  console.error("Auth Error:", error);
-  throw new Error(error.message);
-}
-
 export async function login({
   email,
   password,
 }: {
   email: string;
   password: string;
-}): Promise<void> {
+}) {
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
-
   if (error) {
-    handleAuthError(error);
+    throw new Error(`Login failed: ${error.message}`);
   }
 }
 
@@ -46,9 +40,7 @@ export async function logout(): Promise<void> {
   const supabase = await createClient();
   const { error } = await supabase.auth.signOut();
 
-  if (error) {
-    handleAuthError(error);
-  }
+  if (error) throw new Error(`Logout failed: ${error.message}`);
 }
 
 export async function signup({
@@ -71,19 +63,16 @@ export async function signup({
     },
   });
 
-  if (error) {
-    handleAuthError(error);
-  }
+  if (error) throw new Error(`Signup failed: ${error.message}`);
 
-  const res = await supabase.from("users").upsert({
+  const { error: upsertError } = await supabase.from("users").upsert({
     id: data?.user?.id,
     email,
     ...form,
   });
 
-  if (res.error) {
-    handleAuthError(res.error);
-  }
+  if (upsertError)
+    throw new Error(`User data update failed: ${upsertError.message}`);
 }
 
 export async function forgot({
@@ -92,15 +81,13 @@ export async function forgot({
 }: {
   email: string;
   origin: string;
-}): Promise<void> {
+}): Promise<string> {
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${origin}/api/reset-callback`,
   });
-
-  if (error) {
-    handleAuthError(error);
-  }
+  if (error) throw new Error(`Password reset request failed: ${error.message}`);
+  return "success";
 }
 
 export async function reset({ password }: { password: string }): Promise<void> {
@@ -108,8 +95,5 @@ export async function reset({ password }: { password: string }): Promise<void> {
   const { error } = await supabase.auth.updateUser({
     password: password,
   });
-
-  if (error) {
-    handleAuthError(error);
-  }
+  if (error) throw new Error(`Password reset failed: ${error.message}`);
 }

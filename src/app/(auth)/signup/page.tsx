@@ -1,5 +1,5 @@
 "use client";
-import { signup } from "@/actions/auth";
+import { signup } from "@/app/api/actions/auth";
 import { useFormStore } from "@/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";

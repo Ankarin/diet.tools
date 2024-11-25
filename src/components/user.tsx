@@ -1,5 +1,5 @@
 "use client";
-import { logout } from "@/actions/auth";
+import { logout } from "@/app/api/actions/auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
