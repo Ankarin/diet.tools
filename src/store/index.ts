@@ -26,20 +26,20 @@ type FormStore = {
 };
 
 const initialFormData: FormData = {
-  gender: "male",
-  age: "25",
-  unit: "metric",
-  height: "176",
+  gender: "",
+  age: "",
+  unit: "",
+  height: "",
   heightFeet: "",
   heightInches: "",
-  weight: "80",
-  goals: "Gain mussles",
-  activity: "5 times per week bjj",
+  weight: "",
+  goals: "",
+  activity: "",
   medicalConditions: "",
   dietaryRestrictions: "",
-  foodPreferences: "I like meat",
+  foodPreferences: "",
   dietaryApproach: "",
-  mealPreparation: "at home mo",
+  mealPreparation: "",
 };
 
 export const useFormStore = create<FormStore>((set, get) => ({
