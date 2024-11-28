@@ -2,6 +2,7 @@
 
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFormStore } from "@/store";
 import {
@@ -37,7 +38,7 @@ function HeroTitles() {
       >
         {["Ai ", "Diet ", "Planner"].map((text, index) => (
           <motion.span
-            key={index}
+            key={text}
             className="inline-block px-1 md:px-2 text-balance font-bold"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -67,7 +68,7 @@ function SearchParamsHandler() {
   useEffect(() => {
     const step = searchParams.get("step");
     if (step) {
-      setCurrentStep(parseInt(step, 10));
+      setCurrentStep(Number.parseInt(step, 10));
     }
   }, [searchParams, setCurrentStep]);
 
@@ -122,6 +123,7 @@ export default function BodyCompositionCalculator() {
                 Step {currentStep} of {steps.length}
               </p>
               <div className="w-full bg-secondary rounded-full h-2">
+                {/* biome-ignore lint/style/useSelfClosingElements: <explanation> */}
                 <div
                   className="bg-primary h-2 rounded-full transition-all duration-300 ease-in-out"
                   style={{ width: `${(currentStep / steps.length) * 100}%` }}
@@ -132,11 +134,19 @@ export default function BodyCompositionCalculator() {
         </div>
       </main>
 
-      <footer className="py-6 md:py-0 border-t border-border/40">
-        <div className="container flex flex-col items-center justify-center gap-4 md:h-24 md:flex-row">
-          <p className="text-balance text-center text-sm leading-loose text-muted-foreground">
-            Ai Diet Planner
-          </p>
+      <footer className="mt-auto py-8 border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+          <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-6 md:px-0">
+            <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
+              &copy; {new Date().getFullYear()} Ai Diet Planner. All rights reserved.
+            </p>
+          </div>
+          
+          <nav className="flex gap-4 sm:gap-6">
+            <Link href="/terms" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Terms</Link>
+            <Link href="/privacy" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Privacy</Link>
+            <Link href="/contact" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Contact</Link>
+          </nav>
         </div>
       </footer>
     </div>

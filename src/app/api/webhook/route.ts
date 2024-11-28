@@ -4,11 +4,15 @@ import { headers } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { addMonths } from "date-fns";
 
+// biome-ignore lint/style/noNonNullAssertion: <explanation>
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+// biome-ignore lint/style/noNonNullAssertion: <explanation>
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 const supabase = createClient(
+  // biome-ignore lint/style/noNonNullAssertion: <explanation>
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  // biome-ignore lint/style/noNonNullAssertion: <explanation>
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
   {
     auth: {
@@ -126,7 +130,7 @@ async function updateUserSubscription(
       },
     });
 
-    const res = supabase.from("subs").upsert({
+    const res = await supabase.from("subs").upsert({
       id: userId,
       subscription_expires: newExpirationDate,
       last_payment: new Date(),

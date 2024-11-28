@@ -17,6 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { toast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
@@ -30,6 +31,9 @@ const FormSchema = z
     confirmPassword: z
       .string()
       .min(8, { message: "Password must be at least 8 characters long" }),
+    terms: z.boolean().refine((value) => value === true, {
+      message: "You must agree to the terms and privacy policy",
+    }),
   })
   .refine(
     (values) => {
@@ -49,6 +53,7 @@ export default function Page() {
       email: "",
       password: "",
       confirmPassword: "",
+      terms: false,
     },
   });
 
@@ -132,10 +137,40 @@ export default function Page() {
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="terms"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>
+                  I agree to the{" "}
+                  <Link href="/terms" className="text-blue-600 hover:underline">
+                    Terms of Use
+                  </Link>{" "}
+                  and{" "}
+                  <Link href="/privacy" className="text-blue-600 hover:underline">
+                    Privacy Policy
+                  </Link>
+                </FormLabel>
+                <FormMessage />
+              </div>
+            </FormItem>
+          )}
+        />
+
         {isPending ? (
           <Loader2 className="h-10 w-10 animate-spin" />
         ) : (
-          <Button type="submit">Sign Up</Button>
+          <Button type="submit" className="w-full" disabled={isPending}>
+            Sign Up
+          </Button>
         )}
       </form>
     </Form>

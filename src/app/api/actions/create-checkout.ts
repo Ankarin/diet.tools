@@ -12,7 +12,7 @@ const checkoutSchema = z.object({
 
 export const createCheckoutSession = actionClient
   .schema(checkoutSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<{ sessionId: string }> => {
     try {
       const { priceId } = parsedInput;
 
