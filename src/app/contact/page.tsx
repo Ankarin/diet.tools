@@ -37,7 +37,33 @@ export default function ContactPage() {
 
 	async function onSubmit(data: z.infer<typeof formSchema>) {
 		try {
-			console.log(data);
+			const response = await fetch("/api/contact", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(data),
+			});
+
+			const result = await response.json();
+
+			if (!response.ok) {
+				if (response.status === 429) {
+					toast({
+						title: "Rate limit exceeded",
+						description: result.error,
+						variant: "destructive",
+					});
+				} else {
+					toast({
+						title: "Something went wrong",
+						description: result.error || "Please try again later",
+						variant: "destructive",
+					});
+				}
+				return;
+			}
+
 			toast({
 				title: "✨ Message sent",
 				description: "We'll get back to you soon!",
@@ -123,8 +149,9 @@ export default function ContactPage() {
 						<Button
 							type="submit"
 							className="w-full"
+							disabled={form.formState.isSubmitting}
 						>
-							Send message
+							{form.formState.isSubmitting ? "Sending..." : "Send message"}
 						</Button>
 					</form>
 				</Form>
