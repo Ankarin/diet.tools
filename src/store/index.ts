@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { sendGAEvent } from '@next/third-parties/google';
 
 export type FormData = {
   gender: "male" | "female" | "";
@@ -48,11 +49,24 @@ export const useFormStore = create<FormStore>((set, get) => ({
   goNextStep: async () => {
     const { currentStep } = get();
     const newStep = currentStep + 1;
+    const maxSteps = 13;
 
-    set({ currentStep: newStep });
+    if (newStep <= maxSteps) {
+      set({ currentStep: newStep });
+      sendGAEvent({ 
+        event: 'step_complete',
+        value: currentStep,
+        next_step: newStep
+      });
+      window.location.href = `/step/${newStep}`;
+    }
   },
   setCurrentStep: (step: number) => {
     set({ currentStep: step });
+    sendGAEvent({ 
+      event: 'step_view',
+      value: step
+    });
   },
   updateFormData: (field, value) => {
     set((state) => ({
