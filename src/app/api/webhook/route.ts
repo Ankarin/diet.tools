@@ -19,7 +19,7 @@ const supabase = createClient(
       autoRefreshToken: false,
       persistSession: false,
     },
-  },
+  }
 );
 
 export async function POST(req: Request) {
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   if (!sig) {
     return NextResponse.json(
       { error: "No Stripe signature found" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     console.log("Webhook signature verification failed:", err.message);
     return NextResponse.json(
       { error: `Webhook Error: ${err.message}` },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
   switch (event.type) {
     case "checkout.session.completed":
       await handleCheckoutSessionCompleted(
-        event.data.object as Stripe.Checkout.Session,
+        event.data.object as Stripe.Checkout.Session
       );
       break;
     case "invoice.paid":
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
 }
 
 async function handleCheckoutSessionCompleted(
-  session: Stripe.Checkout.Session,
+  session: Stripe.Checkout.Session
 ) {
   const customerEmail = session.customer_details?.email;
   if (!customerEmail) {
@@ -88,7 +88,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
 
 async function updateUserSubscription(
   customerEmail: string,
-  isNewSubscription: boolean,
+  isNewSubscription: boolean
 ) {
   try {
     // Fetch user ID from the users table
@@ -115,7 +115,7 @@ async function updateUserSubscription(
     if (currentUserError || !currentUser) {
       console.error(
         "Error fetching current user:",
-        currentUserError || "User not found",
+        currentUserError || "User not found"
       );
       return;
     }
@@ -129,13 +129,6 @@ async function updateUserSubscription(
         subscription_expires: newExpirationDate.toISOString(),
       },
     });
-
-    const res = await supabase.from("subs").upsert({
-      id: userId,
-      subscription_expires: newExpirationDate,
-      last_payment: new Date(),
-    });
-    console.log("updated subs", res);
 
     if (error) {
       console.error("Error updating user app_metadata:", error);
