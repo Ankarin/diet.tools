@@ -38,7 +38,7 @@ export default async function RootLayout({
       className="scroll-smooth antialiased"
       suppressHydrationWarning
     >
-      <GoogleTagManager gtmId="GTM-PVN4L8PM" />
+      <GoogleTagManager gtmId="GTM-PMLK9MRC" />
       <body className={`flex min-h-screen flex-col ${inter.className}`}>
         <header className="z-[50] sticky top-0 w-full bg-background/95 border-b backdrop-blur-sm border-border/40">
           <div className="container h-14 flex items-center justify-between">
@@ -57,7 +57,7 @@ export default async function RootLayout({
         </ReactQueryProvider>
         <Analytics />
       </body>
-      <GoogleAnalytics gaId="G-H4QR515G6D" />
+      <GoogleAnalytics gaId="G-L3P8378940" />
     </html>
   );
 }
