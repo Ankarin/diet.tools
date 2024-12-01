@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 const createDailyAIPrompt = (formData: FormData) => {
   const unitSystem = formData.unit === "metric" ? "metric" : "imperial";
 
-  return `As a clinical nutritionist, create a highly personalized and detailed 1-day meal plan that strictly follows the provided singleDailyPlanSchema. Use ONLY ${unitSystem} units throughout the entire plan and shopping list.
+  return `As a clinical nutritionist, create a highly personalized and detailed 1-day meal plan that MUST strictly follow the singleDailyPlanSchema structure. Use ONLY ${unitSystem} units throughout.
 
 Client Details:
 - Gender: ${formData.gender}
@@ -56,55 +56,45 @@ ${formData.foodPreferences ? `- Food Preferences: ${formData.foodPreferences}` :
 ${formData.dietaryApproach ? `- Dietary Approach: ${formData.dietaryApproach}` : ""}
 ${formData.mealPreparation ? `- Meal Preparation Preferences: ${formData.mealPreparation}` : ""}
 
-Strict Instructions:
-1. Use ONLY ${unitSystem} units throughout the entire meal plan and shopping list.
-2. Create a daily meal plan following the singleDailyPlanSchema exactly.
-3. Include breakfast, lunch, and dinner. No snacks or additional meals.
-4. Distribute daily calories approximately: Breakfast 30%, Lunch 40%, Dinner 30%.
-5. Ensure the sum of calories from all meals equals the total daily calorie target.
-6. Provide total calories and macronutrients (protein, carbs, fats) for each meal and food item.
-7. Make meals practical and easy to prepare with commonly available ingredients.
-8. Generate a comprehensive grocery list categorized by food groups.
+Required Schema Components (ALL MUST BE INCLUDED):
+1. day (string): Current day of the week
+2. date (string): Current date
+3. totalCalories (number): Total daily calories
+4. meals (object): MUST include all three meals:
+   - breakfast: { items: Array<MealItem>, totalCalories: number }
+   - lunch: { items: Array<MealItem>, totalCalories: number }
+   - dinner: { items: Array<MealItem>, totalCalories: number }
+5. nutritionTargets (object): MUST include:
+   - calories (number)
+   - protein (string with unit)
+   - carbs (string with unit)
+   - fats (string with unit)
+6. shoppingList (object): MUST include:
+   - categories: Array of { name: string, items: Array<{ name: string, quantity: string, category: string }> }
+7. explanation (string): Detailed explanation of the meal plan
 
-Personalization Guidelines:
-1. Tailor meals to the client's specific goals (e.g., weight loss, muscle gain, maintenance).
-2. Adjust portion sizes and macronutrient ratios based on the client's activity level.
-3. Incorporate the client's food preferences and avoid restricted foods.
-4. Consider the client's medical conditions and provide appropriate meal options.
-5. Align with the specified dietary approach (e.g., Mediterranean, low-carb, plant-based).
-6. Accommodate meal preparation preferences (e.g., meal prep, quick meals, cooking from scratch).
-7. Ensure all meals are free from any listed allergies or food sensitivities.
+Each Meal Item MUST Include:
+- food (string): Name of the food
+- portion (string): Exact portion size in ${unitSystem} units
+- calories (number): Calories per portion
+- protein (number): Protein content in grams
+- carbs (number): Carbohydrate content in grams
+- fats (number): Fat content in grams
 
-Nutritional Guidelines:
-1. Prioritize whole, nutrient-dense foods.
-2. Include a variety of fruits and vegetables to ensure micronutrient intake.
-3. Balance protein sources throughout the day.
-4. Include healthy fats in appropriate portions.
-5. Recommend complex carbohydrates over simple sugars.
-6. Suggest adequate fiber intake for digestive health.
-7. Provide guidance on proper hydration throughout the day.
+Strict Requirements:
+1. ALL components listed above MUST be included and properly formatted
+2. Use ONLY ${unitSystem} units consistently
+3. Each meal MUST have at least 2 food items
+4. Shopping list MUST be categorized (e.g., Proteins, Vegetables, etc.)
+5. Calories MUST be realistic and match the client's goals
+6. ALL numerical values MUST be reasonable and mathematically consistent
+7. Each meal's totalCalories MUST equal the sum of its items' calories
+8. Daily totalCalories MUST equal the sum of all meals' totalCalories
 
-${
-  unitSystem === "metric"
-    ? `
-Metric Unit Guidelines:
-- Use grams (g), kilograms (kg), milliliters (ml), liters (L)
-- Examples: "100g chicken breast", "250ml milk", "1kg potatoes"
-`
-    : `
-Imperial Unit Guidelines:
-- Use ounces (oz), pounds (lbs), cups, tablespoons (tbsp), teaspoons (tsp)
-- Examples: "4 oz chicken breast", "1 cup milk", "2 lbs potatoes"
-`
-}
+Distribution Guidelines:
+- Breakfast: ~30% of total calories
+- Lunch: ~40% of total calories
+- Dinner: ~30% of total calories
 
-Ensure all calculations are accurate and maintain consistent use of ${unitSystem} units throughout the meal plan and shopping list.
-
-In the explanation field, provide:
-1. A brief explanation of how the meal choices align with the client's goals and preferences.
-2. Any special instructions or tips for meal preparation and storage.
-3. Suggestions for adjusting portion sizes based on individual needs.
-
-Remember to follow the singleDailyPlanSchema structure exactly, including all required fields such as day, date, specialInstructions (if any), totalCalories, meals (breakfast, lunch, dinner), nutritionTargets, shoppingList, and explanation.
-`;
+The response MUST be a valid JSON object matching the singleDailyPlanSchema structure. Each required field MUST be present and properly formatted.`;
 };
