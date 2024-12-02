@@ -6,7 +6,7 @@ import { openai } from "@ai-sdk/openai";
 import { streamObject } from "ai";
 import { NextRequest, NextResponse } from "next/server";
 
-const model = openai("gpt-4o-mini");
+const model = openai("gpt-4o");
 // const model = anthropic("claude-3-5-sonnet-latest");
 
 // Define a new schema that uses a single weeklyPlanSchema
@@ -79,25 +79,31 @@ ${formData.mealPreparation ? `- Meal Preparation Preferences: ${formData.mealPre
 Strict Instructions:
 1. Use ONLY ${unitSystem} units throughout the entire meal plan and shopping list. DO NOT include any ${formData.unit === "metric" ? "imperial" : "metric"} units.
 2. Create a weekly meal plan following the \`weeklyPlanSchema\` exactly.
-3. Include only breakfast, lunch, and dinner. No snacks or additional meals.
-4. CRITICAL - Daily Calorie Distribution:
-   - Each day's total calories MUST EXACTLY equal the sum of its meal calories
-   - STRICT meal distribution (no deviation allowed):
-     * Breakfast MUST BE EXACTLY 40% of daily total
-     * Lunch MUST BE EXACTLY 35% of daily total
-     * Dinner MUST BE EXACTLY 25% of daily total
-   - Example calculation for 3000 daily calories:
-     * Breakfast: 3000 × 0.40 = 1200 calories
-     * Lunch: 3000 × 0.35 = 1050 calories
-     * Dinner: 3000 × 0.25 = 750 calories
-     * Verify: 1200 + 1050 + 750 = 3000 total
-5. For EVERY day, calculate the exact calories for each meal using these percentages.
-   DO NOT deviate from 40/35/25 split under any circumstances.
-6. Provide total calories and macronutrients (protein, carbs, fats) for each meal and food item.
-7. Make meals practical and easy to prepare with commonly available ingredients.
-8. Ensure balanced daily plans with variety across the week.
-9. Generate a comprehensive grocery list using the same ${unitSystem} units.
-10. Create plans for 7 days, Monday through Sunday.
+
+3. CRITICAL - Calorie Planning Process:
+   Step 1: For each day, FIRST calculate exact meal calories:
+     * If daily total is X calories:
+     * Breakfast = X × 0.40 calories (EXACTLY 40%)
+     * Lunch = X × 0.35 calories (EXACTLY 35%)
+     * Dinner = X × 0.25 calories (EXACTLY 25%)
+   
+   Step 2: ONLY after calculating exact calories, plan meals to match these numbers
+   
+   Example for 3000 calories/day:
+   1. Calculate first:
+      * Breakfast: 3000 × 0.40 = 1200 calories
+      * Lunch: 3000 × 0.35 = 1050 calories
+      * Dinner: 3000 × 0.25 = 750 calories
+   2. Then plan meals to match these exact numbers
+   
+   DO NOT start planning meals until you have calculated the exact calories for each meal.
+
+4. Include only breakfast, lunch, and dinner. No snacks or additional meals.
+5. Provide total calories and macronutrients (protein, carbs, fats) for each meal and food item.
+6. Make meals practical and easy to prepare with commonly available ingredients.
+7. Ensure balanced daily plans with variety across the week.
+8. Generate a comprehensive grocery list using the same ${unitSystem} units.
+9. Create plans for 7 days, Monday through Sunday.
 
 Personalization Guidelines:
 1. Tailor meals to the client's specific goals (e.g., weight loss, muscle gain, maintenance).

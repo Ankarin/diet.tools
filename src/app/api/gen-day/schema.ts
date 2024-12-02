@@ -29,7 +29,7 @@ const shoppingListSchema = z.object({
     z.object({
       name: z.string(),
       items: z.array(shoppingListItemSchema),
-    }),
+    })
   ),
 });
 
