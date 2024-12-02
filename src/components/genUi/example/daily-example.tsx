@@ -60,7 +60,7 @@ export default function DailyExample() {
       ) : !isLoading && mealPlan ? (
         <Link href="/signup">
           <Button disabled={isLoading} className="mb-6 text-lg py-6 px-8 w-full">
-            Get Your Full Weekly Plan →
+          Get The Full Version →
           </Button>
         </Link>
       ) : null}
