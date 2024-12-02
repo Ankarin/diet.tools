@@ -6,13 +6,7 @@ import { experimental_useObject as useObject } from "ai/react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { z } from "zod";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MealCard } from "./meal-card";
@@ -33,29 +27,42 @@ export default function DailyExample() {
   });
   const { formData } = useFormStore();
   const handleGenerate = () => submit(formData);
+
+  // Calculate total macros
+  const totalMacros = mealPlan?.meals ? Object.values(mealPlan.meals).reduce(
+    (acc, meal) => {
+      meal.items.forEach((item) => {
+        acc.protein += item.protein || 0;
+        acc.carbs += item.carbs || 0;
+        acc.fats += item.fats || 0;
+      });
+      return acc;
+    },
+    { protein: 0, carbs: 0, fats: 0 }
+  ) : null;
+
   useEffect(() => {
     console.log(mealPlan);
   }, [mealPlan, isLoading, error]);
+
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       {!isLoading && !mealPlan ? (
         <Button
           onClick={handleGenerate}
           disabled={isLoading}
-          className="mb-6 text-lg py-6 px-8 w-full "
+          className="mb-6 text-lg py-6 px-8 w-full"
         >
-          Generate
+          Create My Sample Meal Plan
         </Button>
       ) : !isLoading && mealPlan ? (
         <Link href="/signup">
-          <Button
-            disabled={isLoading}
-            className="mb-6 text-lg py-6 px-8 w-full "
-          >
-            Get plan for a week
+          <Button disabled={isLoading} className="mb-6 text-lg py-6 px-8 w-full">
+            Get Your Full Weekly Plan →
           </Button>
         </Link>
       ) : null}
+
       {error && (
         <Card className="mb-6 bg-red-50 shadow-lg">
           <CardHeader>
@@ -76,9 +83,14 @@ export default function DailyExample() {
               <CardTitle className="text-2xl font-bold">
                 Your meal plan for the day
               </CardTitle>
-              <CardDescription className="text-xl">
-                Calories: {mealPlan?.totalCalories || "Calculating..."}
-              </CardDescription>
+              <div className="text-xl text-muted-foreground">
+                <div>Calories: {mealPlan?.totalCalories || "Calculating..."}</div>
+                {totalMacros && (
+                  <div>
+                    Protein: {totalMacros.protein}g   Carbs: {totalMacros.carbs}g   Fats: {totalMacros.fats}g
+                  </div>
+                )}
+              </div>
             </CardHeader>
           </Card>
 
@@ -103,8 +115,8 @@ export default function DailyExample() {
       )}
 
       {isLoading && (
-        <div className="flex items-center justify-center mt-8">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <div className="flex justify-center items-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       )}
       <br />
@@ -112,9 +124,9 @@ export default function DailyExample() {
         <Link href="/signup">
           <Button
             disabled={isLoading}
-            className="mb-6 text-lg py-6 px-8 w-full "
+            className="mb-6 text-lg py-6 px-8 w-full"
           >
-            Get plan for a week
+            Get The Full Version →
           </Button>
         </Link>
       )}

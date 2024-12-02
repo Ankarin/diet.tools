@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     console.log("Rate limit exceeded");
     return NextResponse.json(
       { error: "Usage limit exceeded, please try again in an hour." },
-      { status: 429 },
+      { status: 429 }
     );
   }
   try {
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error generating daily meal plan:", error);
     throw new Error(
-      "Failed to generate daily meal plan. Please try again later.",
+      "Failed to generate daily meal plan. Please try again later."
     );
   }
 }
@@ -56,45 +56,106 @@ ${formData.foodPreferences ? `- Food Preferences: ${formData.foodPreferences}` :
 ${formData.dietaryApproach ? `- Dietary Approach: ${formData.dietaryApproach}` : ""}
 ${formData.mealPreparation ? `- Meal Preparation Preferences: ${formData.mealPreparation}` : ""}
 
-Required Schema Components (ALL MUST BE INCLUDED):
-1. day (string): Current day of the week
-2. date (string): Current date
-3. totalCalories (number): Total daily calories
-4. meals (object): MUST include all three meals:
-   - breakfast: { items: Array<MealItem>, totalCalories: number }
-   - lunch: { items: Array<MealItem>, totalCalories: number }
-   - dinner: { items: Array<MealItem>, totalCalories: number }
-5. nutritionTargets (object): MUST include:
-   - calories (number)
-   - protein (string with unit)
-   - carbs (string with unit)
-   - fats (string with unit)
-6. shoppingList (object): MUST include:
-   - categories: Array of { name: string, items: Array<{ name: string, quantity: string, category: string }> }
-7. explanation (string): Detailed explanation of the meal plan
+Strict Instructions:
+1. Use ONLY ${unitSystem} units throughout the entire meal plan and shopping list. DO NOT include any ${formData.unit === "metric" ? "imperial" : "metric"} units.
+2. Follow the singleDailyPlanSchema exactly.
+3. Include only breakfast, lunch, and dinner. No snacks or additional meals.
+4. Distribute daily calories: Breakfast 30%, Lunch 40%, Dinner 30%.
+5. Ensure the sum of calories from all meals equals the total daily calorie target in nutritionTargets.
+6. Provide total calories and macronutrients (protein, carbs, fats) for each meal and food item.
+7. Make meals practical and easy to prepare with commonly available ingredients.
+8. Ensure balanced daily plans with variety.
+9. Generate a comprehensive grocery list using the same ${unitSystem} units.
+10. IMPORTANT: Include at least 2-3 servings of fruits throughout the day, preferably with breakfast and as part of other meals.
 
-Each Meal Item MUST Include:
-- food (string): Name of the food
-- portion (string): Exact portion size in ${unitSystem} units
-- calories (number): Calories per portion
-- protein (number): Protein content in grams
-- carbs (number): Carbohydrate content in grams
-- fats (number): Fat content in grams
+Nutritional Guidelines:
+1. Prioritize whole, nutrient-dense foods.
+2. Include a variety of fruits and vegetables to ensure micronutrient intake:
+   - At least 2-3 servings of fruits daily (e.g., berries, citrus, apples)
+   - Aim for colorful fruits to maximize nutritional benefits
+   - Include both fresh and frozen fruit options
+3. Balance protein sources throughout the day.
+4. Include healthy fats in appropriate portions.
+5. Recommend complex carbohydrates over simple sugars.
+6. Suggest adequate fiber intake for digestive health.
+7. Provide guidance on proper hydration throughout the day.
 
-Strict Requirements:
-1. ALL components listed above MUST be included and properly formatted
-2. Use ONLY ${unitSystem} units consistently
-3. Each meal MUST have at least 2 food items
-4. Shopping list MUST be categorized (e.g., Proteins, Vegetables, etc.)
-5. Calories MUST be realistic and match the client's goals
-6. ALL numerical values MUST be reasonable and mathematically consistent
-7. Each meal's totalCalories MUST equal the sum of its items' calories
-8. Daily totalCalories MUST equal the sum of all meals' totalCalories
+Fruit Integration Guidelines:
+1. Breakfast Ideas with Fruit:
+   - Fresh berries with oatmeal or yogurt
+   - Sliced banana on whole grain toast
+   - Fruit smoothies with protein
+2. Lunch Options:
+   - Fresh fruit as a side
+   - Fruit in salads (e.g., apple slices, mandarin oranges)
+3. Dinner Suggestions:
+   - Fruit-based sauces or glazes
+   - Fresh fruit for dessert
+4. Consider seasonal availability and client preferences
 
-Distribution Guidelines:
-- Breakfast: ~30% of total calories
-- Lunch: ~40% of total calories
-- Dinner: ~30% of total calories
+Meal Variety and Cultural Considerations:
+1. Offer a diverse range of flavors, textures, and cooking methods.
+2. Include meals from various cuisines to prevent monotony.
+3. Respect and incorporate cultural food preferences when specified.
+4. Suggest appropriate substitutions for traditional ingredients if needed.
 
-The response MUST be a valid JSON object matching the singleDailyPlanSchema structure. Each required field MUST be present and properly formatted.`;
+Portion Sizes and Meal Timing:
+1. Provide clear portion sizes for each ingredient in ${unitSystem} units.
+2. Suggest optimal meal timing based on the client's activity level and goals.
+3. Adjust portion sizes to meet daily calorie and macronutrient targets.
+
+Allergies and Food Sensitivities:
+1. Carefully avoid all ingredients related to listed allergies.
+2. Suggest suitable alternatives for common allergens.
+3. Provide guidance on reading labels and avoiding hidden allergens.
+
+Seasonal Ingredients and Sustainability:
+1. Recommend seasonal produce when possible for freshness and affordability.
+2. Suggest sustainable protein sources and environmentally friendly food choices.
+3. Provide tips on reducing food waste through proper storage and meal planning.
+
+Meal Prep and Storage Tips:
+1. Include suggestions for batch cooking and meal prepping to save time.
+2. Provide guidance on proper food storage to maintain freshness and safety.
+3. Offer tips on reheating meals without compromising taste or texture.
+
+${
+  unitSystem === "metric"
+    ? `
+Metric Unit Guidelines:
+- Use grams (g), kilograms (kg), milliliters (ml), liters (L)
+- Examples: "100g chicken breast", "250ml milk", "1kg potatoes"
+`
+    : `
+Imperial Unit Guidelines:
+- Use ounces (oz), pounds (lbs), cups, tablespoons (tbsp), teaspoons (tsp)
+- Examples: "4 oz chicken breast", "1 cup milk", "2 lbs potatoes"
+`
+}
+
+Example Format (using ${unitSystem} units):
+
+\`\`\`json
+{
+  "day": "Monday",
+  "totalCalories": 2500,
+  "meals": {
+    "breakfast": {
+      "items": [
+        {
+          "food": "Oatmeal with Almonds and Mixed Berries",
+          "portion": "${unitSystem === "metric" ? "60g oats, 15g almonds, 100g mixed berries" : "1/2 cup oats, 1 oz almonds, 1 cup mixed berries"}",
+          "calories": 1000,
+          "protein": 25,
+          "carbs": 150,
+          "fats": 30
+        }
+      ],
+      "totalCalories": 1000
+    }
+  }
+}
+\`\`\`
+
+Ensure all calculations are accurate and maintain consistent use of ${unitSystem} units throughout the meal plan and shopping list. Do not include any ${formData.unit === "metric" ? "imperial" : "metric"} units in your response. Provide a brief explanation for your meal choices and how they align with the client's goals and preferences.`;
 };

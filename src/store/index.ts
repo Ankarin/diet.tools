@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { sendGAEvent } from '@next/third-parties/google';
+import { sendGAEvent } from "@next/third-parties/google";
 
 export type FormData = {
   gender: "male" | "female" | "";
@@ -27,20 +27,20 @@ type FormStore = {
 };
 
 const initialFormData: FormData = {
-  gender: "",
-  age: "",
-  unit: "",
-  height: "",
+  gender: "male",
+  age: "25",
+  unit: "metric",
+  height: "176",
   heightFeet: "",
   heightInches: "",
-  weight: "",
-  goals: "",
-  activity: "",
+  weight: "77",
+  goals: "build mussles",
+  activity: "bjj 5 times per week",
   medicalConditions: "",
   dietaryRestrictions: "",
-  foodPreferences: "",
+  foodPreferences: "i like meat",
   dietaryApproach: "",
-  mealPreparation: "",
+  mealPreparation: "i cook at home",
 };
 
 export const useFormStore = create<FormStore>((set, get) => ({
@@ -53,19 +53,19 @@ export const useFormStore = create<FormStore>((set, get) => ({
 
     if (newStep <= maxSteps) {
       set({ currentStep: newStep });
-      sendGAEvent({ 
-        event: 'step_complete',
+      sendGAEvent({
+        event: "step_complete",
         value: currentStep,
-        next_step: newStep
+        next_step: newStep,
       });
       window.location.href = `/step/${newStep}`;
     }
   },
   setCurrentStep: (step: number) => {
     set({ currentStep: step });
-    sendGAEvent({ 
-      event: 'step_view',
-      value: step
+    sendGAEvent({
+      event: "step_view",
+      value: step,
     });
   },
   updateFormData: (field, value) => {

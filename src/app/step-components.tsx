@@ -791,8 +791,13 @@ export function MealPreparationStep() {
 
 export function ExamplePlanStep() {
   return (
-    <Step title="Looking good, lets generate an example daily meal plan for you.">
-      <DailyExample />
+    <Step title="Perfect! Let's create your personalized meal plan">
+      <div className="space-y-4">
+        <p className="text-gray-600">
+          Based on your preferences, we&apos;ll generate a sample daily meal plan tailored just for you. This will give you a taste of what you can expect from our AI-powered meal planning.
+        </p>
+        <DailyExample />
+      </div>
     </Step>
   );
 }

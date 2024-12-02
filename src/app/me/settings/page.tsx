@@ -1,13 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { createPortalSession } from "@/app/api/actions/create-portal-session";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
 
 function Page() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleManageSubscription = async () => {
     try {
+      setIsLoading(true);
       const { data, serverError } = await createPortalSession({});
       if (serverError) {
         toast({
@@ -23,6 +27,8 @@ function Page() {
         variant: "destructive",
         title: "Failed to open customer portal",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -32,8 +38,16 @@ function Page() {
       <div className="space-y-6">
         <div>
           <h2 className="text-xl font-semibold mb-2">Subscription</h2>
-          <Button onClick={handleManageSubscription}>
-            Manage Subscription
+          <Button 
+            onClick={handleManageSubscription} 
+            disabled={isLoading}
+            className="w-[180px] justify-center"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Manage Subscription"
+            )}
           </Button>
         </div>
       </div>
