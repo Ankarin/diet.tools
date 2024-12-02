@@ -31,11 +31,13 @@ export default function DailyExample() {
   // Calculate total macros
   const totalMacros = mealPlan?.meals ? Object.values(mealPlan.meals).reduce(
     (acc, meal) => {
-      meal.items.forEach((item) => {
-        acc.protein += item.protein || 0;
-        acc.carbs += item.carbs || 0;
-        acc.fats += item.fats || 0;
-      });
+      if (meal?.items) {
+        meal.items.forEach((item) => {
+          acc.protein += item.protein || 0;
+          acc.carbs += item.carbs || 0;
+          acc.fats += item.fats || 0;
+        });
+      }
       return acc;
     },
     { protein: 0, carbs: 0, fats: 0 }
