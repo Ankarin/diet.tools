@@ -36,6 +36,8 @@ export const updateSession = async (request: NextRequest) => {
     const user = await supabase.auth.getUser();
     if (!user.error && user.data.user) {
       console.log("user", user.data.user.app_metadata);
+      // Temporarily disabled subscription check
+      /*
       const subscriptionExpires =
         user.data.user.app_metadata.subscription_expires;
 
@@ -49,6 +51,7 @@ export const updateSession = async (request: NextRequest) => {
           );
         }
       }
+      */
     }
 
     if (!user.error && user.data.user) {
@@ -71,11 +74,14 @@ export const updateSession = async (request: NextRequest) => {
         request.nextUrl.pathname,
       ) &&
       !user.error &&
+      user.data.user
+      /* Temporarily disabled subscription check
       user.data.user?.app_metadata.subscription_expires &&
       isAfter(
         new Date(user.data.user.app_metadata.subscription_expires),
         new Date(),
       )
+      */
     ) {
       return NextResponse.redirect(new URL("/me", request.url));
     }

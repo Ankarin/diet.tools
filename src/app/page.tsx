@@ -8,9 +8,7 @@ import { useFormStore } from "@/store";
 import {
   GenderStep,
   AgeStep,
-  UnitStep,
-  HeightStep,
-  WeightStep,
+  MeasurementsStep,
   GoalsStep,
   DietaryRestrictionsStep,
   MedicalConditionsStep,
@@ -86,9 +84,7 @@ export default function BodyCompositionCalculator() {
   const steps = [
     <GenderStep key="gender" />,
     <AgeStep key="age" />,
-    <UnitStep key="unit" />,
-    <HeightStep key="height" />,
-    <WeightStep key="weight" />,
+    <MeasurementsStep key="measurements" />,
     <GoalsStep key="goals" />,
     <ActivityStep key="activity" />,
     <MedicalConditionsStep key="medicalConditions" />,

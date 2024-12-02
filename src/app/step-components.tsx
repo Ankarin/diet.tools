@@ -16,6 +16,7 @@ import { useFormStore } from "@/store";
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useState } from "react";
 
 import { Textarea } from "@/components/ui/textarea";
 
@@ -159,33 +160,6 @@ export function AgeStep() {
     </Step>
   );
 }
-export function UnitStep() {
-  const { updateFormData, setCurrentStep } = useFormStore();
-
-  const handleUnitSelection = (unit: "metric" | "imperial") => {
-    updateFormData("unit", unit);
-    setCurrentStep(4);
-  };
-
-  return (
-    <Step title="Choose your preferred unit system">
-      <div className="flex justify-center space-x-4">
-        <RainbowButton
-          colorScheme="black"
-          onClick={() => handleUnitSelection("metric")}
-        >
-          Metric
-        </RainbowButton>
-        <RainbowButton
-          colorScheme="white"
-          onClick={() => handleUnitSelection("imperial")}
-        >
-          Imperial
-        </RainbowButton>
-      </div>
-    </Step>
-  );
-}
 
 const metricHeightSchema = z.object({
   height: z.string().refine(
@@ -214,127 +188,6 @@ const imperialHeightSchema = z.object({
   ),
 });
 
-export function HeightStep() {
-  const { formData, updateFormData, setCurrentStep } = useFormStore();
-
-  const metricForm = useForm<z.infer<typeof metricHeightSchema>>({
-    resolver: zodResolver(metricHeightSchema),
-    defaultValues: { height: formData.height || "" },
-  });
-
-  const imperialForm = useForm<z.infer<typeof imperialHeightSchema>>({
-    resolver: zodResolver(imperialHeightSchema),
-    defaultValues: {
-      heightFeet: formData.heightFeet || "",
-      heightInches: formData.heightInches || "",
-    },
-  });
-
-  function onSubmitMetric(values: z.infer<typeof metricHeightSchema>) {
-    updateFormData("height", values.height);
-    setCurrentStep(5);
-  }
-
-  function onSubmitImperial(values: z.infer<typeof imperialHeightSchema>) {
-    updateFormData("heightFeet", values.heightFeet);
-    updateFormData("heightInches", values.heightInches);
-    setCurrentStep(5);
-  }
-
-  return (
-    <Step
-      title={`What's your height? (${formData.unit === "metric" ? "cm" : "ft/in"})`}
-    >
-      {formData.unit === "metric" ? (
-        <Form {...metricForm}>
-          <form
-            onSubmit={metricForm.handleSubmit(onSubmitMetric)}
-            className="space-y-4"
-          >
-            <FormField
-              control={metricForm.control}
-              name="height"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="number"
-                      placeholder="Enter your height in cm"
-                      className="text-center text-lg"
-                      autoFocus
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <RainbowButton
-              type="submit"
-              className="w-full"
-              disabled={!metricForm.formState.isValid}
-            >
-              Next
-            </RainbowButton>
-          </form>
-        </Form>
-      ) : (
-        <Form {...imperialForm}>
-          <form
-            onSubmit={imperialForm.handleSubmit(onSubmitImperial)}
-            className="space-y-4"
-          >
-            <div className="flex space-x-2">
-              <FormField
-                control={imperialForm.control}
-                name="heightFeet"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        placeholder="Feet"
-                        className="text-center text-lg"
-                        autoFocus
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={imperialForm.control}
-                name="heightInches"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        placeholder="Inches"
-                        className="text-center text-lg"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <RainbowButton
-              type="submit"
-              className="w-full"
-              disabled={!imperialForm.formState.isValid}
-            >
-              Next
-            </RainbowButton>
-          </form>
-        </Form>
-      )}
-    </Step>
-  );
-}
-
 const createWeightSchema = (isMetric: boolean) =>
   z.object({
     weight: z.string().refine(
@@ -349,55 +202,179 @@ const createWeightSchema = (isMetric: boolean) =>
       },
     ),
   });
-export function WeightStep() {
+
+export function MeasurementsStep() {
   const { formData, updateFormData, setCurrentStep } = useFormStore();
+  const [unit, setUnit] = useState<"metric" | "imperial">(formData.unit || "metric");
 
-  const isMetric = formData.unit === "metric";
-  const weightSchema = createWeightSchema(isMetric);
+  const metricHeightForm = useForm<z.infer<typeof metricHeightSchema>>({
+    resolver: zodResolver(metricHeightSchema),
+    defaultValues: { height: formData.height || "" },
+  });
 
-  const form = useForm<z.infer<typeof weightSchema>>({
+  const imperialHeightForm = useForm<z.infer<typeof imperialHeightSchema>>({
+    resolver: zodResolver(imperialHeightSchema),
+    defaultValues: {
+      heightFeet: formData.heightFeet || "",
+      heightInches: formData.heightInches || "",
+    },
+  });
+
+  const weightSchema = createWeightSchema(unit === "metric");
+  const weightForm = useForm<z.infer<typeof weightSchema>>({
     resolver: zodResolver(weightSchema),
     defaultValues: {
       weight: formData.weight || "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof weightSchema>) {
-    updateFormData("weight", values.weight);
-    setCurrentStep(6);
-  }
+  const handleUnitSelection = (selectedUnit: "metric" | "imperial") => {
+    setUnit(selectedUnit);
+    updateFormData("unit", selectedUnit);
+    // Reset forms when changing units
+    if (selectedUnit === "metric") {
+      metricHeightForm.reset();
+      weightForm.reset();
+    } else {
+      imperialHeightForm.reset();
+      weightForm.reset();
+    }
+  };
+
+  const handleSubmit = () => {
+    if (unit === "metric") {
+      const heightData = metricHeightForm.getValues();
+      updateFormData("height", heightData.height);
+    } else {
+      const heightData = imperialHeightForm.getValues();
+      updateFormData("heightFeet", heightData.heightFeet);
+      updateFormData("heightInches", heightData.heightInches);
+    }
+    const weightData = weightForm.getValues();
+    updateFormData("weight", weightData.weight);
+    setCurrentStep(5);
+  };
+
+  const isValid = () => {
+    if (unit === "metric") {
+      return metricHeightForm.formState.isValid && weightForm.formState.isValid;
+    }
+    return imperialHeightForm.formState.isValid && weightForm.formState.isValid;
+  };
 
   return (
-    <Step title={`What's your weight? (${isMetric ? "kg" : "lbs"})`}>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="weight"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="number"
-                    placeholder={`Enter your weight in ${isMetric ? "kg" : "lbs"}`}
-                    className="text-center text-lg"
-                    autoFocus
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <Step title="Your Measurements">
+      <div className="space-y-6">
+        <div className="flex justify-center space-x-4">
           <RainbowButton
-            type="submit"
-            className="w-full"
-            disabled={!form.formState.isValid}
+            colorScheme={unit === "metric" ? "black" : "white"}
+            onClick={() => handleUnitSelection("metric")}
           >
-            Next
+            Metric
           </RainbowButton>
-        </form>
-      </Form>
+          <RainbowButton
+            colorScheme={unit === "imperial" ? "black" : "white"}
+            onClick={() => handleUnitSelection("imperial")}
+          >
+            Imperial
+          </RainbowButton>
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="text-lg font-medium">Height</h3>
+          {unit === "metric" ? (
+            <Form {...metricHeightForm}>
+              <FormField
+                control={metricHeightForm.control}
+                name="height"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        placeholder="Enter your height in cm"
+                        className="text-center text-lg"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Form>
+          ) : (
+            <Form {...imperialHeightForm}>
+              <div className="flex space-x-2">
+                <FormField
+                  control={imperialHeightForm.control}
+                  name="heightFeet"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          placeholder="Feet"
+                          className="text-center text-lg"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={imperialHeightForm.control}
+                  name="heightInches"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          placeholder="Inches"
+                          className="text-center text-lg"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </Form>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="text-lg font-medium">Weight</h3>
+          <Form {...weightForm}>
+            <FormField
+              control={weightForm.control}
+              name="weight"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="number"
+                      placeholder={`Enter your weight in ${unit === "metric" ? "kg" : "lbs"}`}
+                      className="text-center text-lg"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </Form>
+        </div>
+
+        <RainbowButton
+          onClick={handleSubmit}
+          className="w-full"
+          disabled={!isValid()}
+        >
+          Next
+        </RainbowButton>
+      </div>
     </Step>
   );
 }
