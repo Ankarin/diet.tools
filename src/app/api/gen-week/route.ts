@@ -80,8 +80,14 @@ Strict Instructions:
 1. Use ONLY ${unitSystem} units throughout the entire meal plan and shopping list. DO NOT include any ${formData.unit === "metric" ? "imperial" : "metric"} units.
 2. Create a weekly meal plan following the \`weeklyPlanSchema\` exactly.
 3. Include only breakfast, lunch, and dinner. No snacks or additional meals.
-4. Distribute daily calories: Breakfast 40%, Lunch 35%, Dinner 25%.
-5. Ensure the sum of calories from all meals equals the total daily calorie target in \`nutritionTargets\`.
+4. CRITICAL - Daily Calorie Distribution:
+   - Each day's total calories MUST EXACTLY equal the sum of its meal calories
+   - Example: If day total is 2400 calories:
+     * Breakfast (40%): 960 calories
+     * Lunch (35%): 840 calories
+     * Dinner (25%): 600 calories
+     * Verify: 960 + 840 + 600 = 2400 total
+5. Ensure each day follows this exact calorie math. Double-check your calculations.
 6. Provide total calories and macronutrients (protein, carbs, fats) for each meal and food item.
 7. Make meals practical and easy to prepare with commonly available ingredients.
 8. Ensure balanced daily plans with variety across the week.
