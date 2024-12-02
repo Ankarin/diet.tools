@@ -75,19 +75,24 @@ ${formData.dietaryRestrictions ? `- Dietary Restrictions: ${formData.dietaryRest
 ${formData.foodPreferences ? `- Food Preferences: ${formData.foodPreferences}` : ""}
 ${formData.dietaryApproach ? `- Dietary Approach: ${formData.dietaryApproach}` : ""}
 ${formData.mealPreparation ? `- Meal Preparation Preferences: ${formData.mealPreparation}` : ""}
-
+ 
 Strict Instructions:
 1. Use ONLY ${unitSystem} units throughout the entire meal plan and shopping list. DO NOT include any ${formData.unit === "metric" ? "imperial" : "metric"} units.
 2. Create a weekly meal plan following the \`weeklyPlanSchema\` exactly.
 3. Include only breakfast, lunch, and dinner. No snacks or additional meals.
 4. CRITICAL - Daily Calorie Distribution:
    - Each day's total calories MUST EXACTLY equal the sum of its meal calories
-   - Example: If day total is 2400 calories:
-     * Breakfast (40%): 960 calories
-     * Lunch (35%): 840 calories
-     * Dinner (25%): 600 calories
-     * Verify: 960 + 840 + 600 = 2400 total
-5. Ensure each day follows this exact calorie math. Double-check your calculations.
+   - STRICT meal distribution (no deviation allowed):
+     * Breakfast MUST BE EXACTLY 40% of daily total
+     * Lunch MUST BE EXACTLY 35% of daily total
+     * Dinner MUST BE EXACTLY 25% of daily total
+   - Example calculation for 3000 daily calories:
+     * Breakfast: 3000 × 0.40 = 1200 calories
+     * Lunch: 3000 × 0.35 = 1050 calories
+     * Dinner: 3000 × 0.25 = 750 calories
+     * Verify: 1200 + 1050 + 750 = 3000 total
+5. For EVERY day, calculate the exact calories for each meal using these percentages.
+   DO NOT deviate from 40/35/25 split under any circumstances.
 6. Provide total calories and macronutrients (protein, carbs, fats) for each meal and food item.
 7. Make meals practical and easy to prepare with commonly available ingredients.
 8. Ensure balanced daily plans with variety across the week.
