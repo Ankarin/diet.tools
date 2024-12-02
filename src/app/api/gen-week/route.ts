@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     console.log("Rate limit exceeded");
     return NextResponse.json(
       { error: "Usage limit exceeded, please try again in an hour." },
-      { status: 429 },
+      { status: 429 }
     );
   }
 
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     } else {
       return NextResponse.json(
         { error: "An unexpected error occurred" },
-        { status: 500 },
+        { status: 500 }
       );
     }
   }
@@ -87,7 +87,6 @@ Strict Instructions:
 8. Ensure balanced daily plans with variety across the week.
 9. Generate a comprehensive grocery list using the same ${unitSystem} units.
 10. Create plans for 7 days, Monday through Sunday.
-11. IMPORTANT: Include at least 2-3 servings of fruits per day, integrated throughout meals.
 
 Personalization Guidelines:
 1. Tailor meals to the client's specific goals (e.g., weight loss, muscle gain, maintenance).
@@ -101,37 +100,18 @@ Personalization Guidelines:
 
 Nutritional Guidelines:
 1. Prioritize whole, nutrient-dense foods.
-2. Include a variety of fruits and vegetables in every day's meals:
-   - At least 2-3 servings of fruits daily (e.g., berries, citrus, apples)
-   - Aim for colorful fruits to maximize nutritional benefits
-   - Include both fresh and frozen fruit options
-   - Vary fruit choices throughout the week
+2. Include a variety of fruits and vegetables to ensure micronutrient intake.
 3. Balance protein sources throughout the day.
 4. Include healthy fats in appropriate portions.
 5. Recommend complex carbohydrates over simple sugars.
 6. Suggest adequate fiber intake for digestive health.
 7. Provide guidance on proper hydration throughout the day.
 
-Fruit Integration Guidelines:
-1. Breakfast Ideas with Fruit:
-   - Fresh berries with oatmeal, yogurt, or smoothie bowls
-   - Sliced banana on whole grain toast
-   - Fruit and protein smoothies
-2. Lunch Options:
-   - Fresh fruit as a side
-   - Fruit in salads (e.g., apple slices, mandarin oranges)
-   - Fruit-based dressings or sauces
-3. Dinner Suggestions:
-   - Fruit-based sauces or glazes
-   - Fresh fruit for dessert
-   - Grilled or baked fruit as sides
-4. Consider seasonal availability and rotate fruits throughout the week
-
 Meal Variety and Cultural Considerations:
-1. Offer a diverse range of flavors, textures, and cooking methods.
+1. Offer a diverse range of flavors, textures, and cooking methods throughout the week.
 2. Include meals from various cuisines to prevent monotony.
 3. Respect and incorporate cultural food preferences when specified.
-4. Suggest appropriate substitutions for traditional ingredients if needed.
+4. Suggest appropriate substitutions for traditional ingredients if needed to meet dietary requirements.
 
 Portion Sizes and Meal Timing:
 1. Provide clear portion sizes for each ingredient in ${unitSystem} units.
@@ -167,6 +147,57 @@ Imperial Unit Guidelines:
 `
 }
 
-Ensure all calculations are accurate and maintain consistent use of ${unitSystem} units throughout the meal plan and shopping list. Do not include any ${formData.unit === "metric" ? "imperial" : "metric"} units in your response. Provide a brief explanation for your meal choices and how they align with the client's goals and preferences.`;
+Example Format (using ${unitSystem} units):
+
+\`\`\`json
+{
+  "day": "Monday",
+  "totalCalories": 2500,
+  "meals": {
+    "breakfast": {
+      "items": [
+        {
+          "food": "Oatmeal with Almonds and Berries",
+          "portion": "${unitSystem === "metric" ? "60g oats, 15g almonds, 100g mixed berries" : "1/2 cup oats, 1 oz almonds, 1 cup mixed berries"}",
+          "calories": 1000,
+          "protein": 25,
+          "carbs": 150,
+          "fats": 30
+        }
+      ],
+      "totalCalories": 1000
+    },
+    "lunch": {
+      "items": [
+        {
+          "food": "Grilled Chicken Salad",
+          "portion": "${unitSystem === "metric" ? "150g chicken, 200g mixed greens, 30ml vinaigrette" : "5 oz chicken, 4 cups mixed greens, 2 tbsp vinaigrette"}",
+          "calories": 875,
+          "protein": 45,
+          "carbs": 60,
+          "fats": 35
+        }
+      ],
+      "totalCalories": 875
+    },
+    "dinner": {
+      "items": [
+        {
+          "food": "Baked Salmon with Quinoa and Vegetables",
+          "portion": "${unitSystem === "metric" ? "120g salmon, 50g dry quinoa, 150g mixed vegetables" : "4 oz salmon, 1/4 cup dry quinoa, 1.5 cups mixed vegetables"}",
+          "calories": 625,
+          "protein": 35,
+          "carbs": 50,
+          "fats": 20
+        }
+      ],
+      "totalCalories": 625
+    }
+  }
+}
+\`\`\`
+
+Ensure all calculations are accurate and maintain consistent use of ${unitSystem} units throughout the meal plan and shopping list. Do not include any ${formData.unit === "metric" ? "imperial" : "metric"} units in your response. Provide a brief explanation for your meal choices and how they align with the client's goals and preferences.
+`;
 };
 // ... (rest of the code remains unchanged)

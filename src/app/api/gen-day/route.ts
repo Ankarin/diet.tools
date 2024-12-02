@@ -66,32 +66,15 @@ Strict Instructions:
 7. Make meals practical and easy to prepare with commonly available ingredients.
 8. Ensure balanced daily plans with variety.
 9. Generate a comprehensive grocery list using the same ${unitSystem} units.
-10. IMPORTANT: Include at least 2-3 servings of fruits throughout the day, preferably with breakfast and as part of other meals.
 
 Nutritional Guidelines:
 1. Prioritize whole, nutrient-dense foods.
-2. Include a variety of fruits and vegetables to ensure micronutrient intake:
-   - At least 2-3 servings of fruits daily (e.g., berries, citrus, apples)
-   - Aim for colorful fruits to maximize nutritional benefits
-   - Include both fresh and frozen fruit options
+2. Include a variety of fruits and vegetables to ensure micronutrient intake.
 3. Balance protein sources throughout the day.
 4. Include healthy fats in appropriate portions.
 5. Recommend complex carbohydrates over simple sugars.
 6. Suggest adequate fiber intake for digestive health.
 7. Provide guidance on proper hydration throughout the day.
-
-Fruit Integration Guidelines:
-1. Breakfast Ideas with Fruit:
-   - Fresh berries with oatmeal or yogurt
-   - Sliced banana on whole grain toast
-   - Fruit smoothies with protein
-2. Lunch Options:
-   - Fresh fruit as a side
-   - Fruit in salads (e.g., apple slices, mandarin oranges)
-3. Dinner Suggestions:
-   - Fruit-based sauces or glazes
-   - Fresh fruit for dessert
-4. Consider seasonal availability and client preferences
 
 Meal Variety and Cultural Considerations:
 1. Offer a diverse range of flavors, textures, and cooking methods.
@@ -143,7 +126,7 @@ Example Format (using ${unitSystem} units):
     "breakfast": {
       "items": [
         {
-          "food": "Oatmeal with Almonds and Mixed Berries",
+          "food": "Oatmeal with Almonds and Berries",
           "portion": "${unitSystem === "metric" ? "60g oats, 15g almonds, 100g mixed berries" : "1/2 cup oats, 1 oz almonds, 1 cup mixed berries"}",
           "calories": 1000,
           "protein": 25,
@@ -152,6 +135,32 @@ Example Format (using ${unitSystem} units):
         }
       ],
       "totalCalories": 1000
+    },
+    "lunch": {
+      "items": [
+        {
+          "food": "Grilled Chicken Salad",
+          "portion": "${unitSystem === "metric" ? "150g chicken, 200g mixed greens, 30ml vinaigrette" : "5 oz chicken, 4 cups mixed greens, 2 tbsp vinaigrette"}",
+          "calories": 875,
+          "protein": 45,
+          "carbs": 60,
+          "fats": 35
+        }
+      ],
+      "totalCalories": 875
+    },
+    "dinner": {
+      "items": [
+        {
+          "food": "Baked Salmon with Quinoa and Vegetables",
+          "portion": "${unitSystem === "metric" ? "120g salmon, 50g dry quinoa, 150g mixed vegetables" : "4 oz salmon, 1/4 cup dry quinoa, 1.5 cups mixed vegetables"}",
+          "calories": 625,
+          "protein": 35,
+          "carbs": 50,
+          "fats": 20
+        }
+      ],
+      "totalCalories": 625
     }
   }
 }
