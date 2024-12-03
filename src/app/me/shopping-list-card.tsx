@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -37,8 +38,8 @@ export function ShoppingListCard({ shoppingList }: ShoppingListCardProps) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Item</TableHead>
-                  <TableHead>Quantity</TableHead>
+                  <TableHead className="w-[500px]">Item</TableHead>
+                  <TableHead className="w-[200px]">Quantity</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -46,8 +47,8 @@ export function ShoppingListCard({ shoppingList }: ShoppingListCardProps) {
                   category.items.map(
                     (item: ShoppingListItem, itemIndex: number) => (
                       <TableRow key={itemIndex}>
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell>{item.quantity}</TableCell>
+                        <TableCell className="w-[500px]">{item.name}</TableCell>
+                        <TableCell className="w-[200px]">{item.quantity}</TableCell>
                       </TableRow>
                     ),
                   )

@@ -116,13 +116,14 @@ export default function WeeklyExample() {
 
   return (
     <div className="container mx-auto p-4 max-w-5xl">
-      <div className="flex flex-col space-y-4 md:flex-row justify-between mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 z-10 relative bg-background">
         <RainbowButton
           colorScheme="black"
           onClick={handleGenerate}
           disabled={isLoading}
+          className="w-full md:w-auto"
         >
-          <div className="flex  items-center justify-between">
+          <div className="flex items-center justify-center">
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating
@@ -135,9 +136,9 @@ export default function WeeklyExample() {
             )}
           </div>
         </RainbowButton>
-        <Link href="/me/profile">
-          <RainbowButton colorScheme="white" disabled={isLoading}>
-            <div className="flex  items-center justify-between">
+        <Link href="/me/profile" className="w-full md:w-auto">
+          <RainbowButton colorScheme="white" disabled={isLoading} className="w-full">
+            <div className="flex items-center justify-center">
               Update Profile
             </div>
           </RainbowButton>
@@ -159,14 +160,21 @@ export default function WeeklyExample() {
       {(currentPlan || isLoading) && (
         <div className="space-y-6">
           {currentPlan?.dailyPlans && currentPlan.dailyPlans.length > 0 ? (
-            <Tabs defaultValue={"Monday"} className="w-full">
+            <Tabs 
+              defaultValue={
+                currentPlan.dailyPlans.find(
+                  (plan) => plan.day === new Date().toLocaleDateString('en-US', { weekday: 'long' })
+                )?.day ?? "Monday"
+              } 
+              className="w-full"
+            >
               <ScrollArea className="w-full">
-                <TabsList className="inline-flex w-full md:w-auto">
+                <TabsList className="inline-flex h-14 w-full bg-gray-100 rounded-lg">
                   {currentPlan.dailyPlans.map((dayPlan, index) => (
                     <TabsTrigger
                       key={index}
                       value={dayPlan.day ?? `Day ${index + 1}`}
-                      className="flex-1 md:flex-none"
+                      className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm flex-1 px-4 py-3 text-gray-600 data-[state=active]:text-black font-medium text-sm hover:bg-gray-50"
                     >
                       {dayPlan.day ?? `Day ${index + 1}`}
                     </TabsTrigger>
@@ -179,20 +187,23 @@ export default function WeeklyExample() {
                   value={dayPlan.day ?? `Day ${index + 1}`}
                 >
                   <Card className="mb-6">
-                    <CardHeader>
-                      <CardTitle>{dayPlan.day ?? `Day ${index + 1}`}</CardTitle>
-                      <CardDescription>
+                    <CardHeader className="bg-primary/10">
+                      <CardTitle className="text-2xl">{dayPlan.day ?? `Day ${index + 1}`}</CardTitle>
+                      <CardDescription className="text-lg">
                         Total Calories: {dayPlan.totalCalories ?? "N/A"}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-6 pt-6">
                       <MealCard
-                        mealName="Breakfast"
+                        mealName="breakfast"
                         meal={dayPlan.meals?.breakfast}
                       />
-                      <MealCard mealName="Lunch" meal={dayPlan.meals?.lunch} />
+                      <MealCard 
+                        mealName="lunch" 
+                        meal={dayPlan.meals?.lunch} 
+                      />
                       <MealCard
-                        mealName="Dinner"
+                        mealName="dinner"
                         meal={dayPlan.meals?.dinner}
                       />
                     </CardContent>

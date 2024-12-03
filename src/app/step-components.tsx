@@ -99,10 +99,12 @@ export function GenderStep() {
 }
 
 const ageSchema = z.object({
-  age: z.string().refine((val) => {
-    const num = parseInt(val, 10);
-    return !isNaN(num) && num > 0 && num <= 120;
-  }, "Age must be between 1 and 120"),
+  age: z.string()
+    .regex(/^\d+$/, "Please enter a valid number")
+    .refine((val) => {
+      const num = parseInt(val, 10);
+      return num > 0 && num <= 150;
+    }, "Age must be between 1 and 150"),
 });
 
 export function AgeStep() {
@@ -205,7 +207,14 @@ const createWeightSchema = (isMetric: boolean) =>
 
 export function MeasurementsStep() {
   const { formData, updateFormData, setCurrentStep } = useFormStore();
-  const [unit, setUnit] = useState<"metric" | "imperial">(formData.unit || "metric");
+  const [unit, setUnit] = useState<"metric" | "imperial">("metric");
+
+  useEffect(() => {
+    // Set metric as default unit in form data when component mounts
+    if (!formData.unit) {
+      updateFormData("unit", "metric");
+    }
+  }, []);
 
   const metricHeightForm = useForm<z.infer<typeof metricHeightSchema>>({
     resolver: zodResolver(metricHeightSchema),
@@ -252,7 +261,7 @@ export function MeasurementsStep() {
     }
     const weightData = weightForm.getValues();
     updateFormData("weight", weightData.weight);
-    setCurrentStep(5);
+    setCurrentStep(4);
   };
 
   const isValid = () => {
@@ -398,7 +407,7 @@ export function GoalsStep() {
 
   function onSubmit(values: z.infer<typeof goalsSchema>) {
     updateFormData("goals", values.goals);
-    setCurrentStep(7);
+    setCurrentStep(5);
   }
 
   return (
@@ -453,7 +462,7 @@ export function ActivityStep() {
 
   function onSubmit(values: z.infer<typeof activitySchema>) {
     updateFormData("activity", values.activity);
-    setCurrentStep(8);
+    setCurrentStep(6);
   }
 
   return (
@@ -507,7 +516,7 @@ export function MedicalConditionsStep() {
 
   function onSubmit(values: z.infer<typeof medicalConditionsSchema>) {
     updateFormData("medicalConditions", values.medicalConditions);
-    setCurrentStep(9);
+    setCurrentStep(7);
   }
 
   return (
@@ -562,7 +571,7 @@ export function DietaryRestrictionsStep() {
 
   function onSubmit(values: z.infer<typeof dietaryRestrictionsSchema>) {
     updateFormData("dietaryRestrictions", values.dietaryRestrictions);
-    setCurrentStep(10);
+    setCurrentStep(8);
   }
 
   return (
@@ -616,7 +625,7 @@ export function FoodPreferencesStep() {
 
   function onSubmit(values: z.infer<typeof foodPreferencesSchema>) {
     updateFormData("foodPreferences", values.foodPreferences);
-    setCurrentStep(11);
+    setCurrentStep(9);
   }
 
   return (
@@ -671,7 +680,7 @@ export function DietaryApproachStep() {
 
   function onSubmit(values: z.infer<typeof dietaryApproachSchema>) {
     updateFormData("dietaryApproach", values.dietaryApproach);
-    setCurrentStep(12);
+    setCurrentStep(10);
   }
 
   return (
@@ -729,7 +738,7 @@ export function MealPreparationStep() {
 
   function onSubmit(values: z.infer<typeof mealPreparationSchema>) {
     updateFormData("mealPreparation", values.mealPreparation);
-    setCurrentStep(13);
+    setCurrentStep(11);
   }
 
   return (

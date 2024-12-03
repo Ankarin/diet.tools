@@ -81,11 +81,13 @@ export default function DailyExample() {
       {(mealPlan || isLoading) && (
         <div className="space-y-6">
           <Card className="shadow-lg">
-            <CardHeader className="bg-primary/10 py-4">
+            <CardHeader className="bg-primary/10">
               <CardTitle className="text-2xl font-bold">
                 Your meal plan for the day
               </CardTitle>
-              <div className="text-xl text-muted-foreground">
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl pt-4 text-muted-foreground">
                 <div>Calories: {mealPlan?.totalCalories || "Calculating..."}</div>
                 {totalMacros && (
                   <div>
@@ -93,7 +95,7 @@ export default function DailyExample() {
                   </div>
                 )}
               </div>
-            </CardHeader>
+            </CardContent>
           </Card>
 
           {mealPlan?.meals &&
