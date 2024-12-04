@@ -59,6 +59,9 @@ export default function Page() {
   const handleGoogleSignIn = async () => {
     const { data,  error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
+      options:{
+        redirectTo:'https://www.diet.tools/api/google-callback'
+      }
     });
 
     if (error) {
