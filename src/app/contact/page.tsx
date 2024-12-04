@@ -15,25 +15,37 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { useEffect, useState } from "react";
+import supabase from "@/supabase/client";
 
 const formSchema = z.object({
-	name: z.string().min(2, { message: "Name must be at least 2 characters" }),
 	email: z.string().email({ message: "Please enter a valid email" }),
-	message: z
-		.string()
-		.min(10, { message: "Message must be at least 10 characters" }),
+	message: z.string().min(10, { message: "Message must be at least 10 characters" }),
 });
 
 export default function ContactPage() {
 	const { toast } = useToast();
+	const [isEmailPrepopulated, setIsEmailPrepopulated] = useState(false);
+	
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			name: "",
 			email: "",
 			message: "",
 		},
 	});
+
+	useEffect(() => {
+		const getUser = async () => {
+			const { data: { session } } = await supabase.auth.getSession();
+			if (session?.user) {
+				form.setValue('email', session.user.email || '');
+				setIsEmailPrepopulated(true);
+			}
+		};
+
+		getUser();
+	}, [form]);
 
 	async function onSubmit(data: z.infer<typeof formSchema>) {
 		try {
@@ -45,37 +57,22 @@ export default function ContactPage() {
 				body: JSON.stringify(data),
 			});
 
-			const result = await response.json();
-
 			if (!response.ok) {
-				if (response.status === 429) {
-					toast({
-						title: "Rate limit exceeded",
-						description: result.error,
-						variant: "destructive",
-					});
-				} else {
-					toast({
-						title: "Something went wrong",
-						description: result.error || "Please try again later",
-						variant: "destructive",
-					});
-				}
-				return;
+				const error = await response.json();
+				throw new Error(error.error);
 			}
 
-			toast({
-				title: "✨ Message sent",
-				description: "We'll get back to you soon!",
-				className: "bg-black text-white border-none",
-			});
 			form.reset();
-		} catch (error) {
-			console.error("Contact form submission error:", error);
+
 			toast({
-				title: "Something went wrong",
-				description: "Please try again later",
+				title: "Success!",
+				description: "Your message has been sent.",
+			});
+		} catch (error: any) {
+			toast({
 				variant: "destructive",
+				title: "Error",
+				description: error.message,
 			});
 		}
 	}
@@ -92,43 +89,25 @@ export default function ContactPage() {
 
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-						<div className="grid gap-4 sm:grid-cols-2">
-							<FormField
-								control={form.control}
-								name="name"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel className="text-sm font-medium">Name</FormLabel>
-										<FormControl>
-											<Input
-												placeholder="Your name"
-												className="bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage className="text-xs" />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="email"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel className="text-sm font-medium">Email</FormLabel>
-										<FormControl>
-											<Input
-												type="email"
-												placeholder="you@example.com"
-												className="bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage className="text-xs" />
-									</FormItem>
-								)}
-							/>
-						</div>
+						<FormField
+							control={form.control}
+							name="email"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-sm font-medium">Email</FormLabel>
+									<FormControl>
+										<Input
+											type="email"
+											placeholder="you@example.com"
+											className="bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800"
+											disabled={isEmailPrepopulated}
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage className="text-xs" />
+								</FormItem>
+							)}
+						/>
 						<FormField
 							control={form.control}
 							name="message"

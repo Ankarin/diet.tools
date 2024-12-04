@@ -7,6 +7,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
 import Link from "next/link";
+import RainbowButton from "@/components/ui/rainbow-button";
 
 const inter = Inter({ subsets: ["latin"] });
 

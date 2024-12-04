@@ -9,7 +9,14 @@ async function Auth() {
   return (
     <div>
       {data.session ? (
+        <div className="flex flex-row items-center gap-4">
+          <Link href="/contact">
+<RainbowButton colorScheme="black">
+            Feedback
+          </RainbowButton>
+          </Link>
         <UserDropdown />
+        </div>
       ) : (
         <Link href="/login">
           <RainbowButton colorScheme="black" className="w-full">
