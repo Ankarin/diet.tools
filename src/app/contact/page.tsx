@@ -37,15 +37,19 @@ export default function ContactPage() {
 
 	useEffect(() => {
 		const getUser = async () => {
-			const { data: { session } } = await supabase.auth.getSession();
-			if (session?.user) {
-				form.setValue('email', session.user.email || '');
-				setIsEmailPrepopulated(true);
+			try {
+				const { data: { session } } = await supabase.auth.getSession();
+				if (session?.user?.email) {
+					form.setValue('email', session.user.email);
+					setIsEmailPrepopulated(true);
+				}
+			} catch (error) {
+				console.error('Error fetching user session:', error);
 			}
 		};
 
 		getUser();
-	}, [form]);
+	}, []);
 
 	async function onSubmit(data: z.infer<typeof formSchema>) {
 		try {
@@ -101,6 +105,7 @@ export default function ContactPage() {
 											placeholder="you@example.com"
 											className="bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800"
 											disabled={isEmailPrepopulated}
+											readOnly={isEmailPrepopulated}
 											{...field}
 										/>
 									</FormControl>

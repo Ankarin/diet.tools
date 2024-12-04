@@ -6,7 +6,6 @@ import { z } from "zod";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const contactSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
@@ -35,13 +34,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name, email, message } = result.data;
+    const { email, message } = result.data;
 
     const { data, error } = await resend.emails.send({
       from: "AI Diet Planner <hello@diet.tools>",
       to: "ankarn41k@gmail.com",
-      subject: `Contact Form: Message from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+      subject: `Contact Form: Message from ${email}`,
+      text: `Email: ${email}\nMessage: ${message}`,
     });
     console.log("send email", data);
 
