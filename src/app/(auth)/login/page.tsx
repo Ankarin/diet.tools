@@ -132,7 +132,7 @@ export default function Page() {
         )}
       </form>
       <br/>
-      <RainbowButton onClick={handleGoogleSignIn} colorScheme="black" className="w-full">Sign in with Google</RainbowButton>
+      <RainbowButton onClick={handleGoogleSignIn} colorScheme="black" className="w-full">Login with Google</RainbowButton>
     </Form>
   );
 }
