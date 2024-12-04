@@ -6,7 +6,6 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -18,6 +17,8 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import supabase from "@/supabase/client";
+import RainbowButton from "@/components/ui/rainbow-button";
 
 const FormSchema = z.object({
   email: z.string().email({ message: "Must be valid email" }),
@@ -54,6 +55,24 @@ export default function Page() {
     // @ts-ignore
     mutate(data);
   }
+
+  const handleGoogleSignIn = async () => {
+    const { data,  error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+    });
+
+    if (error) {
+      console.error('Error signing in with Google:', error);
+      toast({
+        variant: "destructive",
+        title: "Google Sign-In Error",
+        description: error.message,
+      });
+    } else {
+      console.log('Successfully signed in:', data);
+      router.replace("/me");
+    }
+  };
 
   return (
     <Form {...form}>
@@ -106,9 +125,11 @@ export default function Page() {
         {isPending ? (
           <Loader2 className="h-10 w-10 animate-spin" />
         ) : (
-          <Button type="submit">Login</Button>
+          <RainbowButton type="submit" className="w-full">Login</RainbowButton>
         )}
       </form>
+      <br/>
+      <RainbowButton onClick={handleGoogleSignIn} colorScheme="black" className="w-full">Sign in with Google</RainbowButton>
     </Form>
   );
 }

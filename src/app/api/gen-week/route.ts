@@ -4,7 +4,7 @@ import { FormData } from "@/store";
 import { createClient } from "@/supabase/server";
 import { openai } from "@ai-sdk/openai";
 import { streamObject } from "ai";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 const model = openai("gpt-4o");
 // const model = anthropic("claude-3-5-sonnet-latest");
@@ -12,7 +12,7 @@ const model = openai("gpt-4o");
 // Define a new schema that uses a single weeklyPlanSchema
 const oneWeekPlanSchema = weeklyPlanSchema;
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   const supabase = await createClient();
   const session = await supabase.auth.getSession();
   if (!session.data?.session) {

@@ -6,8 +6,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import supabase from "@/supabase/client";
 
-import { Button } from "@/components/ui/button";
+import RainbowButton from "@/components/ui/rainbow-button";
 import {
   Form,
   FormControl,
@@ -79,100 +80,124 @@ export default function Page() {
     mutate({ origin, form: formData, ...data });
   }
 
+  const handleGoogleSignUp = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+    });
+
+    if (error) {
+      console.error('Error signing up with Google:', error);
+      toast({
+        variant: "destructive",
+        title: "Google Sign-Up Error",
+        description: error.message,
+      });
+    }
+    console.log('Successfully signed up with Google:', data);
+  };
+
+  const isTermsChecked = form.watch("terms");
+
   return (
-    <Form {...form}>
-      <p className={"font-semibold text-xl"}> Sign Up</p>
-      <p className={"pb-4 pt-1"}>
-        Already have an account ?{" "}
-        <Link href={"/login"} className={"text-blue-600 cursor-pointer"}>
-          Sign In
-        </Link>
-      </p>
+    <div>
+      <Form {...form}>
+        <p className={"font-semibold text-xl"}> Sign Up</p>
+        <p className={"pb-4 pt-1"}>
+          Already have an account ?{" "}
+          <Link href={"/login"} className={"text-blue-600 cursor-pointer"}>
+            Sign In
+          </Link>
+        </p>
 
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full pt-5  space-y-6"
-      >
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full pt-5  space-y-6"
+        >
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input type={"password"} {...field} />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
-              <FormControl>
-                <Input type={"password"} {...field} />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="terms"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>
-                  I agree to the{" "}
-                  <Link href="/terms" className="text-blue-600 hover:underline">
-                    Terms of Use
-                  </Link>{" "}
-                  and{" "}
-                  <Link href="/privacy" className="text-blue-600 hover:underline">
-                    Privacy Policy
-                  </Link>
-                </FormLabel>
                 <FormMessage />
-              </div>
-            </FormItem>
-          )}
-        />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type={"password"} {...field} />
+                </FormControl>
 
-        {isPending ? (
-          <Loader2 className="h-10 w-10 animate-spin" />
-        ) : (
-          <Button type="submit" className="w-full" disabled={isPending}>
-            Sign Up
-          </Button>
-        )}
-      </form>
-    </Form>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Confirm Password</FormLabel>
+                <FormControl>
+                  <Input type={"password"} {...field} />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="terms"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>
+                    I agree to the{" "}
+                    <Link href="/terms" className="text-blue-600 hover:underline">
+                      Terms of Use
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="/privacy" className="text-blue-600 hover:underline">
+                      Privacy Policy
+                    </Link>
+                  </FormLabel>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+
+          {isPending ? (
+            <Loader2 className="h-10 w-10 animate-spin" />
+          ) : (
+            <RainbowButton type="submit" className="w-full" disabled={isPending || !isTermsChecked}>
+              Sign Up
+            </RainbowButton>
+          )}
+        </form>
+      </Form>
+      <br/>
+      <RainbowButton colorScheme="black" onClick={handleGoogleSignUp} className="w-full" disabled={!isTermsChecked}>
+        Sign up with Google
+      </RainbowButton>
+    </div>
   );
 }

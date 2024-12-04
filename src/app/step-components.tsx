@@ -214,7 +214,7 @@ export function MeasurementsStep() {
     if (!formData.unit) {
       updateFormData("unit", "metric");
     }
-  }, []);
+  }, [formData.unit, updateFormData]);
 
   const metricHeightForm = useForm<z.infer<typeof metricHeightSchema>>({
     resolver: zodResolver(metricHeightSchema),

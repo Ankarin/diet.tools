@@ -1,6 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
-import { isAfter } from "date-fns";
 
 export const updateSession = async (request: NextRequest) => {
   try {
@@ -20,17 +19,17 @@ export const updateSession = async (request: NextRequest) => {
           },
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value),
+              request.cookies.set(name, value)
             );
             response = NextResponse.next({
               request,
             });
             cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options),
+              response.cookies.set(name, value, options)
             );
           },
         },
-      },
+      }
     );
 
     const user = await supabase.auth.getUser();
@@ -71,7 +70,7 @@ export const updateSession = async (request: NextRequest) => {
 
     if (
       ["/", "/login", "/signup", "/forgot", "/confirm"].includes(
-        request.nextUrl.pathname,
+        request.nextUrl.pathname
       ) &&
       !user.error &&
       user.data.user
