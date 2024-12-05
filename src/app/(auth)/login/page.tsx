@@ -73,6 +73,7 @@ export default function Page() {
 			});
 
 			const user = await supabase.auth.getUser();
+			console.log(111, user);
 			const res = await supabase
 				.from("users")
 				.upsert({ id: user.data.user.id, email: user.data.user.email });
