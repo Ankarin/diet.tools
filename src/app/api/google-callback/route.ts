@@ -9,14 +9,14 @@ export async function GET(request: Request) {
 	const next = searchParams.get("next") ?? "/";
 
 	if (!code) {
-		return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+		return NextResponse.redirect(`${origin}/auth-code-error`);
 	}
 
 	const supabase = await createClient();
 	const { error } = await supabase.auth.exchangeCodeForSession(code);
 
 	if (error) {
-		return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+		return NextResponse.redirect(`${origin}/auth-code-error`);
 	}
 
 	const forwardedHost = request.headers.get("x-forwarded-host"); // original origin before load balancer
