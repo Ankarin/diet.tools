@@ -71,13 +71,6 @@ export default function Page() {
 				title: "Google Sign-In Error",
 				description: error.message,
 			});
-
-			const user = await supabase.auth.getUser();
-			console.log(111, user);
-			const res = await supabase
-				.from("users")
-				.upsert({ id: user.data.user.id, email: user.data.user.email });
-			console.log(res);
 		} else {
 			console.log("Successfully signed in:", data);
 			router.replace("/me");

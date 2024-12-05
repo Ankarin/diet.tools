@@ -97,12 +97,6 @@ export default function Page() {
 					description: error.message,
 				});
 			}
-			const authRes = await supabase.auth.getUser();
-			const res = await supabase
-				.from("users")
-				.update({ email: authRes.data.user.email })
-				.eq("id", user.data.user.id);
-			console.log(res);
 			console.log("Successfully linked anon user  with Google:", data);
 		} else {
 			const { data, error } = await supabase.auth.signInWithOAuth({
@@ -111,11 +105,6 @@ export default function Page() {
 					redirectTo: "https://www.diet.tools/api/google-callback",
 				},
 			});
-			console.log(22, data);
-			const authRes = await supabase.auth.getUser();
-			await supabase
-				.from("users")
-				.upsert({ id: authRes.data.user.id, email: authRes.data.user.email });
 			if (error) {
 				console.error("Error signing up with Google:", error);
 				toast({
