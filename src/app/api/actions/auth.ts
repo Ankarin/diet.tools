@@ -54,41 +54,66 @@ export async function signup({
 	origin: string;
 	form: FormData;
 }) {
-	const supabase = await createClient();
-	const user = await supabase.auth.getUser();
-	if (user.data?.user.is_anonymous) {
-		const { error } = await supabase.auth.updateUser({
-			email,
-			password,
-		});
-		if (error) {
-			return { error: error.message };
-		}
-		await supabase.from("users").upsert({
-			id: user.data.user.id,
-			email,
-			...form,
-		});
-	} else {
-		const { data, error } = await supabase.auth.signUp({
-			email,
-			password,
-			options: {
-				emailRedirectTo: `${origin}/api/confirm-callback`,
-			},
-		});
-
-		if (error) {
-			return { error: error.message };
+	try {
+		const supabase = await createClient();
+		const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+		
+		if (sessionError) {
+			return { error: sessionError.message };
 		}
 
-		const { error: upsertError } = await supabase.from("users").upsert({
-			id: data?.user?.id,
-			email,
-			...form,
-		});
+		if (session?.user?.is_anonymous) {
+			const { error } = await supabase.auth.updateUser({
+				email,
+				password,
+			});
+			if (error) {
+				return { error: error.message };
+			}
 
-		if (upsertError) return { error: upsertError.message };
+			const { error: upsertError } = await supabase
+				.from("users")
+				.upsert({
+					id: session.user.id,
+					email,
+					...form,
+				});
+
+			if (upsertError) {
+				return { error: upsertError.message };
+			}
+		} else {
+			const { data, error } = await supabase.auth.signUp({
+				email,
+				password,
+				options: {
+					emailRedirectTo: `${origin}/api/confirm-callback`,
+				},
+			});
+
+			if (error) {
+				return { error: error.message };
+			}
+
+			if (data?.user) {
+				const { error: upsertError } = await supabase
+					.from("users")
+					.upsert({
+						id: data.user.id,
+						email,
+						...form,
+					});
+
+				if (upsertError) {
+					return { error: upsertError.message };
+				}
+			}
+		}
+
+		return { success: true };
+	} catch (error: any) {
+		console.error("Signup error:", error);
+		return { error: error.message || "An error occurred during signup" };
 	}
 }
 
