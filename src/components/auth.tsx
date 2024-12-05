@@ -8,7 +8,7 @@ async function Auth() {
   const { data } = await supabase.auth.getSession();
   return (
     <div>
-      {data.session ? (
+      {data.session && !data.session.user.is_anonymous ? (
         <div className="flex flex-row items-center gap-4">
           <Link href="/contact">
 <RainbowButton colorScheme="black">

@@ -13,11 +13,12 @@ export default function TermsPage() {
 
 			<div className="prose dark:prose-invert max-w-none">
 				<p className="mb-4">
-					Welcome to Mitryco LLC (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;). These Terms of Use
-					(&quot;Terms&quot;) govern your access to and use of diet.tools (the &quot;Website&quot;)
-					and any related services. By using the Website, you agree to be bound
-					by these Terms. If you do not agree with any part of these Terms, you
-					must discontinue using the Website immediately.
+					Welcome to Mitryco LLC (&quot;we,&quot; &quot;us,&quot; or
+					&quot;our&quot;). These Terms of Use (&quot;Terms&quot;) govern your
+					access to and use of diet.tools (the &quot;Website&quot;) and any
+					related services. By using the Website, you agree to be bound by these
+					Terms. If you do not agree with any part of these Terms, you must
+					discontinue using the Website immediately.
 				</p>
 
 				<section className="mb-8">
@@ -151,9 +152,9 @@ export default function TermsPage() {
 					</h2>
 					<p>
 						Your use of the Website is at your sole risk. The Website and its
-						content are provided on an &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; basis. We make
-						no warranties or representations, express or implied, about the
-						Website, including but not limited to:
+						content are provided on an &quot;AS IS&quot; and &quot;AS
+						AVAILABLE&quot; basis. We make no warranties or representations,
+						express or implied, about the Website, including but not limited to:
 					</p>
 					<ul className="list-disc pl-6 mt-2">
 						<li>The accuracy or reliability of the content provided.</li>
@@ -196,9 +197,9 @@ export default function TermsPage() {
 					<p>
 						You agree to indemnify, defend, and hold harmless Mitryco LLC and
 						its affiliates from and against any and all claims, liabilities,
-						damages, losses, or expenses (including reasonable attorneys&apos; fees)
-						arising out of your use of the Website, your violation of these
-						Terms, or your infringement of any third-party rights.
+						damages, losses, or expenses (including reasonable attorneys&apos;
+						fees) arising out of your use of the Website, your violation of
+						these Terms, or your infringement of any third-party rights.
 					</p>
 				</section>
 

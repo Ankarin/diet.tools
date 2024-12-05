@@ -1,97 +1,132 @@
 import { createServerClient } from "@supabase/ssr";
+import { isAfter } from "date-fns";
 import { type NextRequest, NextResponse } from "next/server";
 
+const PUBLIC_ROUTES = [
+	"/",
+	"/login",
+	"/signup",
+	"/forgot",
+	"/confirm",
+] as const;
+const SUBSCRIPTION_ROUTE = "/me/subscription";
+const PROFILE_ROUTE = "/me/profile";
+const ME_ROUTE = "/me";
+const LOGIN_ROUTE = "/login";
+const CONTACT_ROUTE = "/contact";
+
+interface UserMetadata {
+	completed_profile?: boolean;
+}
+
+interface AppMetadata {
+	subscription_expires?: string;
+}
+
+const createSupabaseClient = (request: NextRequest, response: NextResponse) => {
+	return createServerClient(
+		// biome-ignore lint/style/noNonNullAssertion: <explanation>
+		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+		// biome-ignore lint/style/noNonNullAssertion: <explanation>
+		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+		{
+			cookies: {
+				getAll() {
+					return request.cookies.getAll();
+				},
+				setAll(cookiesToSet) {
+					// biome-ignore lint/complexity/noForEach: <explanation>
+					cookiesToSet.forEach(({ name, value }) =>
+						request.cookies.set(name, value),
+					);
+					// biome-ignore lint/complexity/noForEach: <explanation>
+					cookiesToSet.forEach(({ name, value, options }) =>
+						response.cookies.set(name, value, options),
+					);
+				},
+			},
+		},
+	);
+};
+
+const isSubscriptionExpired = (subscriptionExpires?: string) => {
+	return (
+		!subscriptionExpires || isAfter(new Date(), new Date(subscriptionExpires))
+	);
+};
+
+const hasValidSubscription = (subscriptionExpires?: string) => {
+	return (
+		subscriptionExpires && isAfter(new Date(subscriptionExpires), new Date())
+	);
+};
+
+const redirectTo = (request: NextRequest, path: string) => {
+	return NextResponse.redirect(new URL(path, request.url));
+};
+
 export const updateSession = async (request: NextRequest) => {
-  try {
-    let response = NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
+	try {
+		const response = NextResponse.next({
+			request: {
+				headers: request.headers,
+			},
+		});
 
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value)
-            );
-            response = NextResponse.next({
-              request,
-            });
-            cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options)
-            );
-          },
-        },
-      }
-    );
+		const supabase = createSupabaseClient(request, response);
+		const {
+			data: { user },
+			error,
+		} = await supabase.auth.getUser();
+		console.log(user, error);
+		// Handle unauthenticated access to protected routes
+		if (
+			(error || user.is_anonymous) &&
+			request.nextUrl.pathname.startsWith(ME_ROUTE)
+		) {
+			return redirectTo(request, LOGIN_ROUTE);
+		}
 
-    const user = await supabase.auth.getUser();
-    if (!user.error && user.data.user) {
-      console.log("user", user.data.user.app_metadata);
-      // Temporarily disabled subscription check
-      /*
-      const subscriptionExpires =
-        user.data.user.app_metadata.subscription_expires;
+		// If no user, return the original response
+		if (!user || user.is_anonymous) {
+			return response;
+		}
 
-      if (
-        !subscriptionExpires ||
-        isAfter(new Date(), new Date(subscriptionExpires))
-      ) {
-        if (request.nextUrl.pathname !== "/me/subscription") {
-          return NextResponse.redirect(
-            new URL("/me/subscription", request.url),
-          );
-        }
-      }
-      */
-    }
+		const { subscription_expires } = user.app_metadata as AppMetadata;
+		const { completed_profile } = user.user_metadata as UserMetadata;
 
-    if (!user.error && user.data.user) {
-      console.log("user", user.data.user.user_metadata);
-      const completed = user.data.user.user_metadata.completed_profile;
+		// Check subscription status
+		if (isSubscriptionExpired(subscription_expires)) {
+			if (
+				request.nextUrl.pathname !== SUBSCRIPTION_ROUTE &&
+				request.nextUrl.pathname !== CONTACT_ROUTE
+			) {
+				return redirectTo(request, SUBSCRIPTION_ROUTE);
+			}
+		}
 
-      if (!completed) {
-        if (request.nextUrl.pathname === "/me") {
-          return NextResponse.redirect(new URL("/me/profile", request.url));
-        }
-      }
-    }
-    if (request.nextUrl.pathname.startsWith("/me") && user.error) {
-      console.log(1);
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+		// Check profile completion
+		if (!completed_profile && request.nextUrl.pathname === ME_ROUTE) {
+			return redirectTo(request, PROFILE_ROUTE);
+		}
 
-    if (
-      ["/", "/login", "/signup", "/forgot", "/confirm"].includes(
-        request.nextUrl.pathname
-      ) &&
-      !user.error &&
-      user.data.user
-      /* Temporarily disabled subscription check
-      user.data.user?.app_metadata.subscription_expires &&
-      isAfter(
-        new Date(user.data.user.app_metadata.subscription_expires),
-        new Date(),
-      )
-      */
-    ) {
-      return NextResponse.redirect(new URL("/me", request.url));
-    }
+		// Redirect authenticated users with valid subscription away from public routes
+		if (
+			PUBLIC_ROUTES.includes(
+				request.nextUrl.pathname as (typeof PUBLIC_ROUTES)[number],
+			) &&
+			hasValidSubscription(subscription_expires)
+		) {
+			return redirectTo(request, ME_ROUTE);
+		}
 
-    return response;
-  } catch (e) {
-    console.log(e);
-    return NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
-  }
+		return response;
+	} catch (e) {
+		console.error("Middleware error:", e);
+		return NextResponse.next({
+			request: {
+				headers: request.headers,
+			},
+		});
+	}
 };

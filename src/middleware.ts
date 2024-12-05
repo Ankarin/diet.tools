@@ -1,20 +1,20 @@
 import { updateSession } from "@/supabase/middleware";
-import { type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+	const { pathname } = request.nextUrl;
 
-  const response = await updateSession(request);
+	const response = await updateSession(request);
 
-  if (pathname.startsWith("/api")) {
-    return response;
-  }
+	if (pathname.startsWith("/api")) {
+		return response;
+	}
 
-  return response;
+	return response;
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+	matcher: [
+		"/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+	],
 };
