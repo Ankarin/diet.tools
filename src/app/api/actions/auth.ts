@@ -56,7 +56,7 @@ export async function signup({
 }) {
 	const supabase = await createClient();
 	const user = await supabase.auth.getUser();
-	if (!user.data.user.is_anonymous) {
+	if (user.data?.user.is_anonymous) {
 		const { error } = await supabase.auth.updateUser({
 			email,
 			password,
