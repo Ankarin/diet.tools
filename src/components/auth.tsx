@@ -4,28 +4,26 @@ import { createClient } from "@/supabase/server";
 import Link from "next/link";
 
 async function Auth() {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getSession();
-  return (
-    <div>
-      {data.session && !data.session.user.is_anonymous ? (
-        <div className="flex flex-row items-center gap-4">
-          <Link href="/contact">
-<RainbowButton colorScheme="black">
-            Feedback
-          </RainbowButton>
-          </Link>
-        <UserDropdown />
-        </div>
-      ) : (
-        <Link href="/login">
-          <RainbowButton colorScheme="black" className="w-full">
-            Login
-          </RainbowButton>
-        </Link>
-      )}
-    </div>
-  );
+	const supabase = await createClient();
+	const { data } = await supabase.auth.getUser();
+	return (
+		<div>
+			{data && !data.user.is_anonymous ? (
+				<div className="flex flex-row items-center gap-4">
+					<Link href="/contact">
+						<RainbowButton colorScheme="black">Feedback</RainbowButton>
+					</Link>
+					<UserDropdown />
+				</div>
+			) : (
+				<Link href="/login">
+					<RainbowButton colorScheme="black" className="w-full">
+						Login
+					</RainbowButton>
+				</Link>
+			)}
+		</div>
+	);
 }
 
 export default Auth;
