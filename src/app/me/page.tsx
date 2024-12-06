@@ -169,17 +169,19 @@ export default function WeeklyExample() {
               className="w-full"
             >
               <ScrollArea className="w-full">
-                <TabsList className="inline-flex h-14 w-full bg-gray-100 rounded-lg">
-                  {currentPlan.dailyPlans.map((dayPlan, index) => (
-                    <TabsTrigger
-                      key={index}
-                      value={dayPlan.day ?? `Day ${index + 1}`}
-                      className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm flex-1 px-4 py-3 text-gray-600 data-[state=active]:text-black font-medium text-sm hover:bg-gray-50"
-                    >
-                      {dayPlan.day ?? `Day ${index + 1}`}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
+                <div className="w-full overflow-auto">
+                  <TabsList className="inline-flex h-14 w-max min-w-full bg-gray-100 rounded-lg">
+                    {currentPlan.dailyPlans.map((dayPlan, index) => (
+                      <TabsTrigger
+                        key={index}
+                        value={dayPlan.day ?? `Day ${index + 1}`}
+                        className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm flex-1 px-4 py-3 text-gray-600 data-[state=active]:text-black font-medium text-sm hover:bg-gray-50"
+                      >
+                        {dayPlan.day ?? `Day ${index + 1}`}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </div>
               </ScrollArea>
               {currentPlan.dailyPlans.map((dayPlan, index) => (
                 <TabsContent

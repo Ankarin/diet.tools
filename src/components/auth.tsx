@@ -10,7 +10,7 @@ async function Auth() {
 		<div>
 			{data.user && !data?.user?.is_anonymous ? (
 				<div className="flex flex-row items-center gap-4">
-					<Link href="/contact">
+					<Link className="hidden md:block" href="/contact">
 						<RainbowButton colorScheme="black">Feedback</RainbowButton>
 					</Link>
 					<UserDropdown />

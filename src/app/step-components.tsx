@@ -55,19 +55,19 @@ function Step({ title, children }: StepProps) {
 			}}
 			className="w-full max-w-2xl mx-auto"
 		>
-			<div className="flex items-center mb-6">
+			<div className="flex items-center mb-6 relative">
 				{currentStep > 1 && (
 					<Button
 						variant="ghost"
 						size="icon"
 						onClick={() => setCurrentStep(currentStep - 1)}
-						className="mr-4 text-primary hover:text-primary/80"
+						className="absolute left-0 text-primary hover:text-primary/80"
 					>
 						<ArrowLeft className="h-6 w-6" />
 						<span className="sr-only">Go back</span>
 					</Button>
 				)}
-				<p className="text-xl sm:text-2xl font-bold text-left  sm:text-center flex-grow">{title}</p>
+				<p className="text-xl sm:text-2xl font-bold text-center w-full pl-12 pr-12">{title}</p>
 			</div>
 			{children}
 		</motion.div>
