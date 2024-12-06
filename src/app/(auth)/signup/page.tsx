@@ -26,12 +26,8 @@ import { Loader2 } from "lucide-react";
 const FormSchema = z
 	.object({
 		email: z.string().email({ message: "Must be valid email" }),
-		password: z
-			.string()
-			.min(8, { message: "Password must be at least 8 characters long" }),
-		confirmPassword: z
-			.string()
-			.min(8, { message: "Password must be at least 8 characters long" }),
+		password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
+		confirmPassword: z.string().min(8, { message: "Password must be at least 8 characters long" }),
 		terms: z.boolean().refine((value) => value === true, {
 			message: "You must agree to the terms and privacy policy",
 		}),
@@ -130,10 +126,7 @@ export default function Page() {
 					</Link>
 				</p>
 
-				<form
-					onSubmit={form.handleSubmit(onSubmit)}
-					className="w-full pt-5  space-y-6"
-				>
+				<form onSubmit={form.handleSubmit(onSubmit)} className="w-full pt-5  space-y-6">
 					<FormField
 						control={form.control}
 						name="email"
@@ -184,25 +177,16 @@ export default function Page() {
 						render={({ field }) => (
 							<FormItem className="flex flex-row items-start space-x-3 space-y-0">
 								<FormControl>
-									<Checkbox
-										checked={field.value}
-										onCheckedChange={field.onChange}
-									/>
+									<Checkbox checked={field.value} onCheckedChange={field.onChange} />
 								</FormControl>
 								<div className="space-y-1 leading-none">
 									<FormLabel>
 										I agree to the{" "}
-										<Link
-											href="/terms"
-											className="text-blue-600 hover:underline"
-										>
+										<Link href="/terms" className="text-blue-600 hover:underline">
 											Terms of Use
 										</Link>{" "}
 										and{" "}
-										<Link
-											href="/privacy"
-											className="text-blue-600 hover:underline"
-										>
+										<Link href="/privacy" className="text-blue-600 hover:underline">
 											Privacy Policy
 										</Link>
 									</FormLabel>
@@ -215,17 +199,13 @@ export default function Page() {
 					{isPending ? (
 						<Loader2 className="h-10 w-10 animate-spin" />
 					) : (
-						<RainbowButton
-							type="submit"
-							className="w-full"
-							disabled={isPending || !isTermsChecked}
-						>
+						<RainbowButton type="submit" className="w-full" disabled={isPending || !isTermsChecked}>
 							Sign Up
 						</RainbowButton>
 					)}
 				</form>
 			</Form>
-			<br />
+			{/* <br />
 			<RainbowButton
 				colorScheme="black"
 				onClick={handleGoogleSignUp}
@@ -233,7 +213,7 @@ export default function Page() {
 				disabled={!isTermsChecked}
 			>
 				Sign up with Google
-			</RainbowButton>
+			</RainbowButton> */}
 		</div>
 	);
 }

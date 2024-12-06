@@ -87,10 +87,7 @@ export default function Page() {
 				</Link>
 			</p>
 
-			<form
-				onSubmit={form.handleSubmit(onSubmit)}
-				className="w-full pt-5  space-y-6"
-			>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="w-full pt-5  space-y-6">
 				<FormField
 					control={form.control}
 					name="email"
@@ -133,14 +130,14 @@ export default function Page() {
 					</RainbowButton>
 				)}
 			</form>
-			<br />
+			{/* <br />
 			<RainbowButton
 				onClick={handleGoogleSignIn}
 				colorScheme="black"
 				className="w-full"
 			>
 				Login with Google
-			</RainbowButton>
+			</RainbowButton> */}
 		</Form>
 	);
 }
