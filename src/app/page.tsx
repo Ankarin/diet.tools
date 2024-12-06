@@ -14,7 +14,6 @@ import {
 	MedicalConditionsStep,
 	ActivityStep,
 	FoodPreferencesStep,
-	MealPreparationStep,
 	DietaryApproachStep,
 	ExamplePlanStep,
 } from "./step-components";
@@ -84,11 +83,7 @@ export default function BodyCompositionCalculator() {
 		} = await supabase.auth.getUser();
 
 		if (user) {
-			const { data, error } = await supabase
-				.from("users")
-				.select("*")
-				.eq("id", user.id)
-				.single();
+			const { data, error } = await supabase.from("users").select("*").eq("id", user.id).single();
 			if (error) {
 				console.error("Error fetching user data:", error);
 			} else if (data) {
@@ -105,7 +100,7 @@ export default function BodyCompositionCalculator() {
 		const {
 			data: { user },
 		} = await supabase.auth.getUser();
-		
+
 		if (user) {
 			await supabase.from("users").upsert({
 				id: user.id,
@@ -134,7 +129,6 @@ export default function BodyCompositionCalculator() {
 		<DietaryRestrictionsStep key="dietaryRestrictions" />,
 		<FoodPreferencesStep key="foodPreferences" />,
 		<DietaryApproachStep key="dietaryApproach" />,
-		<MealPreparationStep key="mealPreparation" />,
 		<ExamplePlanStep key="examplePlan" />,
 	];
 
@@ -148,9 +142,7 @@ export default function BodyCompositionCalculator() {
 				<div className="w-full max-w-3xl">
 					<HeroTitles />
 					<div className="mt-12">
-						<AnimatePresence mode="wait">
-							{steps[currentStep - 1]}
-						</AnimatePresence>
+						<AnimatePresence mode="wait">{steps[currentStep - 1]}</AnimatePresence>
 
 						<motion.div
 							className="mt-8"
@@ -162,7 +154,6 @@ export default function BodyCompositionCalculator() {
 								Step {currentStep} of {steps.length}
 							</p>
 							<div className="w-full bg-secondary rounded-full h-2">
-								{/* biome-ignore lint/style/useSelfClosingElements: <explanation> */}
 								<div
 									className="bg-primary h-2 rounded-full transition-all duration-300 ease-in-out"
 									style={{ width: `${(currentStep / steps.length) * 100}%` }}
@@ -177,8 +168,7 @@ export default function BodyCompositionCalculator() {
 				<div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
 					<div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-6 md:px-0">
 						<p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-							&copy; {new Date().getFullYear()} Ai Diet Planner. All rights
-							reserved.
+							&copy; {new Date().getFullYear()} Ai Diet Planner. All rights reserved.
 						</p>
 					</div>
 

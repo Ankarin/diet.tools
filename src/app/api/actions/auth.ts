@@ -56,8 +56,11 @@ export async function signup({
 }) {
 	try {
 		const supabase = await createClient();
-		const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-		
+		const {
+			data: { session },
+			error: sessionError,
+		} = await supabase.auth.getSession();
+
 		if (sessionError) {
 			return { error: sessionError.message };
 		}
@@ -71,13 +74,11 @@ export async function signup({
 				return { error: error.message };
 			}
 
-			const { error: upsertError } = await supabase
-				.from("users")
-				.upsert({
-					id: session.user.id,
-					email,
-					...form,
-				});
+			const { error: upsertError } = await supabase.from("users").upsert({
+				id: session.user.id,
+				email,
+				...form,
+			});
 
 			if (upsertError) {
 				return { error: upsertError.message };
@@ -96,13 +97,11 @@ export async function signup({
 			}
 
 			if (data?.user) {
-				const { error: upsertError } = await supabase
-					.from("users")
-					.upsert({
-						id: data.user.id,
-						email,
-						...form,
-					});
+				const { error: upsertError } = await supabase.from("users").upsert({
+					id: data.user.id,
+					email,
+					...form,
+				});
 
 				if (upsertError) {
 					return { error: upsertError.message };
@@ -111,6 +110,7 @@ export async function signup({
 		}
 
 		return { success: true };
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (error: any) {
 		console.error("Signup error:", error);
 		return { error: error.message || "An error occurred during signup" };

@@ -2,13 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { isAfter } from "date-fns";
 import { type NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_ROUTES = [
-	"/",
-	"/login",
-	"/signup",
-	"/forgot",
-	"/confirm",
-] as const;
+const PUBLIC_ROUTES = ["/", "/login", "/signup", "/forgot", "/confirm"] as const;
 const SUBSCRIPTION_ROUTE = "/me/subscription";
 const PROFILE_ROUTE = "/me/profile";
 const ME_ROUTE = "/me";
@@ -25,9 +19,7 @@ interface AppMetadata {
 
 const createSupabaseClient = (request: NextRequest, response: NextResponse) => {
 	return createServerClient(
-		// biome-ignore lint/style/noNonNullAssertion: <explanation>
 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
-		// biome-ignore lint/style/noNonNullAssertion: <explanation>
 		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 		{
 			cookies: {
@@ -35,11 +27,7 @@ const createSupabaseClient = (request: NextRequest, response: NextResponse) => {
 					return request.cookies.getAll();
 				},
 				setAll(cookiesToSet) {
-					// biome-ignore lint/complexity/noForEach: <explanation>
-					cookiesToSet.forEach(({ name, value }) =>
-						request.cookies.set(name, value),
-					);
-					// biome-ignore lint/complexity/noForEach: <explanation>
+					cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
 					cookiesToSet.forEach(({ name, value, options }) =>
 						response.cookies.set(name, value, options),
 					);
@@ -50,15 +38,11 @@ const createSupabaseClient = (request: NextRequest, response: NextResponse) => {
 };
 
 const isSubscriptionExpired = (subscriptionExpires?: string) => {
-	return (
-		!subscriptionExpires || isAfter(new Date(), new Date(subscriptionExpires))
-	);
+	return !subscriptionExpires || isAfter(new Date(), new Date(subscriptionExpires));
 };
 
 const hasValidSubscription = (subscriptionExpires?: string) => {
-	return (
-		subscriptionExpires && isAfter(new Date(subscriptionExpires), new Date())
-	);
+	return subscriptionExpires && isAfter(new Date(subscriptionExpires), new Date());
 };
 
 const redirectTo = (request: NextRequest, path: string) => {
@@ -78,12 +62,8 @@ export const updateSession = async (request: NextRequest) => {
 			data: { user },
 			error,
 		} = await supabase.auth.getUser();
-		console.log(user, error);
 		// Handle unauthenticated access to protected routes
-		if (
-			(error || user.is_anonymous) &&
-			request.nextUrl.pathname.startsWith(ME_ROUTE)
-		) {
+		if ((error || user.is_anonymous) && request.nextUrl.pathname.startsWith(ME_ROUTE)) {
 			return redirectTo(request, LOGIN_ROUTE);
 		}
 
@@ -112,9 +92,7 @@ export const updateSession = async (request: NextRequest) => {
 
 		// Redirect authenticated users with valid subscription away from public routes
 		if (
-			PUBLIC_ROUTES.includes(
-				request.nextUrl.pathname as (typeof PUBLIC_ROUTES)[number],
-			) &&
+			PUBLIC_ROUTES.includes(request.nextUrl.pathname as (typeof PUBLIC_ROUTES)[number]) &&
 			hasValidSubscription(subscription_expires)
 		) {
 			return redirectTo(request, ME_ROUTE);

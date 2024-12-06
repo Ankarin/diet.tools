@@ -1,0 +1,68 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.4.1/schema.json",
+	"organizeImports": {
+		"enabled": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"correctness": {
+				"noUnusedVariables": "error",
+				"useExhaustiveDependencies": "error",
+				"noUndeclaredVariables": "error",
+				"noUnusedPrivateClassMembers": "error"
+			},
+			"suspicious": {
+				"noConsoleLog": "off",
+				"noExplicitAny": "off",
+				"noImportAssign": "error",
+				"noArrayIndexKey": "off",
+				"noAssignInExpressions": "error",
+				"noDoubleEquals": "error",
+				"noGlobalIsNan": "off"
+			},
+			"style": {
+				"useNumberNamespace": "off",
+				"noNonNullAssertion": "off",
+				"useShorthandArrayType": "error",
+				"useImportType": "off",
+				"useSelfClosingElements": "off",
+				"noDefaultExport": "off",
+				"useConst": "error"
+			},
+			"complexity": {
+				"noForEach": "off",
+				"noBannedTypes": "error",
+				"noStaticOnlyClass": "error",
+				"noUselessConstructor": "error"
+			},
+			"performance": {
+				"noDelete": "off"
+			},
+			"a11y": {
+				"useKeyWithClickEvents": "error",
+				"useButtonType": "error",
+				"noSvgWithoutTitle": "error",
+				"useAltText": "error",
+				"useMediaCaption": "error"
+			}
+		},
+		"ignore": ["node_modules", ".next", "dist", "build"]
+	},
+	"formatter": {
+		"enabled": true,
+		"formatWithErrors": true,
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineWidth": 100,
+		"lineEnding": "lf",
+		"ignore": ["node_modules", ".next", "dist", "build"]
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double",
+			"semicolons": "always"
+		}
+	}
+}

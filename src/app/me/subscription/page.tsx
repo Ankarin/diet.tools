@@ -38,20 +38,17 @@ const features = [
 	{
 		icon: BarChart3,
 		title: "Nutritional Analysis",
-		description:
-			"Get detailed calorie and macro breakdowns for every meal in your plan",
+		description: "Get detailed calorie and macro breakdowns for every meal in your plan",
 	},
 	{
 		icon: Clock,
 		title: "Weekly Planning",
-		description:
-			"Access comprehensive weekly meal plans to streamline your nutrition journey",
+		description: "Access comprehensive weekly meal plans to streamline your nutrition journey",
 	},
 	{
 		icon: Sparkles,
 		title: "Shopping Lists",
-		description:
-			"Get organized shopping lists with all ingredients needed for your meal plans",
+		description: "Get organized shopping lists with all ingredients needed for your meal plans",
 	},
 ];
 
@@ -94,9 +91,7 @@ export default function SubscribePage() {
 	}, []);
 	const setEmail = async () => {
 		const user = await supabase.auth.getUser();
-		await supabase
-			.from("users")
-			.upsert({ id: user.data.user.id, email: user.data.user.email });
+		await supabase.from("users").upsert({ id: user.data.user.id, email: user.data.user.email });
 	};
 
 	const item = {
@@ -117,8 +112,8 @@ export default function SubscribePage() {
 						Unlock Your Perfect Diet Plan
 					</h1>
 					<p className="mt-6 text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
-						Join thousands of happy customers who have transformed their lives
-						with our AI-powered personalized nutrition platform.
+						Join thousands of happy customers who have transformed their lives with our AI-powered
+						personalized nutrition platform.
 					</p>
 				</motion.div>
 
@@ -130,7 +125,7 @@ export default function SubscribePage() {
 					className="mt-12 max-w-lg mx-auto"
 				>
 					<div className="relative">
-						<div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/60 rounded-2xl blur opacity-25"></div>
+						<div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/60 rounded-2xl blur opacity-25" />
 						<div className="relative bg-white rounded-xl shadow-xl overflow-hidden">
 							<div className="px-6 py-8 sm:p-10 sm:pb-6">
 								<div className="flex justify-center">
@@ -199,12 +194,8 @@ export default function SubscribePage() {
 							<div className="relative p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col h-[280px]">
 								<feature.icon className="h-8 w-8 text-primary mb-4 flex-shrink-0" />
 								<div className="flex flex-col flex-grow">
-									<h3 className="text-lg font-semibold text-gray-900 mb-3">
-										{feature.title}
-									</h3>
-									<p className="text-gray-600 flex-grow">
-										{feature.description}
-									</p>
+									<h3 className="text-lg font-semibold text-gray-900 mb-3">{feature.title}</h3>
+									<p className="text-gray-600 flex-grow">{feature.description}</p>
 								</div>
 							</div>
 						</motion.div>
@@ -213,9 +204,7 @@ export default function SubscribePage() {
 
 				{/* Testimonials */}
 				<div className="mt-24">
-					<h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-						What Our Users Say
-					</h2>
+					<h2 className="text-3xl font-bold text-center text-gray-900 mb-12">What Our Users Say</h2>
 					<motion.div
 						variants={container}
 						initial="hidden"
@@ -237,18 +226,13 @@ export default function SubscribePage() {
 										className="h-12 w-12 rounded-full"
 									/>
 									<div className="ml-4">
-										<h4 className="text-lg font-semibold text-gray-900">
-											{testimonial.name}
-										</h4>
+										<h4 className="text-lg font-semibold text-gray-900">{testimonial.name}</h4>
 										<p className="text-gray-600">{testimonial.role}</p>
 									</div>
 								</div>
 								<div className="flex mb-4">
 									{[...Array(5)].map((_, i) => (
-										<Star
-											key={i}
-											className="h-5 w-5 text-yellow-400 fill-current"
-										/>
+										<Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
 									))}
 								</div>
 								<p className="text-gray-700">{testimonial.content}</p>
@@ -264,9 +248,7 @@ export default function SubscribePage() {
 					transition={{ delay: 0.4 }}
 					className="mt-24 text-center"
 				>
-					<h2 className="text-3xl font-bold text-gray-900">
-						Ready to Transform Your Diet?
-					</h2>
+					<h2 className="text-3xl font-bold text-gray-900">Ready to Transform Your Diet?</h2>
 					<p className="mt-4 text-xl text-gray-600">
 						Join now and get your first personalized meal plan in minutes.
 					</p>

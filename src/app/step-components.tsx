@@ -1,12 +1,8 @@
 import DailyExample from "@/components/genUi/example/daily-example";
 import { Button } from "@/components/ui/button";
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Card, CardHeader } from "@/components/ui/card";
+import { CheckIcon } from "@radix-ui/react-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
@@ -19,6 +15,7 @@ import { z } from "zod";
 import { useState } from "react";
 
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 const stepVariants = {
 	hidden: { opacity: 0, x: 50 },
@@ -28,6 +25,7 @@ const stepVariants = {
 
 interface StepProps {
 	title: string;
+	// biome-ignore lint/correctness/noUndeclaredVariables: <explanation>
 	children: React.ReactNode;
 }
 
@@ -55,9 +53,7 @@ function Step({ title, children }: StepProps) {
 						<span className="sr-only">Go back</span>
 					</Button>
 				)}
-				<p className="text-xl sm:text-2xl font-bold text-left  sm:text-center flex-grow">
-					{title}
-				</p>
+				<p className="text-xl sm:text-2xl font-bold text-left  sm:text-center flex-grow">{title}</p>
 			</div>
 			{children}
 		</motion.div>
@@ -67,14 +63,12 @@ function Step({ title, children }: StepProps) {
 export function GenderStep() {
 	const { updateFormData, setCurrentStep } = useFormStore();
 
-	const handleGenderSelection =
-		(gender: string) => async (e: React.MouseEvent) => {
-			e.preventDefault();
-			updateFormData("gender", gender);
-			setCurrentStep(2);
-			// const res = await supabase.auth.signInAnonymously();
-			// console.log(res);
-		};
+	// biome-ignore lint/correctness/noUndeclaredVariables: <explanation>
+	const handleGenderSelection = (gender: string) => async (e: React.MouseEvent) => {
+		e.preventDefault();
+		updateFormData("gender", gender);
+		setCurrentStep(2);
+	};
 
 	return (
 		<Step title="What is your gender?">
@@ -151,11 +145,7 @@ export function AgeStep() {
 							</FormItem>
 						)}
 					/>
-					<RainbowButton
-						type="submit"
-						className="w-full"
-						disabled={!form.formState.isValid}
-					>
+					<RainbowButton type="submit" className="w-full" disabled={!form.formState.isValid}>
 						Next
 					</RainbowButton>
 				</form>
@@ -246,8 +236,7 @@ export function MeasurementsStep() {
 			if (formData.height) metricHeightForm.trigger();
 			if (formData.weight) weightForm.trigger();
 		} else {
-			if (formData.heightFeet || formData.heightInches)
-				imperialHeightForm.trigger();
+			if (formData.heightFeet || formData.heightInches) imperialHeightForm.trigger();
 			if (formData.weight) weightForm.trigger();
 		}
 	}, [formData, unit, metricHeightForm, imperialHeightForm, weightForm]);
@@ -391,11 +380,7 @@ export function MeasurementsStep() {
 					</Form>
 				</div>
 
-				<RainbowButton
-					onClick={handleSubmit}
-					className="w-full"
-					disabled={!isValid()}
-				>
+				<RainbowButton onClick={handleSubmit} className="w-full" disabled={!isValid()}>
 					Next
 				</RainbowButton>
 			</div>
@@ -403,75 +388,49 @@ export function MeasurementsStep() {
 	);
 }
 
-const goalsSchema = z.object({
-	goals: z
-		.string()
-		.min(5, "Please enter your goals")
-		.max(500, "Goals should be 500 characters or less"),
-});
-
-export function GoalsStep() {
-	const { formData, updateFormData, setCurrentStep } = useFormStore();
-
-	const form = useForm<z.infer<typeof goalsSchema>>({
-		resolver: zodResolver(goalsSchema),
-		defaultValues: {
-			goals: formData.goals || "",
-		},
-	});
-
-	function onSubmit(values: z.infer<typeof goalsSchema>) {
-		updateFormData("goals", values.goals);
-		setCurrentStep(5);
-	}
-
-	return (
-		<Step title="What are your weight and health goals ?">
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-					<FormField
-						control={form.control}
-						name="goals"
-						render={({ field }) => (
-							<FormItem>
-								<FormControl>
-									<Textarea
-										placeholder="Are you aiming to lose weight, gain muscle, maintain weight, or manage a health condition?"
-										{...field}
-										className="min-h-[150px] text-lg"
-										autoFocus
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<RainbowButton
-						type="submit"
-						className="w-full"
-						disabled={!form.formState.isValid}
-					>
-						Next
-					</RainbowButton>
-				</form>
-			</Form>
-		</Step>
-	);
-}
-
 const activitySchema = z.object({
-	activity: z
-		.string()
-		.min(5, "Please describe your activity level")
-		.max(1000, "Description should be 1000 characters or less"),
+	activity: z.enum(["sedentary", "light", "moderate", "very", "extra"]),
 });
+
 export function ActivityStep() {
 	const { formData, updateFormData, setCurrentStep } = useFormStore();
+
+	const activities = [
+		{
+			value: "sedentary",
+			label: "Sedentary",
+			description: "Desk job and little to no exercise (e.g., office work with minimal movement)",
+		},
+		{
+			value: "light",
+			label: "Lightly Active",
+			description: "Light exercise 1-3 days/week or active job with lots of walking",
+		},
+		{
+			value: "moderate",
+			label: "Moderately Active",
+			description: "Moderate exercise 3-5 days/week or physically demanding job",
+		},
+		{
+			value: "very",
+			label: "Very Active",
+			description: "Hard exercise 6-7 days/week or athletic job with daily training",
+		},
+		{
+			value: "extra",
+			label: "Extremely Active",
+			description: "Professional athlete level or extremely physical job with additional training",
+		},
+	];
 
 	const form = useForm<z.infer<typeof activitySchema>>({
 		resolver: zodResolver(activitySchema),
 		defaultValues: {
-			activity: formData.activity || "",
+			activity:
+				formData.activity &&
+				["sedentary", "light", "moderate", "very", "extra"].includes(formData.activity)
+					? formData.activity
+					: "moderate",
 		},
 	});
 
@@ -481,31 +440,137 @@ export function ActivityStep() {
 	}
 
 	return (
-		<Step title="How physically active are you throughout the day?">
+		<Step title="What's your typical activity level?">
 			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 					<FormField
 						control={form.control}
 						name="activity"
 						render={({ field }) => (
-							<FormItem>
+							<FormItem className="space-y-4">
 								<FormControl>
-									<Textarea
-										{...field}
-										placeholder="Describe your typical daily activities, including any exercise or sports you participate in."
-										className="min-h-[150px] text-lg"
-										autoFocus
-									/>
+									<div className="grid grid-cols-1 gap-4">
+										{activities.map((activity) => (
+											<Card
+												key={activity.value}
+												className={cn(
+													"cursor-pointer border transition-all hover:bg-accent",
+													field.value === activity.value && "border-primary bg-accent",
+												)}
+												onClick={() => field.onChange(activity.value)}
+											>
+												<CardHeader>
+													<div className="flex items-center justify-between">
+														<div className="space-y-1">
+															<div className="text-lg font-medium">{activity.label}</div>
+															<div className="text-sm text-muted-foreground">
+																{activity.description}
+															</div>
+														</div>
+														{field.value === activity.value && (
+															<CheckIcon className="h-5 w-5 text-primary" />
+														)}
+													</div>
+												</CardHeader>
+											</Card>
+										))}
+									</div>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
-					<RainbowButton
-						type="submit"
-						className="w-full"
-						disabled={!form.formState.isValid}
-					>
+					<RainbowButton type="submit" className="w-full" disabled={!form.formState.isValid}>
+						Next
+					</RainbowButton>
+				</form>
+			</Form>
+		</Step>
+	);
+}
+
+const goalsSchema = z.object({
+	goals: z.enum(["lose", "maintain", "gain"]),
+});
+
+export function GoalsStep() {
+	const { formData, updateFormData, setCurrentStep } = useFormStore();
+
+	const goals = [
+		{
+			value: "lose",
+			label: "Fat Loss",
+			description: "Achieve sustainable fat loss while preserving muscle mass",
+		},
+		{
+			value: "maintain",
+			label: "Body Recomposition",
+			description: "Maintain weight while improving body composition and fitness",
+		},
+		{
+			value: "gain",
+			label: "Muscle Building",
+			description: "Build lean muscle mass and strength through proper nutrition",
+		},
+	];
+
+	const form = useForm<z.infer<typeof goalsSchema>>({
+		resolver: zodResolver(goalsSchema),
+		defaultValues: {
+			goals:
+				formData.goals && ["lose", "maintain", "gain"].includes(formData.goals)
+					? formData.goals
+					: "maintain",
+		},
+	});
+
+	function onSubmit(values: z.infer<typeof goalsSchema>) {
+		updateFormData("goals", values.goals);
+		setCurrentStep(5);
+	}
+
+	return (
+		<Step title="What are your weight and health goals?">
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+					<FormField
+						control={form.control}
+						name="goals"
+						render={({ field }) => (
+							<FormItem className="space-y-4">
+								<FormControl>
+									<div className="grid grid-cols-1 gap-4">
+										{goals.map((goal) => (
+											<Card
+												key={goal.value}
+												className={cn(
+													"cursor-pointer border transition-all hover:bg-accent",
+													field.value === goal.value && "border-primary bg-accent",
+												)}
+												onClick={() => field.onChange(goal.value)}
+											>
+												<CardHeader>
+													<div className="flex items-center justify-between">
+														<div className="space-y-1">
+															<div className="text-lg font-medium">{goal.label}</div>
+															<div className="text-sm text-muted-foreground">
+																{goal.description}
+															</div>
+														</div>
+														{field.value === goal.value && (
+															<CheckIcon className="h-5 w-5 text-primary" />
+														)}
+													</div>
+												</CardHeader>
+											</Card>
+										))}
+									</div>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<RainbowButton type="submit" className="w-full" disabled={!form.formState.isValid}>
 						Next
 					</RainbowButton>
 				</form>
@@ -515,9 +580,7 @@ export function ActivityStep() {
 }
 
 const medicalConditionsSchema = z.object({
-	medicalConditions: z
-		.string()
-		.max(1000, "Description should be 1000 characters or less"),
+	medicalConditions: z.string().max(1000, "Description should be 1000 characters or less"),
 });
 export function MedicalConditionsStep() {
 	const { formData, updateFormData, setCurrentStep } = useFormStore();
@@ -555,11 +618,7 @@ export function MedicalConditionsStep() {
 							</FormItem>
 						)}
 					/>
-					<RainbowButton
-						type="submit"
-						className="w-full"
-						disabled={!form.formState.isValid}
-					>
+					<RainbowButton type="submit" className="w-full" disabled={!form.formState.isValid}>
 						Next
 					</RainbowButton>
 				</form>
@@ -569,9 +628,7 @@ export function MedicalConditionsStep() {
 }
 
 const dietaryRestrictionsSchema = z.object({
-	dietaryRestrictions: z
-		.string()
-		.max(1000, "Description should be 1000 characters or less"),
+	dietaryRestrictions: z.string().max(1000, "Description should be 1000 characters or less"),
 });
 
 export function DietaryRestrictionsStep() {
@@ -610,11 +667,7 @@ export function DietaryRestrictionsStep() {
 							</FormItem>
 						)}
 					/>
-					<RainbowButton
-						type="submit"
-						className="w-full"
-						disabled={!form.formState.isValid}
-					>
+					<RainbowButton type="submit" className="w-full" disabled={!form.formState.isValid}>
 						Next
 					</RainbowButton>
 				</form>
@@ -624,9 +677,7 @@ export function DietaryRestrictionsStep() {
 }
 
 const foodPreferencesSchema = z.object({
-	foodPreferences: z
-		.string()
-		.max(1000, "Description should be 1000 characters or less"),
+	foodPreferences: z.string().max(1000, "Description should be 1000 characters or less"),
 });
 export function FoodPreferencesStep() {
 	const { formData, updateFormData, setCurrentStep } = useFormStore();
@@ -664,11 +715,7 @@ export function FoodPreferencesStep() {
 							</FormItem>
 						)}
 					/>
-					<RainbowButton
-						type="submit"
-						className="w-full"
-						disabled={!form.formState.isValid}
-					>
+					<RainbowButton type="submit" className="w-full" disabled={!form.formState.isValid}>
 						Next
 					</RainbowButton>
 				</form>
@@ -678,9 +725,7 @@ export function FoodPreferencesStep() {
 }
 
 const dietaryApproachSchema = z.object({
-	dietaryApproach: z
-		.string()
-		.max(1000, "Description should be 1000 characters or less"),
+	dietaryApproach: z.string().max(1000, "Description should be 1000 characters or less"),
 });
 
 export function DietaryApproachStep() {
@@ -719,70 +764,8 @@ export function DietaryApproachStep() {
 							</FormItem>
 						)}
 					/>
-					<RainbowButton
-						type="submit"
-						className="w-full"
-						disabled={!form.formState.isValid}
-					>
+					<RainbowButton type="submit" className="w-full" disabled={!form.formState.isValid}>
 						Next
-					</RainbowButton>
-				</form>
-			</Form>
-		</Step>
-	);
-}
-
-const mealPreparationSchema = z.object({
-	mealPreparation: z
-		.string()
-		.min(
-			1,
-			"Please provide information about your meal preparation preferences",
-		)
-		.max(1000, "Description should be 1000 characters or less"),
-});
-export function MealPreparationStep() {
-	const { formData, updateFormData, setCurrentStep } = useFormStore();
-
-	const form = useForm<z.infer<typeof mealPreparationSchema>>({
-		resolver: zodResolver(mealPreparationSchema),
-		defaultValues: {
-			mealPreparation: formData.mealPreparation || "",
-		},
-	});
-
-	function onSubmit(values: z.infer<typeof mealPreparationSchema>) {
-		updateFormData("mealPreparation", values.mealPreparation);
-		setCurrentStep(11);
-	}
-
-	return (
-		<Step title="Do you prefer cooking at home or eating out, and how much time can you dedicate to meal preparation each day?">
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-					<FormField
-						control={form.control}
-						name="mealPreparation"
-						render={({ field }) => (
-							<FormItem>
-								<FormControl>
-									<Textarea
-										{...field}
-										placeholder="Combining these questions helps tailor the meal plan to your eating habits, availability, and schedule."
-										className="min-h-[150px] text-lg"
-										autoFocus
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<RainbowButton
-						type="submit"
-						className="w-full"
-						disabled={!form.formState.isValid}
-					>
-						Finish
 					</RainbowButton>
 				</form>
 			</Form>
@@ -795,9 +778,8 @@ export function ExamplePlanStep() {
 		<Step title="Perfect! Let's create your personalized meal plan">
 			<div className="space-y-4">
 				<p className="text-gray-600">
-					Based on your preferences, we&apos;ll generate a sample daily meal
-					plan tailored just for you. This will give you a taste of what you can
-					expect from our AI-powered meal planning.
+					Based on your preferences, we&apos;ll generate a sample daily meal plan tailored just for
+					you. This will give you a taste of what you can expect from our AI-powered meal planning.
 				</p>
 				<DailyExample />
 			</div>

@@ -10,8 +10,8 @@ export type FormData = {
 	heightFeet: string;
 	heightInches: string;
 	weight: string;
-	goals: string;
-	activity: string;
+	goals: "lose" | "maintain" | "gain" | "";
+	activity: "sedentary" | "light" | "moderate" | "very" | "extra" | "";
 	medicalConditions: string;
 	dietaryRestrictions: string;
 	foodPreferences: string;

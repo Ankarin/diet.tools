@@ -44,10 +44,6 @@ export default function DailyExample() {
 			)
 		: null;
 
-	// useEffect(() => {
-	//   console.log(mealPlan);
-	// }, [mealPlan, isLoading, error]);
-
 	return (
 		<div className="container mx-auto p-4 max-w-4xl">
 			{!isLoading && !mealPlan ? (
@@ -60,10 +56,7 @@ export default function DailyExample() {
 				</Button>
 			) : !isLoading && mealPlan ? (
 				<Link href="/signup">
-					<Button
-						disabled={isLoading}
-						className="mb-6 text-lg py-6 px-8 w-full"
-					>
+					<Button disabled={isLoading} className="mb-6 text-lg py-6 px-8 w-full">
 						Get The Full Version →
 					</Button>
 				</Link>
@@ -72,9 +65,7 @@ export default function DailyExample() {
 			{error && (
 				<Card className="mb-6 bg-red-50 shadow-lg">
 					<CardHeader>
-						<CardTitle className="text-2xl font-bold text-red-600">
-							Error
-						</CardTitle>
+						<CardTitle className="text-2xl font-bold text-red-600">Error</CardTitle>
 					</CardHeader>
 					<CardContent>
 						<p className="text-lg text-red-600">{error.message}</p>
@@ -86,19 +77,15 @@ export default function DailyExample() {
 				<div className="space-y-6">
 					<Card className="shadow-lg">
 						<CardHeader className="bg-primary/10">
-							<CardTitle className="text-2xl font-bold">
-								Your meal plan for the day
-							</CardTitle>
+							<CardTitle className="text-2xl font-bold">Your meal plan for the day</CardTitle>
 						</CardHeader>
 						<CardContent>
 							<div className="text-xl pt-4 text-muted-foreground">
-								<div>
-									Calories: {mealPlan?.totalCalories || "Calculating..."}
-								</div>
+								<div>Calories: {mealPlan?.totalCalories || "Calculating..."}</div>
 								{totalMacros && (
 									<div>
-										Protein: {totalMacros.protein}g Carbs: {totalMacros.carbs}g
-										Fats: {totalMacros.fats}g
+										Protein: {totalMacros.protein}g Carbs: {totalMacros.carbs}g Fats:{" "}
+										{totalMacros.fats}g
 									</div>
 								)}
 							</div>
@@ -114,14 +101,11 @@ export default function DailyExample() {
 								items={meal.items || []}
 							/>
 						))}
-					{mealPlan?.shoppingList?.categories &&
-						mealPlan.shoppingList.categories.length > 0 && (
-							// @ts-ignore
-							<ShoppingListCard categories={mealPlan.shoppingList.categories} />
-						)}
-					{mealPlan?.explanation && (
-						<InfoCard title="Explanation" content={mealPlan.explanation} />
+					{mealPlan?.shoppingList?.categories && mealPlan.shoppingList.categories.length > 0 && (
+						// @ts-ignore
+						<ShoppingListCard categories={mealPlan.shoppingList.categories} />
 					)}
+					{mealPlan?.explanation && <InfoCard title="Explanation" content={mealPlan.explanation} />}
 				</div>
 			)}
 
@@ -133,10 +117,7 @@ export default function DailyExample() {
 			<br />
 			{!isLoading && mealPlan && (
 				<Link href="/signup">
-					<Button
-						disabled={isLoading}
-						className="mb-6 text-lg py-6 px-8 w-full"
-					>
+					<Button disabled={isLoading} className="mb-6 text-lg py-6 px-8 w-full">
 						Get The Full Version →
 					</Button>
 				</Link>
