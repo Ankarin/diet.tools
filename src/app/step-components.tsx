@@ -18,9 +18,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
 const stepVariants = {
-	hidden: { opacity: 0, x: 50 },
-	visible: { opacity: 1, x: 0 },
-	exit: { opacity: 0, x: -50 },
+	hidden: {
+		opacity: 0,
+		x: 15,
+	},
+	visible: {
+		opacity: 1,
+		x: 0,
+	},
+	exit: {
+		opacity: 0,
+		x: -15,
+	},
 };
 
 interface StepProps {
@@ -38,7 +47,12 @@ function Step({ title, children }: StepProps) {
 			initial="hidden"
 			animate="visible"
 			exit="exit"
-			transition={{ duration: 0.5 }}
+			transition={{
+				type: "spring",
+				stiffness: 300,
+				damping: 30,
+				mass: 1,
+			}}
 			className="w-full max-w-2xl mx-auto"
 		>
 			<div className="flex items-center mb-6">

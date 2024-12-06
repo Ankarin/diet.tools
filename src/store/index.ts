@@ -16,7 +16,6 @@ export type FormData = {
 	dietaryRestrictions: string;
 	foodPreferences: string;
 	dietaryApproach: string;
-	mealPreparation: string;
 };
 
 type FormStore = {
@@ -43,7 +42,6 @@ const initialFormData: FormData = {
 	dietaryRestrictions: "",
 	foodPreferences: "",
 	dietaryApproach: "",
-	mealPreparation: "",
 };
 
 export const useFormStore = create<FormStore>((set, get) => ({
@@ -72,20 +70,95 @@ export const useFormStore = create<FormStore>((set, get) => ({
 		} = await supabase.auth.getUser();
 
 		if (!user && step > 1) {
-			const res = await supabase.auth.signInAnonymously();
-			console.log("signup", res);
+			const { data: { user: anonUser } } = await supabase.auth.signInAnonymously();
+			if (anonUser) {
+				// Fetch existing data for the anonymous user
+				const { data } = await supabase
+					.from('users')
+					.select('*')
+					.eq('id', anonUser.id)
+					.single();
+				
+				if (data) {
+					set({ formData: {
+						gender: data.gender ?? "",
+						age: data.age ?? "",
+						unit: data.unit ?? "",
+						height: data.height ?? "",
+						heightFeet: data.heightFeet ?? "",
+						heightInches: data.heightInches ?? "",
+						weight: data.weight ?? "",
+						goals: data.goals ?? "",
+						activity: data.activity ?? "",
+						medicalConditions: data.medicalConditions ?? "",
+						dietaryRestrictions: data.dietaryRestrictions ?? "",
+						foodPreferences: data.foodPreferences ?? "",
+						dietaryApproach: data.dietaryApproach ?? "",
+					}});
+				}
+			}
+		} else if (user && step === 1) {
+			// Fetch existing data when returning user starts from step 1
+			const { data } = await supabase
+				.from('users')
+				.select('*')
+				.eq('id', user.id)
+				.single();
+			
+			if (data) {
+				set({ formData: {
+					gender: data.gender ?? "",
+					age: data.age ?? "",
+					unit: data.unit ?? "",
+					height: data.height ?? "",
+					heightFeet: data.heightFeet ?? "",
+					heightInches: data.heightInches ?? "",
+					weight: data.weight ?? "",
+					goals: data.goals ?? "",
+					activity: data.activity ?? "",
+					medicalConditions: data.medicalConditions ?? "",
+					dietaryRestrictions: data.dietaryRestrictions ?? "",
+					foodPreferences: data.foodPreferences ?? "",
+					dietaryApproach: data.dietaryApproach ?? "",
+				}});
+			}
 		}
+
 		sendGAEvent({
 			event: "step_view",
 			value: step,
 		});
 	},
-	updateFormData: (field, value) => {
+	updateFormData: async (field, value) => {
 		set((state) => ({
 			formData: { ...state.formData, [field]: value },
 		}));
+
+		// Save to Supabase after each update
+		const { data: { user } } = await supabase.auth.getUser();
+		if (user) {
+			const { error } = await supabase
+				.from('users')
+				.upsert({ 
+					id: user.id,
+					[field]: value,
+				});
+			if (error) console.error('Error saving to Supabase:', error);
+		}
 	},
-	setFormData: (data) => {
+	setFormData: async (data) => {
 		set({ formData: data });
+
+		// Save complete form data to Supabase
+		const { data: { user } } = await supabase.auth.getUser();
+		if (user) {
+			const { error } = await supabase
+				.from('users')
+				.upsert({ 
+					id: user.id,
+					...data,
+				});
+			if (error) console.error('Error saving to Supabase:', error);
+		}
 	},
 }));

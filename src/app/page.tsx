@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, Suspense, useCallback } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,7 +17,6 @@ import {
 	DietaryApproachStep,
 	ExamplePlanStep,
 } from "./step-components";
-import supabase from "@/supabase/client";
 
 const ease = [0.16, 1, 0.3, 1];
 
@@ -75,45 +74,7 @@ function SearchParamsHandler() {
 
 export default function BodyCompositionCalculator() {
 	const router = useRouter();
-	const { currentStep, setFormData, formData, initialFormData } = useFormStore();
-
-	const setData = useCallback(async () => {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser();
-
-		if (user) {
-			const { data, error } = await supabase.from("users").select("*").eq("id", user.id).single();
-			if (error) {
-				console.error("Error fetching user data:", error);
-			} else if (data) {
-				setFormData(data);
-			}
-		}
-	}, [setFormData]);
-
-	useEffect(() => {
-		setData();
-	}, [setData]);
-
-	const saveData = useCallback(async () => {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser();
-
-		if (user) {
-			await supabase.from("users").upsert({
-				id: user.id,
-				...formData,
-			});
-		}
-	}, [formData]);
-
-	useEffect(() => {
-		if (formData !== initialFormData) {
-			saveData();
-		}
-	}, [formData, saveData, initialFormData]);
+	const { currentStep } = useFormStore();
 
 	useEffect(() => {
 		router.replace(`?step=${currentStep}`, { scroll: false });
@@ -140,9 +101,9 @@ export default function BodyCompositionCalculator() {
 
 			<main className="flex-grow flex items-center justify-center py-12 px-4">
 				<div className="w-full max-w-3xl">
-					<HeroTitles />
-					<div className="mt-12">
-						<AnimatePresence mode="wait">{steps[currentStep - 1]}</AnimatePresence>
+					{currentStep === 1 && <HeroTitles />}
+					<div className=" mt-6 md:mt-12">
+						<AnimatePresence mode="wait" initial={false}>{steps[currentStep - 1]}</AnimatePresence>
 
 						<motion.div
 							className="mt-8"

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -167,6 +168,7 @@ export default function UserForm() {
 	}, [form, toast]);
 
 	useEffect(() => {
+		// biome-ignore lint/correctness/noUnusedVariables: <explanation>
 		const schema = watchUnit === "metric" ? metricSchema : imperialSchema;
 		form.clearErrors();
 		if (watchUnit === "metric") {

@@ -125,7 +125,7 @@ export async function POST() {
 
 		return response.toTextStreamResponse();
 	} catch (error) {
-		console.error("Error generating weekly meal plan:", error);
+		console.error(999, "Error generating weekly meal plan:", error);
 		if (error instanceof Error) {
 			return NextResponse.json({ error: error.message }, { status: 500 });
 		}
@@ -170,19 +170,47 @@ ${formData.medicalConditions ? `- Medical Conditions: ${formData.medicalConditio
 ${formData.dietaryRestrictions ? `- Dietary Restrictions: ${formData.dietaryRestrictions}` : ""}
 ${formData.foodPreferences ? `- Food Preferences: ${formData.foodPreferences}` : ""}
 ${formData.dietaryApproach ? `- Dietary Approach: ${formData.dietaryApproach}` : ""}
-${formData.mealPreparation ? `- Meal Preparation: ${formData.mealPreparation}` : ""}
 
-REQUIREMENTS:
-1. Use ONLY ${unitSystem} units throughout
-2. Each meal must include:
-   - Detailed food names
-   - Exact portions in ${unitSystem} units
-   - Calories and macros (protein, carbs, fats)
-3. Ensure daily meal totals match the calculated targets
-4. Focus on whole, nutrient-dense foods
-5. Account for all dietary restrictions and preferences
-6. Include practical, easy-to-prepare meals
-7. Create plans for all 7 days of the week
+SCHEMA REQUIREMENTS:
+1. Each day MUST have exactly three meals: breakfast, lunch, and dinner
+2. Each meal MUST include:
+   - An array of food items with:
+     * food name (string)
+     * portion in ${unitSystem} units (string)
+     * calories (number)
+     * protein (number)
+     * carbs (number)
+     * fats (number)
+   - totalCalories (number) for the meal
+
+3. Each day MUST follow this exact structure:
+{
+  "day": "Monday", // (or other day)
+  "totalCalories": ${dailyCalories},
+  "meals": {
+    "breakfast": {
+      "items": [
+        {
+          "food": "Food Name",
+          "portion": "Portion in ${unitSystem}",
+          "calories": number,
+          "protein": number,
+          "carbs": number,
+          "fats": number
+        }
+      ],
+      "totalCalories": ${Math.round(dailyCalories * 0.3)}
+    },
+    "lunch": {
+      "items": [...],
+      "totalCalories": ${Math.round(dailyCalories * 0.4)}
+    },
+    "dinner": {
+      "items": [...],
+      "totalCalories": ${Math.round(dailyCalories * 0.3)}
+    }
+  }
+}
 
 MEAL STRUCTURE:
 Each meal should have:
@@ -200,5 +228,14 @@ Example: "100g chicken breast, 150g brown rice"`
 Example: "4 oz chicken breast, 3/4 cup brown rice"`
 }
 
-Please provide a complete 7-day meal plan following the weeklyPlanSchema exactly.`;
+CRITICAL REQUIREMENTS:
+1. Generate EXACTLY 7 days (Monday through Sunday)
+2. Include ALL three meals for EACH day
+3. Include totalCalories for EACH meal
+4. Ensure meal calories sum up to daily target
+5. Use ONLY ${unitSystem} units
+6. Include a shopping list with categorized items
+7. Provide a brief explanation of the meal plan
+
+Please provide the complete 7-day meal plan following the weeklyPlanSchema exactly.`;
 };
