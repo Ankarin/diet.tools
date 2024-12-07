@@ -12,35 +12,26 @@ import { useFormStore } from "@/store";
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useState } from "react";
+import { useState, ReactNode, MouseEvent } from "react";
 
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const stepVariants = {
-	hidden: {
-		opacity: 0,
-		x: 15,
-	},
-	visible: {
-		opacity: 1,
-		x: 0,
-	},
-	exit: {
-		opacity: 0,
-		x: -15,
-	},
+	hidden: { opacity: 0, x: 50 },
+	visible: { opacity: 1, x: 0 },
+	exit: { opacity: 0, x: -50 },
 };
 
 interface StepProps {
 	title: string;
-	// biome-ignore lint/correctness/noUndeclaredVariables: <explanation>
-	children: React.ReactNode;
+	children: ReactNode;
 }
 
 function Step({ title, children }: StepProps) {
-	const { currentStep, setCurrentStep } = useFormStore();
-
+	const { currentStep } = useFormStore();
+	const router = useRouter();
 	return (
 		<motion.div
 			variants={stepVariants}
@@ -48,10 +39,8 @@ function Step({ title, children }: StepProps) {
 			animate="visible"
 			exit="exit"
 			transition={{
-				type: "spring",
-				stiffness: 300,
-				damping: 30,
-				mass: 1,
+				duration: 0.6,
+				ease: [0.32, 0.72, 0, 1],
 			}}
 			className="w-full max-w-2xl mx-auto"
 		>
@@ -60,7 +49,7 @@ function Step({ title, children }: StepProps) {
 					<Button
 						variant="ghost"
 						size="icon"
-						onClick={() => setCurrentStep(currentStep - 1)}
+						onClick={() => router.replace(`${currentStep - 1}`)}
 						className="absolute left-0 text-primary hover:text-primary/80"
 					>
 						<ArrowLeft className="h-6 w-6" />
@@ -75,13 +64,12 @@ function Step({ title, children }: StepProps) {
 }
 
 export function GenderStep() {
-	const { updateFormData, setCurrentStep } = useFormStore();
-
-	// biome-ignore lint/correctness/noUndeclaredVariables: <explanation>
-	const handleGenderSelection = (gender: string) => async (e: React.MouseEvent) => {
+	const { updateFormData } = useFormStore();
+	const router = useRouter();
+	const handleGenderSelection = (gender: string) => async (e: MouseEvent) => {
 		e.preventDefault();
 		updateFormData("gender", gender);
-		setCurrentStep(2);
+		router.replace(`${2}`);
 	};
 
 	return (
@@ -117,7 +105,7 @@ const ageSchema = z.object({
 });
 
 export function AgeStep() {
-	const { formData, updateFormData, setCurrentStep } = useFormStore();
+	const { formData, updateFormData } = useFormStore();
 
 	const form = useForm<z.infer<typeof ageSchema>>({
 		resolver: zodResolver(ageSchema),
@@ -125,7 +113,7 @@ export function AgeStep() {
 			age: formData.age || "",
 		},
 	});
-
+	const router = useRouter();
 	useEffect(() => {
 		if (formData.age) {
 			form.setValue("age", formData.age.toString());
@@ -134,7 +122,7 @@ export function AgeStep() {
 
 	function onSubmit(values: z.infer<typeof ageSchema>) {
 		updateFormData("age", values.age);
-		setCurrentStep(3);
+		router.replace(`${3}`);
 	}
 
 	return (
@@ -211,7 +199,7 @@ const createWeightSchema = (isMetric: boolean) =>
 	});
 
 export function MeasurementsStep() {
-	const { formData, updateFormData, setCurrentStep } = useFormStore();
+	const { formData, updateFormData } = useFormStore();
 	const [unit, setUnit] = useState<"metric" | "imperial">("metric");
 
 	useEffect(() => {
@@ -267,7 +255,7 @@ export function MeasurementsStep() {
 			weightForm.reset();
 		}
 	};
-
+	const router = useRouter();
 	const handleSubmit = () => {
 		if (unit === "metric") {
 			const heightData = metricHeightForm.getValues();
@@ -279,7 +267,7 @@ export function MeasurementsStep() {
 		}
 		const weightData = weightForm.getValues();
 		updateFormData("weight", weightData.weight);
-		setCurrentStep(4);
+		router.replace("4");
 	};
 
 	const isValid = () => {
@@ -407,7 +395,7 @@ const activitySchema = z.object({
 });
 
 export function ActivityStep() {
-	const { formData, updateFormData, setCurrentStep } = useFormStore();
+	const { formData, updateFormData } = useFormStore();
 
 	const activities = [
 		{
@@ -447,10 +435,10 @@ export function ActivityStep() {
 					: "moderate",
 		},
 	});
-
+	const router = useRouter();
 	function onSubmit(values: z.infer<typeof activitySchema>) {
 		updateFormData("activity", values.activity);
-		setCurrentStep(6);
+		router.replace("6");
 	}
 
 	return (
@@ -508,7 +496,7 @@ const goalsSchema = z.object({
 });
 
 export function GoalsStep() {
-	const { formData, updateFormData, setCurrentStep } = useFormStore();
+	const { formData, updateFormData } = useFormStore();
 
 	const goals = [
 		{
@@ -537,10 +525,10 @@ export function GoalsStep() {
 					: "maintain",
 		},
 	});
-
+	const router = useRouter();
 	function onSubmit(values: z.infer<typeof goalsSchema>) {
 		updateFormData("goals", values.goals);
-		setCurrentStep(5);
+		router.replace("5");
 	}
 
 	return (
@@ -597,7 +585,7 @@ const medicalConditionsSchema = z.object({
 	medicalConditions: z.string().max(1000, "Description should be 1000 characters or less"),
 });
 export function MedicalConditionsStep() {
-	const { formData, updateFormData, setCurrentStep } = useFormStore();
+	const { formData, updateFormData } = useFormStore();
 
 	const form = useForm<z.infer<typeof medicalConditionsSchema>>({
 		resolver: zodResolver(medicalConditionsSchema),
@@ -605,10 +593,10 @@ export function MedicalConditionsStep() {
 			medicalConditions: formData.medicalConditions || "",
 		},
 	});
-
+	const router = useRouter();
 	function onSubmit(values: z.infer<typeof medicalConditionsSchema>) {
 		updateFormData("medicalConditions", values.medicalConditions);
-		setCurrentStep(7);
+		router.replace("7");
 	}
 
 	return (
@@ -646,7 +634,7 @@ const dietaryRestrictionsSchema = z.object({
 });
 
 export function DietaryRestrictionsStep() {
-	const { formData, updateFormData, setCurrentStep } = useFormStore();
+	const { formData, updateFormData } = useFormStore();
 
 	const form = useForm<z.infer<typeof dietaryRestrictionsSchema>>({
 		resolver: zodResolver(dietaryRestrictionsSchema),
@@ -654,10 +642,10 @@ export function DietaryRestrictionsStep() {
 			dietaryRestrictions: formData.dietaryRestrictions || "",
 		},
 	});
-
+	const router = useRouter();
 	function onSubmit(values: z.infer<typeof dietaryRestrictionsSchema>) {
 		updateFormData("dietaryRestrictions", values.dietaryRestrictions);
-		setCurrentStep(8);
+		router.replace("8");
 	}
 
 	return (
@@ -694,7 +682,7 @@ const foodPreferencesSchema = z.object({
 	foodPreferences: z.string().max(1000, "Description should be 1000 characters or less"),
 });
 export function FoodPreferencesStep() {
-	const { formData, updateFormData, setCurrentStep } = useFormStore();
+	const { formData, updateFormData } = useFormStore();
 
 	const form = useForm<z.infer<typeof foodPreferencesSchema>>({
 		resolver: zodResolver(foodPreferencesSchema),
@@ -703,9 +691,10 @@ export function FoodPreferencesStep() {
 		},
 	});
 
+	const router = useRouter();
 	function onSubmit(values: z.infer<typeof foodPreferencesSchema>) {
 		updateFormData("foodPreferences", values.foodPreferences);
-		setCurrentStep(9);
+		router.replace("9");
 	}
 
 	return (
@@ -743,7 +732,7 @@ const dietaryApproachSchema = z.object({
 });
 
 export function DietaryApproachStep() {
-	const { formData, updateFormData, setCurrentStep } = useFormStore();
+	const { formData, updateFormData } = useFormStore();
 
 	const form = useForm<z.infer<typeof dietaryApproachSchema>>({
 		resolver: zodResolver(dietaryApproachSchema),
@@ -751,10 +740,10 @@ export function DietaryApproachStep() {
 			dietaryApproach: formData.dietaryApproach || "",
 		},
 	});
-
+	const router = useRouter();
 	function onSubmit(values: z.infer<typeof dietaryApproachSchema>) {
 		updateFormData("dietaryApproach", values.dietaryApproach);
-		setCurrentStep(10);
+		router.replace("10");
 	}
 
 	return (
