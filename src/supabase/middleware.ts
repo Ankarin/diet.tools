@@ -2,7 +2,22 @@ import { createServerClient } from "@supabase/ssr";
 import { isAfter } from "date-fns";
 import { type NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_ROUTES = ["/login", "/signup", "/forgot", "/confirm", "/1", "/2", "/3", "/4", "/5", "/6", "/7", "/8", "/9", "/10"] as const;
+const PUBLIC_ROUTES = [
+	"/login",
+	"/signup",
+	"/forgot",
+	"/confirm",
+	"/1",
+	"/2",
+	"/3",
+	"/4",
+	"/5",
+	"/6",
+	"/7",
+	"/8",
+	"/9",
+	"/10",
+] as const;
 const SUBSCRIPTION_ROUTE = "/me/subscription";
 const PROFILE_ROUTE = "/me/profile";
 const ME_ROUTE = "/me";
@@ -59,7 +74,7 @@ export const updateSession = async (request: NextRequest) => {
 		});
 
 		const path = request.nextUrl.pathname;
-		
+
 		// Fast path for numbered routes and root
 		if (path === "/" || /^\/\d+$/.test(path)) {
 			// Only handle root redirect, skip all other middleware checks
@@ -76,7 +91,9 @@ export const updateSession = async (request: NextRequest) => {
 
 		const supabase = createSupabaseClient(request, response);
 		const {
-			data: { user },
+			data: {
+				session: { user },
+			},
 			error,
 		} = await supabase.auth.getSession();
 
