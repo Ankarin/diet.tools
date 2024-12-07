@@ -35,7 +35,7 @@ export default async function RootLayout({
 }>) {
 	return (
 		<html lang="en" className="scroll-smooth antialiased" suppressHydrationWarning>
-			<GoogleTagManager gtmId="GTM-W88XTQH3" />
+			<GoogleTagManager gtmId="GTM-PMLK9MRC" />
 			<body className={`flex min-h-screen max-w-screen flex-col ${inter.className}`}>
 				<header className="z-[50] sticky top-0 w-full bg-background/95 border-b backdrop-blur-sm border-border/40">
 					<div className="container h-14 flex items-center justify-between">
