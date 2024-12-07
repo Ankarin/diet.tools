@@ -58,34 +58,45 @@ export const updateSession = async (request: NextRequest) => {
 			},
 		});
 
-		// Redirect root to step 1
-		if (request.nextUrl.pathname === "/") {
-			return redirectTo(request, "/1");
+		const path = request.nextUrl.pathname;
+		
+		// Fast path for numbered routes and root
+		if (path === "/" || /^\/\d+$/.test(path)) {
+			// Only handle root redirect, skip all other middleware checks
+			if (path === "/") {
+				return redirectTo(request, "/1");
+			}
+			return response;
 		}
 
-		// Allow public access to API and step routes
-		if (PUBLIC_ROUTES.includes(request.nextUrl.pathname as any) || request.nextUrl.pathname.startsWith(API_ROUTE)) {
+		// Allow public access to API routes
+		if (request.nextUrl.pathname.startsWith(API_ROUTE)) {
 			return response;
 		}
 
 		const supabase = createSupabaseClient(request, response);
 		const {
-			data: { session },
+			data: { user },
 			error,
 		} = await supabase.auth.getSession();
 
 		// Handle unauthenticated access to protected routes
-		if ((error || !session?.user || session.user.is_anonymous) && request.nextUrl.pathname.startsWith(ME_ROUTE)) {
+		if ((error || !user) && request.nextUrl.pathname.startsWith(ME_ROUTE)) {
 			return redirectTo(request, LOGIN_ROUTE);
 		}
 
-		// If no user, return the original response
-		if (!session || !session.user) {
+		// Skip subscription checks for public routes
+		if (PUBLIC_ROUTES.includes(request.nextUrl.pathname as any)) {
 			return response;
 		}
 
-		const { subscription_expires } = session.user.app_metadata as AppMetadata;
-		const { completed_profile } = session.user.user_metadata as UserMetadata;
+		// Check subscription status
+		if (!user) {
+			return response;
+		}
+
+		const { subscription_expires } = user.app_metadata as AppMetadata;
+		const { completed_profile } = user.user_metadata as UserMetadata;
 
 		// Check subscription status
 		if (isSubscriptionExpired(subscription_expires)) {
