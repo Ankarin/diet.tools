@@ -157,7 +157,6 @@ ${formData.medicalConditions ? `- Medical Conditions: ${formData.medicalConditio
 ${formData.dietaryRestrictions ? `- Dietary Restrictions: ${formData.dietaryRestrictions}` : ""}
 ${formData.foodPreferences ? `- Food Preferences: ${formData.foodPreferences}` : ""}
 ${formData.dietaryApproach ? `- Dietary Approach: ${formData.dietaryApproach}` : ""}
-${formData.mealPreparation ? `- Meal Preparation: ${formData.mealPreparation}` : ""}
 
 MACRONUTRIENT DISTRIBUTION:
 - Protein: ${nutritionTargets.protein} (${Math.round((dailyCalories * 0.3) / 4)} calories)
