@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { sendGAEvent } from "@next/third-parties/google";
-import supabase from "@/supabase/client";
+// import supabase from "@/supabase/client";
 
 export type FormData = {
 	gender: "male" | "female" | "";
@@ -65,6 +65,7 @@ export const useFormStore = create<FormStore>((set, get) => ({
 	},
 	setCurrentStep: async (step: number) => {
 		set({ currentStep: step });
+		/* Commenting out anonymous user and Supabase functionality
 		const {
 			data: { user },
 		} = await supabase.auth.getUser();
@@ -123,7 +124,7 @@ export const useFormStore = create<FormStore>((set, get) => ({
 				}});
 			}
 		}
-
+		*/
 		sendGAEvent({
 			event: "step_view",
 			value: step,
@@ -134,6 +135,7 @@ export const useFormStore = create<FormStore>((set, get) => ({
 			formData: { ...state.formData, [field]: value },
 		}));
 
+		/* Commenting out Supabase save functionality
 		// Save to Supabase after each update
 		const { data: { user } } = await supabase.auth.getUser();
 		if (user) {
@@ -145,10 +147,12 @@ export const useFormStore = create<FormStore>((set, get) => ({
 				});
 			if (error) console.error('Error saving to Supabase:', error);
 		}
+		*/
 	},
 	setFormData: async (data) => {
 		set({ formData: data });
 
+		/* Commenting out Supabase save functionality
 		// Save complete form data to Supabase
 		const { data: { user } } = await supabase.auth.getUser();
 		if (user) {
@@ -160,5 +164,6 @@ export const useFormStore = create<FormStore>((set, get) => ({
 				});
 			if (error) console.error('Error saving to Supabase:', error);
 		}
+		*/
 	},
 }));
