@@ -8,6 +8,7 @@ const PROFILE_ROUTE = "/me/profile";
 const ME_ROUTE = "/me";
 const LOGIN_ROUTE = "/login";
 const CONTACT_ROUTE = "/contact";
+const API_ROUTE = "/api";
 
 interface UserMetadata {
 	completed_profile?: boolean;
@@ -62,8 +63,8 @@ export const updateSession = async (request: NextRequest) => {
 			return redirectTo(request, "/1");
 		}
 
-		// Allow public access to step routes
-		if (PUBLIC_ROUTES.includes(request.nextUrl.pathname as any)) {
+		// Allow public access to API and step routes
+		if (PUBLIC_ROUTES.includes(request.nextUrl.pathname as any) || request.nextUrl.pathname.startsWith(API_ROUTE)) {
 			return response;
 		}
 

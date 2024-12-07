@@ -93,7 +93,6 @@ export const formDataSchema = z
 		dietaryRestrictions: z.string().optional(),
 		foodPreferences: z.string().optional(),
 		dietaryApproach: z.string().optional(),
-		mealPreparation: z.string().optional(),
 	})
 	.refine(
 		(data) => {
