@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { MealCard } from "./meal-card";
 import { ShoppingListCard } from "./shopping-list-card";
 import { InfoCard } from "./info-card";
+import { toast } from "@/components/ui/use-toast";
+import supabase from "@/supabase/client";
 
 type DailyPlanData = z.infer<typeof singleDailyPlanSchema>;
 
@@ -23,6 +25,49 @@ export default function DailyExample() {
 	} = useObject<DailyPlanData>({
 		api: "/api/gen-day",
 		schema: singleDailyPlanSchema,
+		onError: (err) => {
+			console.error(err.message);
+			toast({
+				variant: "destructive",
+				title: err.message,
+			});
+		},
+		onFinish: async ({ object, error }) => {
+			if (error) {
+				console.error(error.message);
+				toast({
+					variant: "destructive",
+					title: error.message,
+				});
+				return;
+			}
+			try {
+				const {
+					data: { user },
+				} = await supabase.auth.getUser();
+				if (user) {
+					const { error: saveError } = await supabase.from("diets_day").insert([
+						{
+							user_id: user.id,
+							plan: object,
+						},
+					]);
+					if (saveError) {
+						console.error("Error saving diet:", saveError);
+						toast({
+							variant: "destructive",
+							title: "Error saving diet plan to database",
+						});
+					}
+				}
+			} catch (err) {
+				console.error("Error saving diet:", err);
+				toast({
+					variant: "destructive",
+					title: "Error saving diet plan to database",
+				});
+			}
+		},
 	});
 	const { formData } = useFormStore();
 	const handleGenerate = () => submit(formData);

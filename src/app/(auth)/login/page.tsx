@@ -56,26 +56,26 @@ export default function Page() {
 		mutate(data);
 	}
 
-	const handleGoogleSignIn = async () => {
-		const { data, error } = await supabase.auth.signInWithOAuth({
-			provider: "google",
-			options: {
-				redirectTo: "https://www.diet.tools/api/google-callback",
-			},
-		});
+	// const handleGoogleSignIn = async () => {
+	// 	const { data, error } = await supabase.auth.signInWithOAuth({
+	// 		provider: "google",
+	// 		options: {
+	// 			redirectTo: "https://www.diet.tools/api/google-callback",
+	// 		},
+	// 	});
 
-		if (error) {
-			console.error("Error signing in with Google:", error);
-			toast({
-				variant: "destructive",
-				title: "Google Sign-In Error",
-				description: error.message,
-			});
-		} else {
-			console.log("Successfully signed in:", data);
-			router.replace("/me");
-		}
-	};
+	// 	if (error) {
+	// 		console.error("Error signing in with Google:", error);
+	// 		toast({
+	// 			variant: "destructive",
+	// 			title: "Google Sign-In Error",
+	// 			description: error.message,
+	// 		});
+	// 	} else {
+	// 		console.log("Successfully signed in:", data);
+	// 		router.replace("/me");
+	// 	}
+	// };
 
 	return (
 		<Form {...form}>

@@ -76,42 +76,42 @@ export default function Page() {
 		mutate({ origin, form: formData, ...data });
 	}
 
-	const handleGoogleSignUp = async () => {
-		const user = await supabase.auth.getUser();
-		if (user.data.user.is_anonymous) {
-			const { data, error } = await supabase.auth.linkIdentity({
-				provider: "google",
-				options: {
-					redirectTo: "https://www.diet.tools/api/google-callback",
-				},
-			});
-			if (error) {
-				console.error("Error signing up with Google:", error);
-				toast({
-					variant: "destructive",
-					title: "Google Sign-Up Error",
-					description: error.message,
-				});
-			}
-			console.log("Successfully linked anon user  with Google:", data);
-		} else {
-			const { data, error } = await supabase.auth.signInWithOAuth({
-				provider: "google",
-				options: {
-					redirectTo: "https://www.diet.tools/api/google-callback",
-				},
-			});
-			if (error) {
-				console.error("Error signing up with Google:", error);
-				toast({
-					variant: "destructive",
-					title: "Google Sign-Up Error",
-					description: error.message,
-				});
-			}
-			console.log("Successfully signed up with Google:", data);
-		}
-	};
+	// const handleGoogleSignUp = async () => {
+	// 	const user = await supabase.auth.getUser();
+	// 	if (user.data.user.is_anonymous) {
+	// 		const { data, error } = await supabase.auth.linkIdentity({
+	// 			provider: "google",
+	// 			options: {
+	// 				redirectTo: "https://www.diet.tools/api/google-callback",
+	// 			},
+	// 		});
+	// 		if (error) {
+	// 			console.error("Error signing up with Google:", error);
+	// 			toast({
+	// 				variant: "destructive",
+	// 				title: "Google Sign-Up Error",
+	// 				description: error.message,
+	// 			});
+	// 		}
+	// 		console.log("Successfully linked anon user  with Google:", data);
+	// 	} else {
+	// 		const { data, error } = await supabase.auth.signInWithOAuth({
+	// 			provider: "google",
+	// 			options: {
+	// 				redirectTo: "https://www.diet.tools/api/google-callback",
+	// 			},
+	// 		});
+	// 		if (error) {
+	// 			console.error("Error signing up with Google:", error);
+	// 			toast({
+	// 				variant: "destructive",
+	// 				title: "Google Sign-Up Error",
+	// 				description: error.message,
+	// 			});
+	// 		}
+	// 		console.log("Successfully signed up with Google:", data);
+	// 	}
+	// };
 
 	const isTermsChecked = form.watch("terms");
 
