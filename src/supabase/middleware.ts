@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { isAfter } from "date-fns";
 import { type NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_ROUTES = ["/", "/login", "/signup", "/forgot", "/confirm"] as const;
+const PUBLIC_ROUTES = ["/login", "/signup", "/forgot", "/confirm", "/1", "/2", "/3", "/4", "/5", "/6", "/7", "/8", "/9", "/10"] as const;
 const SUBSCRIPTION_ROUTE = "/me/subscription";
 const PROFILE_ROUTE = "/me/profile";
 const ME_ROUTE = "/me";
@@ -57,23 +57,34 @@ export const updateSession = async (request: NextRequest) => {
 			},
 		});
 
+		// Redirect root to step 1
+		if (request.nextUrl.pathname === "/") {
+			return redirectTo(request, "/1");
+		}
+
+		// Allow public access to step routes
+		if (PUBLIC_ROUTES.includes(request.nextUrl.pathname as any)) {
+			return response;
+		}
+
 		const supabase = createSupabaseClient(request, response);
 		const {
-			data: { user },
+			data: { session },
 			error,
-		} = await supabase.auth.getUser();
+		} = await supabase.auth.getSession();
+
 		// Handle unauthenticated access to protected routes
-		if ((error || user.is_anonymous) && request.nextUrl.pathname.startsWith(ME_ROUTE)) {
+		if ((error || !session?.user || session.user.is_anonymous) && request.nextUrl.pathname.startsWith(ME_ROUTE)) {
 			return redirectTo(request, LOGIN_ROUTE);
 		}
 
 		// If no user, return the original response
-		if (!user || user.is_anonymous) {
+		if (!session || !session.user) {
 			return response;
 		}
 
-		const { subscription_expires } = user.app_metadata as AppMetadata;
-		const { completed_profile } = user.user_metadata as UserMetadata;
+		const { subscription_expires } = session.user.app_metadata as AppMetadata;
+		const { completed_profile } = session.user.user_metadata as UserMetadata;
 
 		// Check subscription status
 		if (isSubscriptionExpired(subscription_expires)) {
