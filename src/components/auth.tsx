@@ -5,10 +5,12 @@ import Link from "next/link";
 
 async function Auth() {
 	const supabase = await createClient();
-	const { data } = await supabase.auth.getUser();
+	const {
+		data: { session },
+	} = await supabase.auth.getSession();
 	return (
 		<div>
-			{data.user && !data?.user?.is_anonymous ? (
+			{session?.user && !session?.user?.is_anonymous ? (
 				<div className="flex flex-row items-center gap-4">
 					<Link className="hidden md:block" href="/contact">
 						<RainbowButton colorScheme="black">Feedback</RainbowButton>
