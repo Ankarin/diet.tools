@@ -75,32 +75,23 @@ export const updateSession = async (request: NextRequest) => {
 
 		const path = request.nextUrl.pathname;
 
-		// Fast path for numbered routes and root
-		if (path === "/" || /^\/\d+$/.test(path)) {
-			const supabase = createSupabaseClient(request, response);
-			const { data: { session } } = await supabase.auth.getSession();
-			
-			// If user is authenticated, redirect them to /me
-			if (session?.user) {
-				return redirectTo(request, ME_ROUTE);
-			}
-			
-			// For unauthenticated users, handle root redirect or allow access to numbered routes
-			if (path === "/") {
-				return redirectTo(request, "/1");
-			}
-			return response;
-		}
-
 		// Allow public access to API routes
 		if (request.nextUrl.pathname.startsWith(API_ROUTE)) {
 			return response;
 		}
 
 		const supabase = createSupabaseClient(request, response);
-		const {
-			data: { session },
-		} = await supabase.auth.getSession();
+		const { data: { session } } = await supabase.auth.getSession();
+
+		// Handle root redirect first
+		if (path === "/") {
+			return redirectTo(request, "/1");
+		}
+
+		// Handle numbered routes
+		if (/^\/\d+$/.test(path)) {
+			return response;
+		}
 
 		// Handle unauthenticated access to protected routes
 		if (request.nextUrl.pathname.startsWith(ME_ROUTE)) {
@@ -114,7 +105,7 @@ export const updateSession = async (request: NextRequest) => {
 			return response;
 		}
 
-		// Check subscription status
+		// Early return for unauthenticated users on public routes
 		if (!session?.user) {
 			return response;
 		}
@@ -135,14 +126,6 @@ export const updateSession = async (request: NextRequest) => {
 		// Check profile completion
 		if (!completed_profile && request.nextUrl.pathname === ME_ROUTE) {
 			return redirectTo(request, PROFILE_ROUTE);
-		}
-
-		// Redirect authenticated users with valid subscription away from public routes
-		if (
-			PUBLIC_ROUTES.includes(request.nextUrl.pathname as (typeof PUBLIC_ROUTES)[number]) &&
-			hasValidSubscription(subscription_expires)
-		) {
-			return redirectTo(request, ME_ROUTE);
 		}
 
 		return response;
