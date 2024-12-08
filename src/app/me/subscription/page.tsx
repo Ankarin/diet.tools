@@ -100,16 +100,16 @@ export default function SubscribePage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+		<div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex flex-col">
 			{/* Hero Section */}
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-8 sm:pb-16">
+			<div className="flex-1 flex flex-col max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-8 sm:pb-16 items-center justify-center">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
-					className="text-center"
+					className="text-center w-full"
 				>
 					<h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">
-						Unlock Your Perfect Diet Plan
+						Diet Plan
 					</h1>
 					<p className="mt-4 sm:mt-6 text-lg sm:text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto px-2">
 						Join thousands of happy customers who have transformed their lives with our AI-powered
@@ -122,7 +122,7 @@ export default function SubscribePage() {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ delay: 0.2 }}
-					className="mt-8 sm:mt-12 max-w-lg mx-auto px-2"
+					className="mt-8 sm:mt-12 w-full max-w-md mx-auto px-2"
 				>
 					<div className="relative">
 						<div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/60 rounded-2xl blur opacity-25" />
