@@ -19,15 +19,10 @@ const PUBLIC_ROUTES = [
 	"/10",
 ] as const;
 const SUBSCRIPTION_ROUTE = "/me/subscription";
-const PROFILE_ROUTE = "/me/profile";
 const ME_ROUTE = "/me";
 const LOGIN_ROUTE = "/login";
 const CONTACT_ROUTE = "/contact";
 const API_ROUTE = "/api";
-
-interface UserMetadata {
-	completed_profile?: boolean;
-}
 
 interface AppMetadata {
 	subscription_expires?: string;
@@ -109,7 +104,6 @@ export const updateSession = async (request: NextRequest) => {
 		}
 
 		const { subscription_expires } = user.app_metadata as AppMetadata;
-		const { completed_profile } = user.user_metadata as UserMetadata;
 
 		// Check subscription status
 		if (isSubscriptionExpired(subscription_expires)) {
@@ -122,9 +116,6 @@ export const updateSession = async (request: NextRequest) => {
 		}
 
 		// Check profile completion
-		if (!completed_profile && request.nextUrl.pathname === ME_ROUTE) {
-			return redirectTo(request, PROFILE_ROUTE);
-		}
 
 		return response;
 	} catch (e) {

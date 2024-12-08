@@ -61,11 +61,11 @@ export default function WeeklyExample() {
 	const router = useRouter();
 
 	const fetchLatestDiet = async () => {
-		const res = await supabase.auth.getSession();
+		const res = await supabase.auth.getUser();
 		if (res.error) return null;
 
-		console.log(res.data?.session.user.user_metadata);
-		if (!res.data?.session.user.user_metadata?.completed_profile) {
+		console.log(res.data?.user.user_metadata);
+		if (!res.data?.user.user_metadata?.completed_profile) {
 			router.push("/me/profile");
 		}
 		const { data, error } = await supabase
