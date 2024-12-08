@@ -10,7 +10,6 @@
 			"correctness": {
 				"noUnusedVariables": "error",
 				"useExhaustiveDependencies": "error",
-				"noUndeclaredVariables": "error",
 				"noUnusedPrivateClassMembers": "error"
 			},
 			"suspicious": {

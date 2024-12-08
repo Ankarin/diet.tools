@@ -96,13 +96,14 @@ export default function UserForm() {
 	const { toast } = useToast();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
+	const [unit, setUnit] = useState<"metric" | "imperial">("metric");
 
 	const form = useForm<FormValues>({
-		resolver: zodResolver(metricSchema),
+		resolver: zodResolver(unit === "metric" ? metricSchema : imperialSchema),
 		defaultValues: {
 			gender: "male",
 			age: "",
-			unit: "imperial",
+			unit: "metric",
 			height: "",
 			weight: "",
 			heightFeet: "",
@@ -115,6 +116,17 @@ export default function UserForm() {
 			dietaryApproach: "",
 		},
 	});
+
+	// Watch for unit changes and update the resolver
+	useEffect(() => {
+		const subscription = form.watch((value, { name }) => {
+			if (name === "unit") {
+				setUnit(value.unit as "metric" | "imperial");
+				form.clearErrors();
+			}
+		});
+		return () => subscription.unsubscribe();
+	}, [form]);
 
 	const watchUnit = form.watch("unit");
 
@@ -166,18 +178,6 @@ export default function UserForm() {
 
 		fetchUserData();
 	}, [form, toast]);
-
-	useEffect(() => {
-		// biome-ignore lint/correctness/noUnusedVariables: <explanation>
-		const schema = watchUnit === "metric" ? metricSchema : imperialSchema;
-		form.clearErrors();
-		if (watchUnit === "metric") {
-			form.setValue("heightFeet", "");
-			form.setValue("heightInches", "");
-		} else {
-			form.setValue("height", "");
-		}
-	}, [watchUnit, form]);
 
 	const router = useRouter();
 
@@ -297,7 +297,18 @@ export default function UserForm() {
 						<FormItem>
 							<FormLabel>Age</FormLabel>
 							<FormControl>
-								<Input {...field} type="number" placeholder="Enter your age" />
+								<Input
+									{...field}
+									type="text"
+									inputMode="numeric"
+									pattern="\d*"
+									placeholder="Enter your age"
+									onChange={(e) => {
+										const value = e.target.value.replace(/\D/g, '');
+										e.target.value = value;
+										field.onChange(value);
+									}}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -332,22 +343,44 @@ export default function UserForm() {
 							<FormItem>
 								<FormLabel>Height (cm)</FormLabel>
 								<FormControl>
-									<Input {...field} type="number" placeholder="Enter your height in cm" />
+									<Input
+										{...field}
+										type="text"
+										inputMode="numeric"
+										pattern="\d*"
+										placeholder="Enter your height"
+										onChange={(e) => {
+											const value = e.target.value.replace(/\D/g, '');
+											e.target.value = value;
+											field.onChange(value);
+										}}
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
 				) : (
-					<>
+					<div className="flex gap-4">
 						<FormField
 							control={form.control}
 							name="heightFeet"
 							render={({ field }) => (
-								<FormItem>
+								<FormItem className="flex-1">
 									<FormLabel>Height (feet)</FormLabel>
 									<FormControl>
-										<Input {...field} type="number" placeholder="Feet" />
+										<Input
+											{...field}
+											type="text"
+											inputMode="numeric"
+											pattern="\d*"
+											placeholder="Feet"
+											onChange={(e) => {
+												const value = e.target.value.replace(/\D/g, '');
+												e.target.value = value;
+												field.onChange(value);
+											}}
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -357,16 +390,27 @@ export default function UserForm() {
 							control={form.control}
 							name="heightInches"
 							render={({ field }) => (
-								<FormItem>
+								<FormItem className="flex-1">
 									<FormLabel>Height (inches)</FormLabel>
 									<FormControl>
-										<Input {...field} type="number" placeholder="Inches" />
+										<Input
+											{...field}
+											type="text"
+											inputMode="numeric"
+											pattern="\d*"
+											placeholder="Inches"
+											onChange={(e) => {
+												const value = e.target.value.replace(/\D/g, '');
+												e.target.value = value;
+												field.onChange(value);
+											}}
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
 							)}
 						/>
-					</>
+					</div>
 				)}
 				<FormField
 					control={form.control}
@@ -377,8 +421,15 @@ export default function UserForm() {
 							<FormControl>
 								<Input
 									{...field}
-									type="number"
-									placeholder={`Enter your weight in ${watchUnit === "metric" ? "kg" : "lbs"}`}
+									type="text"
+									inputMode="numeric"
+									pattern="\d*"
+									placeholder="Enter your weight"
+									onChange={(e) => {
+										const value = e.target.value.replace(/\D/g, '');
+										e.target.value = value;
+										field.onChange(value);
+									}}
 								/>
 							</FormControl>
 							<FormMessage />
@@ -519,6 +570,7 @@ export default function UserForm() {
 							<FormControl>
 								<Textarea
 									{...field}
+									rows={4}
 									placeholder="Do you have any medical conditions or health concerns?"
 								/>
 							</FormControl>
@@ -535,6 +587,7 @@ export default function UserForm() {
 							<FormControl>
 								<Textarea
 									{...field}
+									rows={4}
 									placeholder="Do you have any dietary restrictions? (e.g., vegetarian, vegan, gluten-free, allergies)"
 								/>
 							</FormControl>
@@ -551,6 +604,7 @@ export default function UserForm() {
 							<FormControl>
 								<Textarea
 									{...field}
+									rows={4}
 									placeholder="Are there any foods you particularly enjoy or dislike?"
 								/>
 							</FormControl>
@@ -567,6 +621,7 @@ export default function UserForm() {
 							<FormControl>
 								<Textarea
 									{...field}
+									rows={4}
 									placeholder="Are you interested in following any specific dietary approaches or meal plans? (e.g., low-carb, Mediterranean, keto)"
 								/>
 							</FormControl>

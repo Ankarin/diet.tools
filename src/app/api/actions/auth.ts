@@ -43,7 +43,7 @@ export async function signup({
 }) {
 	const supabase = await createClient();
 
-	const { error: signUpError } = await supabase.auth.signUp({
+	const { data, error: signUpError } = await supabase.auth.signUp({
 		email,
 		password,
 	});
@@ -53,12 +53,10 @@ export async function signup({
 	}
 
 	if (form) {
-		const { error: profileError } = await supabase
-			.from("profiles")
-			.update({
-				form_data: form,
-			})
-			.eq("id", (await supabase.auth.getUser()).data.user?.id);
+		const { error: profileError } = await supabase.from("users").upsert({
+			id: data.user?.id,
+			...form,
+		});
 
 		if (profileError) {
 			return { error: profileError.message };

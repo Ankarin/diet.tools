@@ -137,10 +137,17 @@ export function AgeStep() {
 								<FormControl>
 									<Input
 										{...field}
-										type="number"
+										type="text"
+										inputMode="numeric"
+										pattern="\d*"
 										placeholder="Enter your age"
 										className="text-center text-lg"
 										autoFocus
+										onChange={(e) => {
+											const value = e.target.value.replace(/\D/g, '');
+											e.target.value = value;
+											field.onChange(value);
+										}}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -307,9 +314,16 @@ export function MeasurementsStep() {
 										<FormControl>
 											<Input
 												{...field}
-												type="number"
+												type="text"
+												inputMode="numeric"
+												pattern="\d*"
 												placeholder="Enter your height in cm"
 												className="text-center text-lg"
+												onChange={(e) => {
+													const value = e.target.value.replace(/\D/g, '');
+													e.target.value = value;
+													field.onChange(value);
+												}}
 											/>
 										</FormControl>
 										<FormMessage />
@@ -328,9 +342,16 @@ export function MeasurementsStep() {
 											<FormControl>
 												<Input
 													{...field}
-													type="number"
+													type="text"
+													inputMode="numeric"
+													pattern="\d*"
 													placeholder="Feet"
 													className="text-center text-lg"
+													onChange={(e) => {
+														const value = e.target.value.replace(/\D/g, '');
+														e.target.value = value;
+														field.onChange(value);
+													}}
 												/>
 											</FormControl>
 											<FormMessage />
@@ -345,9 +366,16 @@ export function MeasurementsStep() {
 											<FormControl>
 												<Input
 													{...field}
-													type="number"
+													type="text"
+													inputMode="numeric"
+													pattern="\d*"
 													placeholder="Inches"
 													className="text-center text-lg"
+													onChange={(e) => {
+														const value = e.target.value.replace(/\D/g, '');
+														e.target.value = value;
+														field.onChange(value);
+													}}
 												/>
 											</FormControl>
 											<FormMessage />
@@ -370,9 +398,16 @@ export function MeasurementsStep() {
 									<FormControl>
 										<Input
 											{...field}
-											type="number"
+											type="text"
+											inputMode="numeric"
+											pattern="\d*"
 											placeholder={`Enter your weight in ${unit === "metric" ? "kg" : "lbs"}`}
 											className="text-center text-lg"
+											onChange={(e) => {
+												const value = e.target.value.replace(/\D/g, '');
+												e.target.value = value;
+												field.onChange(value);
+											}}
 										/>
 									</FormControl>
 									<FormMessage />
