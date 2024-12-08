@@ -89,10 +89,8 @@ const formSchema = z.object({
 	(data) => {
 		if (data.unit === "metric") {
 			return !!data.height; // Metric height must be filled
-		} else {
-			// For imperial, both feet and inches must be filled
-			return !!data.heightFeet && !!data.heightInches;
 		}
+		return !!data.heightFeet && !!data.heightInches;
 	},
 	{
 		message: "Please enter both feet and inches",
