@@ -102,16 +102,16 @@ export default function SubscribePage() {
 	return (
 		<div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
 			{/* Hero Section */}
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-8 sm:pb-16">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					className="text-center"
 				>
-					<h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">
+					<h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">
 						Unlock Your Perfect Diet Plan
 					</h1>
-					<p className="mt-6 text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
+					<p className="mt-4 sm:mt-6 text-lg sm:text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto px-2">
 						Join thousands of happy customers who have transformed their lives with our AI-powered
 						personalized nutrition platform.
 					</p>
@@ -122,12 +122,12 @@ export default function SubscribePage() {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ delay: 0.2 }}
-					className="mt-12 max-w-lg mx-auto"
+					className="mt-8 sm:mt-12 max-w-lg mx-auto px-2"
 				>
 					<div className="relative">
 						<div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/60 rounded-2xl blur opacity-25" />
 						<div className="relative bg-white rounded-xl shadow-xl overflow-hidden">
-							<div className="px-6 py-8 sm:p-10 sm:pb-6">
+							<div className="px-4 py-6 sm:p-10 sm:pb-6">
 								<div className="flex justify-center">
 									<span className="inline-flex px-4 py-1 rounded-full text-sm font-semibold tracking-wide uppercase bg-primary/10 text-primary">
 										Limited Time Offer
@@ -186,16 +186,21 @@ export default function SubscribePage() {
 					variants={container}
 					initial="hidden"
 					animate="show"
-					className="mt-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+					className="mt-8 sm:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-2 sm:px-0"
 				>
 					{features.map((feature, index) => (
-						<motion.div key={index} variants={item} className="relative group">
-							<div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-primary/30 rounded-lg blur opacity-25 group-hover:opacity-100 transition duration-200"></div>
-							<div className="relative p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col h-[280px]">
-								<feature.icon className="h-8 w-8 text-primary mb-4 flex-shrink-0" />
-								<div className="flex flex-col flex-grow">
-									<h3 className="text-lg font-semibold text-gray-900 mb-3">{feature.title}</h3>
-									<p className="text-gray-600 flex-grow">{feature.description}</p>
+						<motion.div
+							key={index}
+							variants={item}
+							className="relative bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
+						>
+							<div className="flex items-start gap-4">
+								<div className="flex-shrink-0">
+									<feature.icon className="h-6 w-6 text-primary" />
+								</div>
+								<div>
+									<h3 className="text-lg font-semibold text-gray-900">{feature.title}</h3>
+									<p className="mt-2 text-sm text-gray-600">{feature.description}</p>
 								</div>
 							</div>
 						</motion.div>

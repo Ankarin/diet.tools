@@ -28,7 +28,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import supabase from "@/supabase/client";
 
-const baseSchema = z.object({
+const formSchema = z.object({
 	gender: z.enum(["male", "female"], { required_error: "Gender is required" }),
 	age: z.string().refine(
 		(val) => {
@@ -38,6 +38,30 @@ const baseSchema = z.object({
 		{ message: "Age must be between 1 and 120" },
 	),
 	unit: z.enum(["metric", "imperial"]),
+	height: z.string().refine(
+		(val) => {
+			if (!val) return true; // Allow empty for imperial
+			const num = Number.parseFloat(val);
+			return !Number.isNaN(num) && num > 0 && num < 300;
+		},
+		{ message: "Height must be a valid number between 0 and 300 cm" },
+	),
+	heightFeet: z.string().refine(
+		(val) => {
+			if (!val) return true; // Allow empty for metric
+			const num = Number.parseInt(val, 10);
+			return !Number.isNaN(num) && num >= 1 && num <= 9;
+		},
+		{ message: "Feet must be between 1 and 9" },
+	),
+	heightInches: z.string().refine(
+		(val) => {
+			if (!val) return true; // Allow empty for metric
+			const num = Number.parseInt(val, 10);
+			return !Number.isNaN(num) && num >= 0 && num <= 11;
+		},
+		{ message: "Inches must be between 0 and 11" },
+	),
 	weight: z.string().refine(
 		(val) => {
 			const num = Number.parseFloat(val);
@@ -61,36 +85,22 @@ const baseSchema = z.object({
 	dietaryApproach: z.string().max(1000, {
 		message: "Dietary approach should be 1000 characters or less",
 	}),
-});
+}).refine(
+	(data) => {
+		if (data.unit === "metric") {
+			return !!data.height; // Metric height must be filled
+		} else {
+			// For imperial, both feet and inches must be filled
+			return !!data.heightFeet && !!data.heightInches;
+		}
+	},
+	{
+		message: "Please enter both feet and inches",
+		path: ["heightInches"], // Show error on the inches field
+	},
+);
 
-const metricSchema = baseSchema.extend({
-	height: z.string().refine(
-		(val) => {
-			const num = parseFloat(val);
-			return !isNaN(num) && num >= 50 && num <= 300;
-		},
-		{ message: "Height must be between 50 and 300 cm" },
-	),
-});
-
-const imperialSchema = baseSchema.extend({
-	heightFeet: z.string().refine(
-		(val) => {
-			const num = parseInt(val, 10);
-			return !isNaN(num) && num >= 1 && num <= 9;
-		},
-		{ message: "Height (feet) must be between 1 and 9" },
-	),
-	heightInches: z.string().refine(
-		(val) => {
-			const num = parseInt(val, 10);
-			return !isNaN(num) && num >= 0 && num < 12;
-		},
-		{ message: "Height (inches) must be between 0 and 11" },
-	),
-});
-
-type FormValues = z.infer<typeof metricSchema> & z.infer<typeof imperialSchema>;
+type FormValues = z.infer<typeof formSchema>;
 
 export default function UserForm() {
 	const { toast } = useToast();
@@ -99,15 +109,15 @@ export default function UserForm() {
 	const [unit, setUnit] = useState<"metric" | "imperial">("metric");
 
 	const form = useForm<FormValues>({
-		resolver: zodResolver(unit === "metric" ? metricSchema : imperialSchema),
+		resolver: zodResolver(formSchema),
 		defaultValues: {
 			gender: "male",
 			age: "",
-			unit: "metric",
+			unit: unit,
 			height: "",
-			weight: "",
 			heightFeet: "",
 			heightInches: "",
+			weight: "",
 			goals: "maintain",
 			activity: "moderate",
 			medicalConditions: "",
@@ -122,7 +132,10 @@ export default function UserForm() {
 		const subscription = form.watch((value, { name }) => {
 			if (name === "unit") {
 				setUnit(value.unit as "metric" | "imperial");
-				form.clearErrors();
+				// Reset height fields when switching units
+				form.setValue("height", "");
+				form.setValue("heightFeet", "");
+				form.setValue("heightInches", "");
 			}
 		});
 		return () => subscription.unsubscribe();
@@ -250,14 +263,19 @@ export default function UserForm() {
 	return (
 		<Form {...form}>
 			<form
-				onSubmit={form.handleSubmit(onSubmit, (errors) => {
-					console.error(errors);
-					toast({
-						title: "Validation Error",
-						description: "Please check the form for errors",
-						variant: "destructive",
-					});
-				})}
+				onSubmit={form.handleSubmit(
+					async (values) => {
+						await onSubmit(values);
+					},
+					(errors) => {
+						console.error(errors);
+						toast({
+							title: "Validation Error",
+							description: "Please check the form for errors",
+							variant: "destructive",
+						});
+					}
+				)}
 				className="space-y-8"
 			>
 				<FormField
@@ -304,7 +322,7 @@ export default function UserForm() {
 									pattern="\d*"
 									placeholder="Enter your age"
 									onChange={(e) => {
-										const value = e.target.value.replace(/\D/g, '');
+										const value = e.target.value.replace(/\D/g, "");
 										e.target.value = value;
 										field.onChange(value);
 									}}
@@ -350,7 +368,7 @@ export default function UserForm() {
 										pattern="\d*"
 										placeholder="Enter your height"
 										onChange={(e) => {
-											const value = e.target.value.replace(/\D/g, '');
+											const value = e.target.value.replace(/\D/g, "");
 											e.target.value = value;
 											field.onChange(value);
 										}}
@@ -376,7 +394,7 @@ export default function UserForm() {
 											pattern="\d*"
 											placeholder="Feet"
 											onChange={(e) => {
-												const value = e.target.value.replace(/\D/g, '');
+												const value = e.target.value.replace(/\D/g, "");
 												e.target.value = value;
 												field.onChange(value);
 											}}
@@ -400,7 +418,7 @@ export default function UserForm() {
 											pattern="\d*"
 											placeholder="Inches"
 											onChange={(e) => {
-												const value = e.target.value.replace(/\D/g, '');
+												const value = e.target.value.replace(/\D/g, "");
 												e.target.value = value;
 												field.onChange(value);
 											}}
@@ -426,7 +444,7 @@ export default function UserForm() {
 									pattern="\d*"
 									placeholder="Enter your weight"
 									onChange={(e) => {
-										const value = e.target.value.replace(/\D/g, '');
+										const value = e.target.value.replace(/\D/g, "");
 										e.target.value = value;
 										field.onChange(value);
 									}}
