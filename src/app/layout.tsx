@@ -40,7 +40,7 @@ export default async function RootLayout({
 				<header className="z-[50] sticky top-0 w-full bg-background/95 border-b backdrop-blur-sm border-border/40">
 					<div className="container h-14 flex items-center justify-between">
 						<Link
-							href="/1"
+							href="/me"
 							className="flex justify-start items-center hover:opacity-85 transition-opacity duration-300"
 						>
 							<h2 className="font-bold text-xl">Ai Diet Planner</h2>

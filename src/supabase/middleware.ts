@@ -75,27 +75,29 @@ export const updateSession = async (request: NextRequest) => {
 
 		const path = request.nextUrl.pathname;
 
+		// Early skip for numbered routes (steps)
+		if (/^\/\d+$/.test(path)) {
+			return response;
+		}
+
 		// Allow public access to API routes
 		if (request.nextUrl.pathname.startsWith(API_ROUTE)) {
 			return response;
 		}
 
 		const supabase = createSupabaseClient(request, response);
-		const { data: { session } } = await supabase.auth.getSession();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
 		// Handle root redirect first
 		if (path === "/") {
 			return redirectTo(request, "/1");
 		}
 
-		// Handle numbered routes
-		if (/^\/\d+$/.test(path)) {
-			return response;
-		}
-
 		// Handle unauthenticated access to protected routes
 		if (request.nextUrl.pathname.startsWith(ME_ROUTE)) {
-			if (!session?.user || session.user.is_anonymous) {
+			if (!user || user.is_anonymous) {
 				return redirectTo(request, LOGIN_ROUTE);
 			}
 		}
@@ -106,12 +108,12 @@ export const updateSession = async (request: NextRequest) => {
 		}
 
 		// Early return for unauthenticated users on public routes
-		if (!session?.user) {
+		if (!user) {
 			return response;
 		}
 
-		const { subscription_expires } = session.user.app_metadata as AppMetadata;
-		const { completed_profile } = session.user.user_metadata as UserMetadata;
+		const { subscription_expires } = user.app_metadata as AppMetadata;
+		const { completed_profile } = user.user_metadata as UserMetadata;
 
 		// Check subscription status
 		if (isSubscriptionExpired(subscription_expires)) {
