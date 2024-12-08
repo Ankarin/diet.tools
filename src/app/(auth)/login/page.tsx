@@ -19,6 +19,7 @@ import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import supabase from "@/supabase/client";
 import RainbowButton from "@/components/ui/rainbow-button";
+import { useState } from "react";
 
 const FormSchema = z.object({
 	email: z.string().email({ message: "Must be valid email" }),
@@ -26,7 +27,6 @@ const FormSchema = z.object({
 });
 
 export default function Page() {
-	const router = useRouter();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
@@ -35,47 +35,25 @@ export default function Page() {
 		},
 	});
 
+	const [isRedirecting, setIsRedirecting] = useState(false);
 	const { mutate, isPending } = useMutation({
 		mutationFn: login,
-
-		onSuccess: () => {
-			router.replace("/me");
-		},
 		onSettled: (res) => {
-			if (res.error) {
+			if (res?.error) {
 				toast({
 					variant: "destructive",
 					title: res.error,
 				});
+				setIsRedirecting(false);
 			}
 		},
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
+		setIsRedirecting(true);
 		// @ts-ignore
 		mutate(data);
 	}
-
-	// const handleGoogleSignIn = async () => {
-	// 	const { data, error } = await supabase.auth.signInWithOAuth({
-	// 		provider: "google",
-	// 		options: {
-	// 			redirectTo: "https://www.diet.tools/api/google-callback",
-	// 		},
-	// 	});
-
-	// 	if (error) {
-	// 		console.error("Error signing in with Google:", error);
-	// 		toast({
-	// 			variant: "destructive",
-	// 			title: "Google Sign-In Error",
-	// 			description: error.message,
-	// 		});
-	// 	} else {
-	// 		console.log("Successfully signed in:", data);
-	// 		router.replace("/me");
-	// 	}
-	// };
 
 	return (
 		<Form {...form}>
@@ -122,10 +100,12 @@ export default function Page() {
 
 				<br />
 
-				{isPending ? (
-					<Loader2 className="h-10 w-10 animate-spin" />
+				{(isPending || isRedirecting) ? (
+					<div className="flex justify-center">
+						<Loader2 className="h-10 w-10 animate-spin" />
+					</div>
 				) : (
-					<RainbowButton type="submit" className="w-full">
+					<RainbowButton type="submit" className="w-full" disabled={isPending || isRedirecting}>
 						Login
 					</RainbowButton>
 				)}

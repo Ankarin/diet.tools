@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/supabase/server";
+import { redirect } from "next/navigation";
 
 export type FormData = {
 	gender: "male" | "female" | "";
@@ -34,6 +35,8 @@ export async function login({
 	if (error) {
 		return { error: error.message };
 	}
+	
+	redirect("/me");
 }
 
 export async function logout(): Promise<void> {
@@ -41,108 +44,72 @@ export async function logout(): Promise<void> {
 	const { error } = await supabase.auth.signOut();
 
 	if (error) throw new Error(`Logout failed: ${error.message}`);
+	
+	redirect("/");
 }
 
 export async function signup({
 	email,
 	password,
-	origin,
 	form,
 }: {
 	email: string;
 	password: string;
-	origin: string;
-	form: FormData;
+	form?: FormData;
 }) {
-	try {
-		const supabase = await createClient();
-		const {
-			data: { session },
-			error: sessionError,
-		} = await supabase.auth.getSession();
+	const supabase = await createClient();
 
-		if (sessionError) {
-			return { error: sessionError.message };
-		}
+	const { error: signUpError } = await supabase.auth.signUp({
+		email,
+		password,
+	});
 
-		if (session?.user?.is_anonymous) {
-			const { error } = await supabase.auth.updateUser({
-				email,
-				password,
-			});
-			if (error) {
-				return { error: error.message };
-			}
-
-			const { error: upsertError } = await supabase.from("users").upsert({
-				id: session.user.id,
-				email,
-				...form,
-			});
-
-			if (upsertError) {
-				return { error: upsertError.message };
-			}
-		} else {
-			const { data, error } = await supabase.auth.signUp({
-				email,
-				password,
-				options: {
-					emailRedirectTo: `${origin}/api/confirm-callback`,
-				},
-			});
-
-			if (error) {
-				return { error: error.message };
-			}
-
-			if (data?.user) {
-				const { error: upsertError } = await supabase.from("users").upsert({
-					id: data.user.id,
-					email,
-					...form,
-				});
-
-				if (upsertError) {
-					return { error: upsertError.message };
-				}
-			}
-		}
-
-		return { success: true };
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	} catch (error: any) {
-		console.error("Signup error:", error);
-		return { error: error.message || "An error occurred during signup" };
+	if (signUpError) {
+		return { error: signUpError.message };
 	}
+
+	if (form) {
+		const { error: profileError } = await supabase
+			.from("profiles")
+			.update({
+				form_data: form,
+			})
+			.eq("id", (await supabase.auth.getUser()).data.user?.id);
+
+		if (profileError) {
+			return { error: profileError.message };
+		}
+	}
+
+	redirect("/me");
 }
 
 export async function forgot({
 	email,
-	origin,
 }: {
 	email: string;
-	origin: string;
 }) {
 	const supabase = await createClient();
 	const { error } = await supabase.auth.resetPasswordForEmail(email, {
-		redirectTo: `${origin}/api/reset-callback`,
+		redirectTo: "/reset-password",
 	});
+
 	if (error) {
-		return {
-			error: error.message,
-		};
+		return { error: error.message };
 	}
+
+	redirect("/check-email");
 }
 
 export async function reset({ password }: { password: string }) {
 	const supabase = await createClient();
 	const { error } = await supabase.auth.updateUser({
-		password: password,
+		password,
 	});
+
 	if (error) {
-		return {
-			error: error.message,
-		};
+		return { error: error.message };
 	}
+
+	redirect("/me");
 }

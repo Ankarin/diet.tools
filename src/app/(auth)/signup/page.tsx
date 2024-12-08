@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import supabase from "@/supabase/client";
+import { useState } from "react";
 
 import RainbowButton from "@/components/ui/rainbow-button";
 import {
@@ -43,7 +44,6 @@ const FormSchema = z
 	);
 
 export default function Page() {
-	const router = useRouter();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
@@ -54,64 +54,29 @@ export default function Page() {
 		},
 	});
 
-	const { mutate, isPending } = useMutation({
-		mutationFn: signup,
-		onSettled: (res) => {
-			if (res?.error) {
+	const [isRedirecting, setIsRedirecting] = useState(false);
+	const { mutate: signUp, isPending } = useMutation({
+		mutationFn: async (values: z.infer<typeof FormSchema>) => {
+			const result = await signup({
+				email: values.email,
+				password: values.password,
+			});
+
+			if (result?.error) {
+				setIsRedirecting(false);
 				toast({
 					variant: "destructive",
-					title: res.error,
+					title: "Error",
+					description: result.error,
 				});
+				return;
 			}
 		},
-		onSuccess: () => {
-			router.replace("/me/profile");
-		},
 	});
-	const { formData } = useFormStore();
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		const origin: string = window.location.origin;
-
-		// @ts-ignore
-		mutate({ origin, form: formData, ...data });
+		setIsRedirecting(true);
+		signUp(data);
 	}
-
-	// const handleGoogleSignUp = async () => {
-	// 	const user = await supabase.auth.getUser();
-	// 	if (user.data.user.is_anonymous) {
-	// 		const { data, error } = await supabase.auth.linkIdentity({
-	// 			provider: "google",
-	// 			options: {
-	// 				redirectTo: "https://www.diet.tools/api/google-callback",
-	// 			},
-	// 		});
-	// 		if (error) {
-	// 			console.error("Error signing up with Google:", error);
-	// 			toast({
-	// 				variant: "destructive",
-	// 				title: "Google Sign-Up Error",
-	// 				description: error.message,
-	// 			});
-	// 		}
-	// 		console.log("Successfully linked anon user  with Google:", data);
-	// 	} else {
-	// 		const { data, error } = await supabase.auth.signInWithOAuth({
-	// 			provider: "google",
-	// 			options: {
-	// 				redirectTo: "https://www.diet.tools/api/google-callback",
-	// 			},
-	// 		});
-	// 		if (error) {
-	// 			console.error("Error signing up with Google:", error);
-	// 			toast({
-	// 				variant: "destructive",
-	// 				title: "Google Sign-Up Error",
-	// 				description: error.message,
-	// 			});
-	// 		}
-	// 		console.log("Successfully signed up with Google:", data);
-	// 	}
-	// };
 
 	const isTermsChecked = form.watch("terms");
 
@@ -196,10 +161,12 @@ export default function Page() {
 						)}
 					/>
 
-					{isPending ? (
-						<Loader2 className="h-10 w-10 animate-spin" />
+					{(isPending || isRedirecting) ? (
+						<div className="flex justify-center">
+							<Loader2 className="h-10 w-10 animate-spin" />
+						</div>
 					) : (
-						<RainbowButton type="submit" className="w-full" disabled={isPending || !isTermsChecked}>
+						<RainbowButton type="submit" className="w-full" disabled={isPending || isRedirecting || !isTermsChecked}>
 							Sign Up
 						</RainbowButton>
 					)}
