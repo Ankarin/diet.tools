@@ -54,12 +54,14 @@ export default function Page() {
 		},
 	});
 
+	const { formData } = useFormStore();
 	const [isRedirecting, setIsRedirecting] = useState(false);
 	const { mutate: signUp, isPending } = useMutation({
 		mutationFn: async (values: z.infer<typeof FormSchema>) => {
 			const result = await signup({
 				email: values.email,
 				password: values.password,
+				form: formData,
 			});
 
 			if (result?.error) {

@@ -57,10 +57,6 @@ const isSubscriptionExpired = (subscriptionExpires?: string) => {
 	return !subscriptionExpires || isAfter(new Date(), new Date(subscriptionExpires));
 };
 
-const hasValidSubscription = (subscriptionExpires?: string) => {
-	return subscriptionExpires && isAfter(new Date(subscriptionExpires), new Date());
-};
-
 const redirectTo = (request: NextRequest, path: string) => {
 	return NextResponse.redirect(new URL(path, request.url));
 };

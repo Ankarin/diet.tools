@@ -4,16 +4,16 @@ import { z } from "zod";
 const mealItemSchema = z.object({
 	food: z.string(),
 	portion: z.string(),
-	calories: z.number(),
-	protein: z.number(),
-	carbs: z.number(),
-	fats: z.number(),
+	calories: z.number().int(),
+	protein: z.number().int(),
+	carbs: z.number().int(),
+	fats: z.number().int(),
 });
 
 // Define the meal schema
 const mealSchema = z.object({
 	items: z.array(mealItemSchema),
-	totalCalories: z.number(),
+	totalCalories: z.number().int(),
 });
 
 // Define the shopping list item schema
@@ -34,7 +34,7 @@ const shoppingListSchema = z.object({
 });
 
 const nutritionTargetsSchema = z.object({
-	calories: z.number(),
+	calories: z.number().int(),
 	protein: z.string(),
 	carbs: z.string(),
 	fats: z.string(),
@@ -45,18 +45,19 @@ const dailyPlanSchema = z.object({
 	day: z.string(),
 	date: z.string(),
 	specialInstructions: z.string().optional(),
-	totalCalories: z.number(),
+	totalCalories: z.number().int(),
 	meals: z.object({
 		breakfast: mealSchema,
 		lunch: mealSchema,
 		dinner: mealSchema,
+		snacks: z.array(mealSchema).optional(),
 	}),
 	nutritionTargets: nutritionTargetsSchema,
 });
 
 const dayPlanSchema = z.object({
 	day: z.string(),
-	totalCalories: z.number(),
+	totalCalories: z.number().int(),
 	meals: z.object({
 		breakfast: mealSchema,
 		lunch: mealSchema,

@@ -2,23 +2,7 @@
 
 import { createClient } from "@/supabase/server";
 import { redirect } from "next/navigation";
-
-export type FormData = {
-	gender: "male" | "female" | "";
-	age: string;
-	unit: "metric" | "imperial" | "";
-	height: string;
-	heightFeet: string;
-	heightInches: string;
-	weight: string;
-	goals: string;
-	activity: string;
-	medicalConditions: string;
-	dietaryRestrictions: string;
-	foodPreferences: string;
-	dietaryApproach: string;
-	mealPreparation: string;
-};
+import { FormData } from "@/store";
 
 export async function login({
 	email,
@@ -35,7 +19,7 @@ export async function login({
 	if (error) {
 		return { error: error.message };
 	}
-	
+
 	redirect("/me");
 }
 
@@ -44,7 +28,7 @@ export async function logout(): Promise<void> {
 	const { error } = await supabase.auth.signOut();
 
 	if (error) throw new Error(`Logout failed: ${error.message}`);
-	
+
 	redirect("/");
 }
 
@@ -55,7 +39,7 @@ export async function signup({
 }: {
 	email: string;
 	password: string;
-	form?: FormData;
+	form: FormData;
 }) {
 	const supabase = await createClient();
 

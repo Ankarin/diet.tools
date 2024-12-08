@@ -223,6 +223,7 @@ export default function UserForm() {
 						completed_profile: true,
 					},
 				});
+				setTimeout(() => {}, 1000);
 
 				toast({
 					title: "Success",

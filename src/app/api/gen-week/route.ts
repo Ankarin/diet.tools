@@ -7,7 +7,6 @@ import { streamObject } from "ai";
 import { NextResponse } from "next/server";
 
 const model = openai("gpt-4o");
-// const model = anthropic("claude-3-5-sonnet-latest");
 
 // Define a new schema that uses a single weeklyPlanSchema
 const oneWeekPlanSchema = weeklyPlanSchema;
@@ -20,17 +19,20 @@ function calculateNutritionNeeds(data: FormData): {
 	// Convert imperial to metric if needed
 	const weightInKg =
 		data.unit === "imperial"
-			? Number.parseFloat(data.weight) * 0.453592
-			: Number.parseFloat(data.weight);
+			? Math.round(Number.parseFloat(data.weight) * 0.453592)
+			: Math.round(Number.parseFloat(data.weight));
 	const heightInCm =
 		data.unit === "imperial"
-			? Number.parseFloat(data.heightFeet) * 30.48 + Number.parseFloat(data.heightInches) * 2.54
-			: Number.parseFloat(data.height);
-	const ageInYears = Number.parseFloat(data.age);
+			? Math.round(
+					Number.parseFloat(data.heightFeet) * 30.48 + Number.parseFloat(data.heightInches) * 2.54,
+				)
+			: Math.round(Number.parseFloat(data.height));
+	const ageInYears = Math.round(Number.parseFloat(data.age));
 
 	// Calculate BMR using Mifflin-St Jeor Equation
-	let basalMetabolicRate = 10 * weightInKg + 6.25 * heightInCm - 5 * ageInYears;
+	let basalMetabolicRate = Math.round(10 * weightInKg + 6.25 * heightInCm - 5 * ageInYears);
 	basalMetabolicRate += data.gender === "male" ? 5 : -161;
+	basalMetabolicRate = Math.round(basalMetabolicRate);
 
 	// Calculate daily calories based on activity level
 	const activityMultipliers = {
@@ -61,9 +63,9 @@ function calculateNutritionNeeds(data: FormData): {
 	const CARB_RATIO = 0.4; // 40% of calories
 	const FAT_RATIO = 0.3; // 30% of calories
 
-	const proteinCalories = dailyCaloricNeeds * PROTEIN_RATIO;
-	const carbCalories = dailyCaloricNeeds * CARB_RATIO;
-	const fatCalories = dailyCaloricNeeds * FAT_RATIO;
+	const proteinCalories = Math.round(dailyCaloricNeeds * PROTEIN_RATIO);
+	const carbCalories = Math.round(dailyCaloricNeeds * CARB_RATIO);
+	const fatCalories = Math.round(dailyCaloricNeeds * FAT_RATIO);
 
 	const proteinGrams = Math.round(proteinCalories / 4);
 	const carbGrams = Math.round(carbCalories / 4);
