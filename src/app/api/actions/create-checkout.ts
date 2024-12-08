@@ -28,7 +28,7 @@ export const createCheckoutSession = actionClient
 					},
 				],
 				mode: "subscription",
-				success_url: `${process.env.NEXT_PUBLIC_URL}/me`,
+				success_url: `${process.env.NEXT_PUBLIC_URL}/success`,
 				cancel_url: `${process.env.NEXT_PUBLIC_URL}/me`,
 				allow_promotion_codes: true,
 			});
