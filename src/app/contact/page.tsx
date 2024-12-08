@@ -26,7 +26,7 @@ const formSchema = z.object({
 export default function ContactPage() {
 	const { toast } = useToast();
 	const [isEmailPrepopulated, setIsEmailPrepopulated] = useState(false);
-	
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -38,18 +38,20 @@ export default function ContactPage() {
 	useEffect(() => {
 		const getUser = async () => {
 			try {
-				const { data: { session } } = await supabase.auth.getSession();
+				const {
+					data: { session },
+				} = await supabase.auth.getSession();
 				if (session?.user?.email) {
-					form.setValue('email', session.user.email);
+					form.setValue("email", session.user.email);
 					setIsEmailPrepopulated(true);
 				}
 			} catch (error) {
-				console.error('Error fetching user session:', error);
+				console.error("Error fetching user session:", error);
 			}
 		};
 
 		getUser();
-	}, []);
+	}, [form.setValue]);
 
 	async function onSubmit(data: z.infer<typeof formSchema>) {
 		try {
@@ -130,11 +132,7 @@ export default function ContactPage() {
 								</FormItem>
 							)}
 						/>
-						<Button
-							type="submit"
-							className="w-full"
-							disabled={form.formState.isSubmitting}
-						>
+						<Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
 							{form.formState.isSubmitting ? "Sending..." : "Send message"}
 						</Button>
 					</form>

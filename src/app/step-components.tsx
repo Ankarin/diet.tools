@@ -19,9 +19,19 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 const stepVariants = {
-	hidden: { opacity: 0, x: 50 },
-	visible: { opacity: 1, x: 0 },
-	exit: { opacity: 0, x: -50 },
+	hidden: { opacity: 0, x: 10, scale: 0.98 },
+	visible: {
+		opacity: 1,
+		x: 0,
+		scale: 1,
+		transition: {
+			type: "spring",
+			stiffness: 300,
+			damping: 30,
+			mass: 0.5,
+		},
+	},
+	exit: { opacity: 0, x: -10, scale: 0.98 },
 };
 
 interface StepProps {
@@ -39,10 +49,16 @@ function Step({ title, children }: StepProps) {
 			animate="visible"
 			exit="exit"
 			transition={{
-				duration: 0.6,
-				ease: [0.32, 0.72, 0, 1],
+				type: "spring",
+				stiffness: 300,
+				damping: 30,
+				mass: 0.5,
 			}}
 			className="w-full max-w-2xl mx-auto"
+			style={{
+				willChange: "transform",
+				backfaceVisibility: "hidden",
+			}}
 		>
 			<div className="flex items-center mb-6 relative">
 				{currentStep > 1 && (
@@ -60,6 +76,42 @@ function Step({ title, children }: StepProps) {
 			</div>
 			{children}
 		</motion.div>
+	);
+}
+
+function NumericInput({
+	value,
+	onChange,
+	placeholder,
+	className = "",
+	min,
+	max,
+	...props
+}: {
+	value: string | number;
+	onChange: (value: string) => void;
+	placeholder?: string;
+	className?: string;
+	min?: number;
+	max?: number;
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">) {
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const newValue = e.target.value.replace(/[^0-9]/g, "");
+		const cleanValue = newValue === "" ? "" : String(parseInt(newValue, 10));
+		onChange(cleanValue);
+	};
+
+	return (
+		<Input
+			{...props}
+			type="text"
+			inputMode="numeric"
+			pattern="[0-9]*"
+			value={value}
+			onChange={handleChange}
+			placeholder={placeholder}
+			className={cn("text-center", className)}
+		/>
 	);
 }
 
@@ -135,19 +187,11 @@ export function AgeStep() {
 						render={({ field }) => (
 							<FormItem>
 								<FormControl>
-									<Input
+									<NumericInput
 										{...field}
-										type="text"
-										inputMode="numeric"
-										pattern="\d*"
 										placeholder="Enter your age"
 										className="text-center text-lg"
 										autoFocus
-										onChange={(e) => {
-											const value = e.target.value.replace(/\D/g, '');
-											e.target.value = value;
-											field.onChange(value);
-										}}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -312,18 +356,10 @@ export function MeasurementsStep() {
 								render={({ field }) => (
 									<FormItem>
 										<FormControl>
-											<Input
+											<NumericInput
 												{...field}
-												type="text"
-												inputMode="numeric"
-												pattern="\d*"
 												placeholder="Enter your height in cm"
 												className="text-center text-lg"
-												onChange={(e) => {
-													const value = e.target.value.replace(/\D/g, '');
-													e.target.value = value;
-													field.onChange(value);
-												}}
 											/>
 										</FormControl>
 										<FormMessage />
@@ -340,18 +376,10 @@ export function MeasurementsStep() {
 									render={({ field }) => (
 										<FormItem className="flex-1">
 											<FormControl>
-												<Input
+												<NumericInput
 													{...field}
-													type="text"
-													inputMode="numeric"
-													pattern="\d*"
 													placeholder="Feet"
 													className="text-center text-lg"
-													onChange={(e) => {
-														const value = e.target.value.replace(/\D/g, '');
-														e.target.value = value;
-														field.onChange(value);
-													}}
 												/>
 											</FormControl>
 											<FormMessage />
@@ -364,18 +392,10 @@ export function MeasurementsStep() {
 									render={({ field }) => (
 										<FormItem className="flex-1">
 											<FormControl>
-												<Input
+												<NumericInput
 													{...field}
-													type="text"
-													inputMode="numeric"
-													pattern="\d*"
 													placeholder="Inches"
 													className="text-center text-lg"
-													onChange={(e) => {
-														const value = e.target.value.replace(/\D/g, '');
-														e.target.value = value;
-														field.onChange(value);
-													}}
 												/>
 											</FormControl>
 											<FormMessage />
@@ -396,18 +416,10 @@ export function MeasurementsStep() {
 							render={({ field }) => (
 								<FormItem>
 									<FormControl>
-										<Input
+										<NumericInput
 											{...field}
-											type="text"
-											inputMode="numeric"
-											pattern="\d*"
 											placeholder={`Enter your weight in ${unit === "metric" ? "kg" : "lbs"}`}
 											className="text-center text-lg"
-											onChange={(e) => {
-												const value = e.target.value.replace(/\D/g, '');
-												e.target.value = value;
-												field.onChange(value);
-											}}
 										/>
 									</FormControl>
 									<FormMessage />

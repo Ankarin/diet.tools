@@ -76,7 +76,17 @@ export default function DailyExample() {
 	const totalMacros = mealPlan?.meals
 		? Object.values(mealPlan.meals).reduce(
 				(acc, meal) => {
-					if (meal?.items) {
+					if (Array.isArray(meal)) {
+						meal.forEach(singleMeal => {
+							if (singleMeal?.items) {
+								for (const item of singleMeal.items) {
+									acc.protein += item.protein || 0;
+									acc.carbs += item.carbs || 0;
+									acc.fats += item.fats || 0;
+								}
+							}
+						});
+					} else if (meal?.items) {
 						for (const item of meal.items) {
 							acc.protein += item.protein || 0;
 							acc.carbs += item.carbs || 0;
