@@ -28,75 +28,77 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import supabase from "@/supabase/client";
 
-const formSchema = z.object({
-	gender: z.enum(["male", "female"], { required_error: "Gender is required" }),
-	age: z.string().refine(
-		(val) => {
-			const num = Number.parseInt(val, 10);
-			return !isNaN(num) && num >= 1 && num <= 120;
+const formSchema = z
+	.object({
+		gender: z.enum(["male", "female"], { required_error: "Gender is required" }),
+		age: z.string().refine(
+			(val) => {
+				const num = Number.parseInt(val, 10);
+				return !isNaN(num) && num >= 1 && num <= 120;
+			},
+			{ message: "Age must be between 1 and 120" },
+		),
+		unit: z.enum(["metric", "imperial"]),
+		height: z.string().refine(
+			(val) => {
+				if (!val) return true; // Allow empty for imperial
+				const num = Number.parseFloat(val);
+				return !Number.isNaN(num) && num > 0 && num < 300;
+			},
+			{ message: "Height must be a valid number between 0 and 300 cm" },
+		),
+		heightFeet: z.string().refine(
+			(val) => {
+				if (!val) return true; // Allow empty for metric
+				const num = Number.parseInt(val, 10);
+				return !Number.isNaN(num) && num >= 1 && num <= 9;
+			},
+			{ message: "Feet must be between 1 and 9" },
+		),
+		heightInches: z.string().refine(
+			(val) => {
+				if (!val) return true; // Allow empty for metric
+				const num = Number.parseInt(val, 10);
+				return !Number.isNaN(num) && num >= 0 && num <= 11;
+			},
+			{ message: "Inches must be between 0 and 11" },
+		),
+		weight: z.string().refine(
+			(val) => {
+				const num = Number.parseFloat(val);
+				return !Number.isNaN(num) && num > 0;
+			},
+			{ message: "Weight must be a positive number" },
+		),
+		goals: z.enum(["lose", "maintain", "gain"], { required_error: "Goal is required" }),
+		activity: z.enum(["sedentary", "light", "moderate", "very", "extra"], {
+			required_error: "Activity level is required",
+		}),
+		medicalConditions: z.string().max(1000, {
+			message: "Medical conditions should be 1000 characters or less",
+		}),
+		dietaryRestrictions: z.string().max(1000, {
+			message: "Dietary restrictions should be 1000 characters or less",
+		}),
+		foodPreferences: z.string().max(1000, {
+			message: "Food preferences should be 1000 characters or less",
+		}),
+		dietaryApproach: z.string().max(1000, {
+			message: "Dietary approach should be 1000 characters or less",
+		}),
+	})
+	.refine(
+		(data) => {
+			if (data.unit === "metric") {
+				return !!data.height; // Metric height must be filled
+			}
+			return !!data.heightFeet && !!data.heightInches;
 		},
-		{ message: "Age must be between 1 and 120" },
-	),
-	unit: z.enum(["metric", "imperial"]),
-	height: z.string().refine(
-		(val) => {
-			if (!val) return true; // Allow empty for imperial
-			const num = Number.parseFloat(val);
-			return !Number.isNaN(num) && num > 0 && num < 300;
+		{
+			message: "Please enter both feet and inches",
+			path: ["heightInches"], // Show error on the inches field
 		},
-		{ message: "Height must be a valid number between 0 and 300 cm" },
-	),
-	heightFeet: z.string().refine(
-		(val) => {
-			if (!val) return true; // Allow empty for metric
-			const num = Number.parseInt(val, 10);
-			return !Number.isNaN(num) && num >= 1 && num <= 9;
-		},
-		{ message: "Feet must be between 1 and 9" },
-	),
-	heightInches: z.string().refine(
-		(val) => {
-			if (!val) return true; // Allow empty for metric
-			const num = Number.parseInt(val, 10);
-			return !Number.isNaN(num) && num >= 0 && num <= 11;
-		},
-		{ message: "Inches must be between 0 and 11" },
-	),
-	weight: z.string().refine(
-		(val) => {
-			const num = Number.parseFloat(val);
-			return !Number.isNaN(num) && num > 0;
-		},
-		{ message: "Weight must be a positive number" },
-	),
-	goals: z.enum(["lose", "maintain", "gain"], { required_error: "Goal is required" }),
-	activity: z.enum(["sedentary", "light", "moderate", "very", "extra"], {
-		required_error: "Activity level is required",
-	}),
-	medicalConditions: z.string().max(1000, {
-		message: "Medical conditions should be 1000 characters or less",
-	}),
-	dietaryRestrictions: z.string().max(1000, {
-		message: "Dietary restrictions should be 1000 characters or less",
-	}),
-	foodPreferences: z.string().max(1000, {
-		message: "Food preferences should be 1000 characters or less",
-	}),
-	dietaryApproach: z.string().max(1000, {
-		message: "Dietary approach should be 1000 characters or less",
-	}),
-}).refine(
-	(data) => {
-		if (data.unit === "metric") {
-			return !!data.height; // Metric height must be filled
-		}
-		return !!data.heightFeet && !!data.heightInches;
-	},
-	{
-		message: "Please enter both feet and inches",
-		path: ["heightInches"], // Show error on the inches field
-	},
-);
+	);
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -188,7 +190,7 @@ export default function UserForm() {
 		};
 
 		fetchUserData();
-	}, [form, toast]);
+	}, []); // Empty dependency array to run only once on mount
 
 	const router = useRouter();
 
@@ -272,7 +274,7 @@ export default function UserForm() {
 							description: "Please check the form for errors",
 							variant: "destructive",
 						});
-					}
+					},
 				)}
 				className="space-y-8"
 			>
