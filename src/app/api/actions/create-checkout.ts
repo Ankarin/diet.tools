@@ -31,6 +31,9 @@ export const createCheckoutSession = actionClient
 				success_url: `${process.env.NEXT_PUBLIC_URL}/success`,
 				cancel_url: `${process.env.NEXT_PUBLIC_URL}/me`,
 				allow_promotion_codes: true,
+				subscription_data: {
+					trial_period_days: 7,
+				},
 			});
 
 			return { sessionId: session.id };

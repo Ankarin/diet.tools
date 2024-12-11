@@ -32,7 +32,7 @@ export function SubscribeButton() {
 
 	return (
 		<RainbowButton className="w-full" onClick={handleSubscribe} disabled={isLoading}>
-			{isLoading ? "Processing..." : "Subscribe Now"}
+			{isLoading ? "Processing..." : "Start Free"}
 		</RainbowButton>
 	);
 }

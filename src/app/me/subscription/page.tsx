@@ -10,6 +10,10 @@ import {
 	Clock,
 	Star,
 	CheckCircle2,
+	UserCircle,
+	LineChart,
+	CalendarDays,
+	ShoppingCart,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -30,23 +34,23 @@ const features = [
 			"Receive detailed recipes with ingredients and instructions, perfectly matched to your dietary requirements",
 	},
 	{
-		icon: Target,
+		icon: UserCircle,
 		title: "Personalized Nutrition",
 		description:
 			"Plans adapted to your body metrics, goals, dietary restrictions, and food preferences",
 	},
 	{
-		icon: BarChart3,
+		icon: LineChart,
 		title: "Nutritional Analysis",
 		description: "Get detailed calorie and macro breakdowns for every meal in your plan",
 	},
 	{
-		icon: Clock,
+		icon: CalendarDays,
 		title: "Weekly Planning",
 		description: "Access comprehensive weekly meal plans to streamline your nutrition journey",
 	},
 	{
-		icon: Sparkles,
+		icon: ShoppingCart,
 		title: "Shopping Lists",
 		description: "Get organized shopping lists with all ingredients needed for your meal plans",
 	},
@@ -109,11 +113,10 @@ export default function SubscribePage() {
 					className="text-center w-full"
 				>
 					<h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">
-						Diet Plan
+						AI Diet Planner
 					</h1>
-					<p className="mt-4 sm:mt-6 text-lg sm:text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto px-2">
-						Join thousands of happy customers who have transformed their lives with our AI-powered
-						personalized nutrition platform.
+					<p className="mt-6 text-lg sm:text-2xl text-gray-600 max-w-3xl mx-auto px-2">
+						Start your journey to better health today with our AI-powered nutrition platform.
 					</p>
 				</motion.div>
 
@@ -125,56 +128,48 @@ export default function SubscribePage() {
 					className="mt-8 sm:mt-12 w-full max-w-md mx-auto px-2"
 				>
 					<div className="relative">
-						<div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/60 rounded-2xl blur opacity-25" />
 						<div className="relative bg-white rounded-xl shadow-xl overflow-hidden">
 							<div className="px-4 py-6 sm:p-10 sm:pb-6">
-								<div className="flex justify-center">
-									<span className="inline-flex px-4 py-1 rounded-full text-sm font-semibold tracking-wide uppercase bg-primary/10 text-primary">
-										Limited Time Offer
-									</span>
-								</div>
-								<div className="mt-4 flex flex-col items-center">
-									<div className="text-gray-400 text-lg mb-1">
-										<span className="line-through">$15/month</span>
+								<div className="flex flex-col items-center gap-6">
+									<h2 className="text-3xl font-bold">7 Days Free</h2>
+									<div className="space-y-2">
+										<p className="text-lg text-gray-900 font-medium text-center">
+											Everything Included:
+										</p>
+										<div className="flex flex-col gap-3 text-gray-600">
+											<div className="flex items-center gap-2">
+												<CheckCircle2 className="h-5 w-5 text-primary" />
+												<span>AI-Powered Meal Plans.</span>
+											</div>
+											<div className="flex items-center gap-2">
+												<CheckCircle2 className="h-5 w-5 text-primary" />
+												<span>Smart Recipe Generation.</span>
+											</div>
+											<div className="flex items-center gap-2">
+												<CheckCircle2 className="h-5 w-5 text-primary" />
+												<span>Personalized Nutrition.</span>
+											</div>
+											<div className="flex items-center gap-2">
+												<CheckCircle2 className="h-5 w-5 text-primary" />
+												<span>Nutritional Analysis.</span>
+											</div>
+											<div className="flex items-center gap-2">
+												<CheckCircle2 className="h-5 w-5 text-primary" />
+												<span>Weekly Planning.</span>
+											</div>
+											<div className="flex items-center gap-2">
+												<CheckCircle2 className="h-5 w-5 text-primary" />
+												<span>Shopping Lists.</span>
+											</div>
+										</div>
 									</div>
-									<div className="flex justify-center items-baseline text-6xl font-extrabold">
-										<span className="text-gray-900">$10</span>
-										<span className="ml-1 text-2xl text-gray-500">/month</span>
+									<div className="w-full">
+										<SubscribeButton />
+										<div className="mt-4 flex flex-col items-center gap-2 text-gray-600">
+											<div className="text-base">$9/month after free period</div>
+											<div className="text-base">Cancel anytime</div>
+										</div>
 									</div>
-								</div>
-								<p className="mt-4 text-center text-gray-500">
-									Cancel anytime • No commitment required
-								</p>
-							</div>
-							<div className="px-6 pt-6 pb-8 bg-gray-50 sm:px-10 sm:py-10">
-								<div className="flex flex-col gap-4 text-gray-600">
-									<div className="flex items-center gap-2">
-										<CheckCircle2 className="h-5 w-5 text-primary" />
-										<span>Unlimited AI-generated meal plans</span>
-									</div>
-									<div className="flex items-center gap-2">
-										<CheckCircle2 className="h-5 w-5 text-primary" />
-										<span>Daily and weekly meal planning</span>
-									</div>
-									<div className="flex items-center gap-2">
-										<CheckCircle2 className="h-5 w-5 text-primary" />
-										<span>Personalized nutrition and recipes</span>
-									</div>
-									<div className="flex items-center gap-2">
-										<CheckCircle2 className="h-5 w-5 text-primary" />
-										<span>Detailed macro breakdowns</span>
-									</div>
-									<div className="flex items-center gap-2">
-										<CheckCircle2 className="h-5 w-5 text-primary" />
-										<span>Smart shopping lists</span>
-									</div>
-									<div className="flex items-center gap-2">
-										<CheckCircle2 className="h-5 w-5 text-primary" />
-										<span>Recipe instructions and tips</span>
-									</div>
-								</div>
-								<div className="mt-8">
-									<SubscribeButton />
 								</div>
 							</div>
 						</div>
@@ -186,25 +181,23 @@ export default function SubscribePage() {
 					variants={container}
 					initial="hidden"
 					animate="show"
-					className="mt-8 sm:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-2 sm:px-0"
+					className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none"
 				>
-					{features.map((feature, index) => (
-						<motion.div
-							key={index}
-							variants={item}
-							className="relative bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
-						>
-							<div className="flex items-start gap-4">
-								<div className="flex-shrink-0">
-									<feature.icon className="h-6 w-6 text-primary" />
-								</div>
-								<div>
-									<h3 className="text-lg font-semibold text-gray-900">{feature.title}</h3>
-									<p className="mt-2 text-sm text-gray-600">{feature.description}</p>
-								</div>
-							</div>
-						</motion.div>
-					))}
+					<dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+						{features.map((feature, index) => (
+							<motion.div key={index} variants={item} className="flex flex-col">
+								<dt className="text-base font-semibold leading-7 text-gray-900">
+									<div className="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+										<feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
+									</div>
+									{feature.title}
+								</dt>
+								<dd className="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
+									<p className="flex-auto">{feature.description}</p>
+								</dd>
+							</motion.div>
+						))}
+					</dl>
 				</motion.div>
 
 				{/* Testimonials */}
@@ -254,9 +247,7 @@ export default function SubscribePage() {
 					className="mt-24 text-center"
 				>
 					<h2 className="text-3xl font-bold text-gray-900">Ready to Transform Your Diet?</h2>
-					<p className="mt-4 text-xl text-gray-600">
-						Join now and get your first personalized meal plan in minutes.
-					</p>
+					<p className="mt-4 text-xl text-gray-600">Join now and transform your body.</p>
 					<div className="mt-8">
 						<SubscribeButton />
 					</div>

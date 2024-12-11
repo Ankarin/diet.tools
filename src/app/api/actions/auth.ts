@@ -3,6 +3,7 @@
 import { createClient } from "@/supabase/server";
 import { redirect } from "next/navigation";
 import { FormData } from "@/store";
+import { Resend } from "resend";
 
 export async function login({
 	email,
@@ -62,6 +63,37 @@ export async function signup({
 			return { error: profileError.message };
 		}
 	}
+
+	const resend = new Resend(process.env.RESEND_API_KEY);
+	resend.emails.send({
+		from: "AI Diet Planner <hello@diet.tools>",
+		to: "ankarn41k@gmail.com",
+		subject: `New Signup: ${email}`,
+		text: `New User Signup Details:
+--------------------------
+Email: ${email}
+
+Profile Information:
+------------------
+Gender: ${form.gender || "Not specified"}
+Age: ${form.age || "Not specified"}
+Height: ${form.unit === "metric" ? `${form.height} cm` : `${form.heightFeet}'${form.heightInches}"`}
+Weight: ${form.weight}${form.unit === "metric" ? " kg" : " lbs"}
+
+Goals & Activity:
+---------------
+Fitness Goal: ${form.goals || "Not specified"}
+Activity Level: ${form.activity || "Not specified"}
+
+Health & Preferences:
+------------------
+Medical Conditions: ${form.medicalConditions || "None specified"}
+Dietary Restrictions: ${form.dietaryRestrictions || "None specified"}
+Food Preferences: ${form.foodPreferences || "None specified"}
+Dietary Approach: ${form.dietaryApproach || "Not specified"}
+
+Signup Time: ${new Date().toISOString()}`,
+	});
 
 	redirect("/me");
 }
