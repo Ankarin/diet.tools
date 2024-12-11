@@ -4,7 +4,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Card, CardHeader } from "@/components/ui/card";
 import { CheckIcon } from "@radix-ui/react-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import RainbowButton from "@/components/ui/rainbow-button";
@@ -251,16 +251,7 @@ const createWeightSchema = (isMetric: boolean) =>
 
 export function MeasurementsStep() {
 	const { formData, updateFormData } = useFormStore();
-	const [unit, setUnit] = useState<"metric" | "imperial">("metric");
-
-	useEffect(() => {
-		// Set metric as default unit in form data when component mounts
-		if (!formData.unit) {
-			updateFormData("unit", "metric");
-		} else {
-			setUnit(formData.unit);
-		}
-	}, [formData.unit, updateFormData]);
+	const [unit, setUnit] = useState<"metric" | "imperial">(formData.unit || "metric");
 
 	const metricHeightForm = useForm<z.infer<typeof metricHeightSchema>>({
 		resolver: zodResolver(metricHeightSchema),
@@ -275,7 +266,7 @@ export function MeasurementsStep() {
 		},
 	});
 
-	const weightSchema = createWeightSchema(unit === "metric");
+	const weightSchema = useMemo(() => createWeightSchema(unit === "metric"), [unit]);
 	const weightForm = useForm<z.infer<typeof weightSchema>>({
 		resolver: zodResolver(weightSchema),
 		defaultValues: {
@@ -283,31 +274,36 @@ export function MeasurementsStep() {
 		},
 	});
 
+	// Initialize form data and trigger validation
 	useEffect(() => {
-		// Trigger validation for the forms when component mounts with preloaded data
-		if (unit === "metric") {
-			if (formData.height) metricHeightForm.trigger();
-			if (formData.weight) weightForm.trigger();
-		} else {
-			if (formData.heightFeet || formData.heightInches) imperialHeightForm.trigger();
-			if (formData.weight) weightForm.trigger();
+		if (!formData.unit) {
+			updateFormData("unit", "metric");
 		}
-	}, [formData, unit, metricHeightForm, imperialHeightForm, weightForm]);
+		
+		const currentForm = unit === "metric" ? metricHeightForm : imperialHeightForm;
+		const hasHeight = unit === "metric" ? formData.height : (formData.heightFeet || formData.heightInches);
+		
+		if (hasHeight) {
+			currentForm.trigger();
+		}
+		if (formData.weight) {
+			weightForm.trigger();
+		}
+	}, []);
 
-	const handleUnitSelection = (selectedUnit: "metric" | "imperial") => {
+	const handleUnitSelection = useCallback((selectedUnit: "metric" | "imperial") => {
 		setUnit(selectedUnit);
 		updateFormData("unit", selectedUnit);
-		// Reset forms when changing units
 		if (selectedUnit === "metric") {
 			metricHeightForm.reset();
-			weightForm.reset();
 		} else {
 			imperialHeightForm.reset();
-			weightForm.reset();
 		}
-	};
+		weightForm.reset();
+	}, [metricHeightForm, imperialHeightForm, weightForm, updateFormData]);
+
 	const router = useRouter();
-	const handleSubmit = () => {
+	const handleSubmit = useCallback(() => {
 		if (unit === "metric") {
 			const heightData = metricHeightForm.getValues();
 			updateFormData("height", heightData.height);
@@ -319,14 +315,12 @@ export function MeasurementsStep() {
 		const weightData = weightForm.getValues();
 		updateFormData("weight", weightData.weight);
 		router.replace("4");
-	};
+	}, [unit, metricHeightForm, imperialHeightForm, weightForm, updateFormData, router]);
 
-	const isValid = () => {
-		if (unit === "metric") {
-			return metricHeightForm.formState.isValid && weightForm.formState.isValid;
-		}
-		return imperialHeightForm.formState.isValid && weightForm.formState.isValid;
-	};
+	const isValid = useCallback(() => {
+		const currentHeightForm = unit === "metric" ? metricHeightForm : imperialHeightForm;
+		return currentHeightForm.formState.isValid && weightForm.formState.isValid;
+	}, [unit, metricHeightForm, imperialHeightForm, weightForm]);
 
 	return (
 		<Step title="Your Measurements">
