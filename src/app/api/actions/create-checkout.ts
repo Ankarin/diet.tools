@@ -1,11 +1,12 @@
 "use server";
 
 import { actionClient } from "@/lib/actions";
+import { Resend } from "resend";
 import Stripe from "stripe";
 import { z } from "zod";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
+const resend = new Resend(process.env.RESEND_API_KEY);
 const checkoutSchema = z.object({
 	priceId: z.string(),
 });
@@ -17,6 +18,13 @@ export const createCheckoutSession = actionClient
 			const { priceId } = parsedInput;
 
 			const user = ctx.user;
+
+			resend.emails.send({
+				from: "AI Diet Planner <hello@diet.tools>",
+				to: "ankarn41k@gmail.com",
+				subject: `Checkout started by: ${user.email}`,
+				text: `Checkout started by: ${user.email}`,
+			});
 
 			const session = await stripe.checkout.sessions.create({
 				customer_email: user.email,
